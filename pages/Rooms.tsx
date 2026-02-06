@@ -128,8 +128,8 @@ const Rooms: React.FC = () => {
 
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-black leading-tight tracking-tight font-serif mb-2 text-charcoal">Our Rooms</h1>
-            <p className="text-gray-500 text-base max-w-2xl">
+            <h1 className="text-2xl md:text-4xl font-black leading-tight tracking-tight font-serif mb-2 text-charcoal">Our Rooms</h1>
+            <p className="text-gray-500 text-sm md:text-base max-w-2xl">
               Enjoy your stay in one of our {rooms.length} beautiful rooms and suites.
             </p>
           </div>
@@ -253,7 +253,7 @@ const Rooms: React.FC = () => {
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">{room.category}</p>
-                          <h3 className="text-2xl font-black font-serif group-hover:text-primary transition-colors">{room.name}</h3>
+                          <h3 className="text-xl md:text-2xl font-black font-serif group-hover:text-primary transition-colors">{room.name}</h3>
                         </div>
                         <div className="flex flex-col items-end">
                           <div className="flex items-center text-gold text-sm font-black">
@@ -280,9 +280,9 @@ const Rooms: React.FC = () => {
                       <div className="mt-auto flex items-center justify-between pt-4">
                         <div>
                           <p className="text-gray-400 text-[9px] uppercase font-black tracking-[0.2em]">Nightly rate</p>
-                          <p className="text-3xl font-black text-charcoal font-serif">GH₵{room.price}<span className="text-sm font-normal text-gray-400">.00</span></p>
+                          <p className="text-2xl md:text-3xl font-black text-charcoal font-serif">GH₵{room.price}<span className="text-sm font-normal text-gray-400">.00</span></p>
                         </div>
-                        <Link to={`/checkout?room=${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.15em] text-xs">
+                        <Link to={`/checkout?room=${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.15em] text-xs">
                           Book Now
                         </Link>
                       </div>
@@ -297,10 +297,10 @@ const Rooms: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <h2 className="text-3xl font-black font-serif mb-4">No Rooms Match Your Criteria</h2>
+                <h2 className="text-2xl md:text-3xl font-black font-serif mb-4">No Rooms Match Your Criteria</h2>
                 <button
                   onClick={clearFilters}
-                  className="bg-charcoal text-white font-black px-10 py-4 rounded-xl hover:bg-primary transition-all uppercase tracking-widest text-xs"
+                  className="bg-charcoal text-white font-black px-6 md:px-10 py-3 md:py-4 rounded-xl hover:bg-primary transition-all uppercase tracking-widest text-xs"
                 >
                   Clear All Filters
                 </button>

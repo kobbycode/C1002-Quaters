@@ -55,10 +55,10 @@ const Contact: React.FC = () => {
           <div>
             <div className="mb-10">
               <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Visit Us</span>
-              <h1 className="text-5xl font-black font-serif mb-6 leading-tight text-charcoal">
+              <h1 className="text-3xl md:text-5xl font-black font-serif mb-4 md:mb-6 leading-tight text-charcoal">
                 {formatLuxuryText(contactPage.heroTitle)}
               </h1>
-              <p className="text-gray-600 text-lg mb-10 font-light leading-relaxed">
+              <p className="text-gray-600 text-sm md:text-lg mb-6 md:mb-10 font-light leading-relaxed">
                 {contactPage.heroDescription}
               </p>
             </div>
@@ -71,7 +71,7 @@ const Contact: React.FC = () => {
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gold">Our Location</p>
                 </div>
-                <p className="text-xl font-bold text-charcoal pl-12 group-hover:text-primary transition-colors">{config.footer.address}</p>
+                <p className="text-lg md:text-xl font-bold text-charcoal pl-12 group-hover:text-primary transition-colors">{config.footer.address}</p>
               </div>
 
               <div className="border-t border-gray-100 pt-10 pl-12">
@@ -79,7 +79,7 @@ const Contact: React.FC = () => {
                   <div className="flex flex-col gap-4 flex-1">
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-300 mb-3">Concierge 24/7</p>
-                      <a href={`tel:${config.footer.phone.replace(/\s/g, '')}`} className="text-xl font-black text-primary hover:text-[#6B006B] transition-colors flex items-center gap-2">
+                      <a href={`tel:${config.footer.phone.replace(/\s/g, '')}`} className="text-lg md:text-xl font-black text-primary hover:text-[#6B006B] transition-colors flex items-center gap-2">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                         {config.footer.phone}
                       </a>
@@ -109,7 +109,7 @@ const Contact: React.FC = () => {
             {!isSubmitted ? (
               <>
                 <div className="mb-10 relative z-10">
-                  <h3 className="text-3xl font-black font-serif mb-3 text-charcoal">Akwaaba!</h3>
+                  <h3 className="text-2xl md:text-3xl font-black font-serif mb-3 text-charcoal">Akwaaba!</h3>
                   <p className="text-gray-400 text-sm leading-relaxed">
                     Planning a stay or hosting an event? Share your details and our guest services team will reach out within one business day.
                   </p>
@@ -129,7 +129,7 @@ const Contact: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="relative w-full bg-charcoal hover:bg-primary text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-xs shadow-xl shadow-charcoal/20 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden group/btn"
+                    className="relative w-full bg-charcoal hover:bg-primary text-white font-black py-3 md:py-5 rounded-2xl uppercase tracking-[0.2em] text-xs shadow-xl shadow-charcoal/20 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden group/btn"
                   >
                     <div className={`flex items-center justify-center gap-3 transition-all duration-300`}>
                       {isSubmitting ? (

@@ -47,7 +47,7 @@ const Wishlist: React.FC = () => {
         <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-12">
           <div className="animate-fade-in">
             <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Your Saved Rooms</span>
-            <h1 className="text-5xl font-black font-serif text-charcoal mb-2">My Wishlist</h1>
+            <h1 className="text-3xl md:text-5xl font-black font-serif text-charcoal mb-2">My Wishlist</h1>
             <p className="text-gray-400 text-sm font-medium tracking-wide">
               {wishlistRooms.length === 0
                 ? "You haven't saved any rooms yet."
@@ -90,7 +90,7 @@ const Wishlist: React.FC = () => {
 
                 <div className="p-8 flex-1 flex flex-col">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-2xl font-black font-serif group-hover:text-primary transition-colors leading-tight">
+                    <h3 className="text-xl md:text-2xl font-black font-serif group-hover:text-primary transition-colors leading-tight">
                       {room.name}
                     </h3>
                     <div className="flex items-center text-gold text-xs font-black">
@@ -112,9 +112,9 @@ const Wishlist: React.FC = () => {
                   <div className="mt-auto flex items-center justify-between">
                     <div>
                       <p className="text-gray-400 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Nightly</p>
-                      <p className="text-2xl font-black text-charcoal font-serif">GH₵{room.price}</p>
+                      <p className="text-xl md:text-2xl font-black text-charcoal font-serif">GH₵{room.price}</p>
                     </div>
-                    <Link to={`/rooms/${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.2em] text-[10px]">
+                    <Link to={`/rooms/${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.2em] text-xs">
                       View Details
                     </Link>
                   </div>
@@ -129,13 +129,13 @@ const Wishlist: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </div>
-            <h2 className="text-4xl font-black font-serif mb-6 text-charcoal">No Saved Rooms Yet</h2>
-            <p className="text-gray-400 text-lg mb-12 max-w-lg mx-auto font-light leading-relaxed">
+            <h2 className="text-2xl md:text-4xl font-black font-serif mb-4 md:mb-6 text-charcoal">No Saved Rooms Yet</h2>
+            <p className="text-gray-400 text-sm md:text-lg mb-8 md:mb-12 max-w-lg mx-auto font-light leading-relaxed">
               Explore our beautiful rooms and save your favorites here to plan your perfect stay.
             </p>
             <Link
               to="/rooms"
-              className="inline-flex items-center justify-center bg-charcoal text-white font-black px-12 py-5 rounded-2xl hover:bg-primary transition-all shadow-2xl uppercase tracking-[0.2em] text-xs"
+              className="inline-flex items-center justify-center bg-charcoal text-white font-black px-6 md:px-12 py-3 md:py-5 rounded-2xl hover:bg-primary transition-all shadow-2xl uppercase tracking-[0.2em] text-xs"
             >
               Discover Our Rooms
             </Link>

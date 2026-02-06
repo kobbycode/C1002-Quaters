@@ -55,11 +55,11 @@ const Checkout: React.FC = () => {
         <div className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-10">
           <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
         </div>
-        <h1 className="text-5xl font-black font-serif mb-6 text-charcoal">Akwaaba Home!</h1>
-        <p className="text-gray-400 text-lg max-w-md mx-auto mb-12 font-light">
+        <h1 className="text-3xl md:text-5xl font-black font-serif mb-4 md:mb-6 text-charcoal">Akwaaba Home!</h1>
+        <p className="text-gray-400 text-sm md:text-lg max-w-md mx-auto mb-8 md:mb-12 font-light">
           Your reservation for the <span className="text-charcoal font-bold">{room.name}</span> has been confirmed. A concierge will reach out via email shortly to arrange your arrival.
         </p>
-        <Link to="/" className="bg-charcoal text-white font-black py-5 px-12 rounded-2xl uppercase tracking-[0.2em] text-xs shadow-2xl hover:bg-primary transition-all">
+        <Link to="/" className="bg-charcoal text-white font-black py-3 md:py-5 px-6 md:px-12 rounded-2xl uppercase tracking-[0.2em] text-xs shadow-2xl hover:bg-primary transition-all">
           Return Home
         </Link>
       </div>
@@ -72,7 +72,7 @@ const Checkout: React.FC = () => {
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
         <div className="mb-10 max-w-[960px] mx-auto text-center">
           <span className="text-gold text-[10px] font-black uppercase tracking-[0.4em] mb-4 block">Secure Payments</span>
-          <h1 className="text-4xl font-black font-serif mb-4 text-charcoal">Confirm Your Booking</h1>
+          <h1 className="text-2xl md:text-4xl font-black font-serif mb-4 text-charcoal">Confirm Your Booking</h1>
           <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4 max-w-xs mx-auto">
             <div className="bg-gold h-full" style={{ width: '85%' }} />
           </div>
@@ -84,7 +84,7 @@ const Checkout: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-10">
           <form onSubmit={handleBooking} className="flex-[2] space-y-8 animate-fade-in">
             <section className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40">
-              <h2 className="text-2xl font-black font-serif mb-10 text-charcoal">Your Details</h2>
+              <h2 className="text-xl md:text-2xl font-black font-serif mb-6 md:mb-10 text-charcoal">Your Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">First Name</label>
@@ -103,7 +103,7 @@ const Checkout: React.FC = () => {
 
             <section className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40">
               <div className="flex items-center justify-between mb-10">
-                <h2 className="text-2xl font-black font-serif text-charcoal">Secure Payment</h2>
+                <h2 className="text-xl md:text-2xl font-black font-serif text-charcoal">Secure Payment</h2>
                 <div className="flex gap-2">
                   <div className="w-10 h-6 bg-gray-100 rounded"></div>
                   <div className="w-10 h-6 bg-gray-100 rounded"></div>
@@ -130,7 +130,7 @@ const Checkout: React.FC = () => {
                 </div>
                 <button
                   disabled={isProcessing}
-                  className="relative w-full h-20 bg-primary text-white rounded-[1.25rem] font-black text-xs uppercase tracking-[0.3em] hover:bg-[#6B006B] transition-all shadow-2xl shadow-primary/30 flex items-center justify-center gap-4 overflow-hidden disabled:opacity-50"
+                  className="relative w-full h-14 md:h-20 bg-primary text-white rounded-[1.25rem] font-black text-xs uppercase tracking-[0.3em] hover:bg-[#6B006B] transition-all shadow-2xl shadow-primary/30 flex items-center justify-center gap-4 overflow-hidden disabled:opacity-50"
                 >
                   {isProcessing ? (
                     <>

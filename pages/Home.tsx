@@ -103,16 +103,16 @@ const Home: React.FC = () => {
                     </span>
                     <div className="h-px w-12 bg-white/50" />
                   </div>
-                  <h1 className="text-white text-6xl md:text-8xl font-serif mb-8 leading-[1.1] drop-shadow-2xl">
+                  <h1 className="text-white text-3xl md:text-6xl lg:text-8xl font-serif mb-6 md:mb-8 leading-[1.1] drop-shadow-2xl">
                     {formatLuxuryText(slide.title)}
                   </h1>
-                  <p className="text-white/80 text-lg md:text-xl font-light mb-12 tracking-wide max-w-2xl mx-auto leading-relaxed italic">
+                  <p className="text-white/80 text-sm md:text-lg lg:text-xl font-light mb-8 md:mb-12 tracking-wide max-w-2xl mx-auto leading-relaxed italic">
                     {slide.description}
                   </p>
-                  <div className="flex flex-wrap gap-6 justify-center">
+                  <div className="flex flex-wrap gap-4 md:gap-6 justify-center">
                     <Link
                       to="/rooms"
-                      className="h-16 px-12 flex items-center rounded-lg bg-white text-charcoal font-black text-[11px] hover:bg-gold hover:text-white transition-all shadow-2xl uppercase tracking-[0.2em]"
+                      className="h-12 md:h-16 px-6 md:px-12 flex items-center rounded-lg bg-white text-charcoal font-black text-xs md:text-[11px] hover:bg-gold hover:text-white transition-all shadow-2xl uppercase tracking-[0.2em]"
                     >
                       Explore The Suites
                     </Link>
@@ -171,7 +171,7 @@ const Home: React.FC = () => {
               </select>
             </div>
           </div>
-          <button type="submit" className="lg:w-auto h-16 lg:h-20 px-12 rounded-[1.25rem] bg-primary text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:bg-[#6B006B] transition-all active:scale-[0.98]">
+          <button type="submit" className="lg:w-auto h-12 md:h-16 lg:h-20 px-6 md:px-12 rounded-[1.25rem] bg-primary text-white font-black uppercase tracking-[0.2em] text-xs md:text-[11px] shadow-2xl hover:bg-[#6B006B] transition-all active:scale-[0.98]">
             Check Availability
           </button>
         </form>
@@ -183,13 +183,13 @@ const Home: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 animate-fade-in">
             <div className="max-w-2xl">
               <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">The Best Rooms</span>
-              <h2 className="text-5xl md:text-7xl font-serif text-charcoal leading-tight">
+              <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif text-charcoal leading-tight">
                 {formatLuxuryText("Suites of *Style*")}
               </h2>
             </div>
-            <Link to="/rooms" className="group flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-charcoal hover:text-gold transition-colors">
+            <Link to="/rooms" className="group flex items-center gap-3 md:gap-4 text-xs md:text-[11px] font-black uppercase tracking-widest text-charcoal hover:text-gold transition-colors">
               View All Rooms
-              <div className="w-12 h-px bg-charcoal group-hover:w-20 group-hover:bg-gold transition-all" />
+              <div className="w-8 md:w-12 h-px bg-charcoal group-hover:w-16 md:group-hover:w-20 group-hover:bg-gold transition-all" />
             </Link>
           </div>
 
@@ -201,7 +201,7 @@ const Home: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute bottom-10 left-10 right-10 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                     <p className="text-white text-sm font-light mb-6 leading-relaxed line-clamp-3 italic">"{room.description}"</p>
-                    <Link to={`/rooms/${room.id}`} className="bg-white text-charcoal px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-gold hover:text-white transition-colors">Quick View</Link>
+                    <Link to={`/rooms/${room.id}`} className="bg-white text-charcoal px-6 md:px-8 py-2 md:py-3 rounded-full text-xs md:text-[10px] font-black uppercase tracking-widest hover:bg-gold hover:text-white transition-colors">Quick View</Link>
                   </div>
                   <div className="absolute top-8 left-8">
                     <span className="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest text-charcoal shadow-lg border border-white/20">
@@ -211,8 +211,8 @@ const Home: React.FC = () => {
                 </div>
                 <div className="px-2">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-2xl font-black font-serif text-charcoal group-hover:text-gold transition-colors">{room.name}</h3>
-                    <p className="text-xl font-bold text-primary font-serif">GH₵{room.price}</p>
+                    <h3 className="text-xl md:text-2xl font-black font-serif text-charcoal group-hover:text-gold transition-colors">{room.name}</h3>
+                    <p className="text-lg md:text-xl font-bold text-primary font-serif">GH₵{room.price}</p>
                   </div>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{room.size} — {room.view}</p>
                 </div>
@@ -231,8 +231,8 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-24 max-w-3xl mx-auto">
             <span className="text-gold font-black uppercase tracking-[0.5em] text-[10px] mb-6 block">Our Welcome</span>
-            <h2 className="text-5xl md:text-6xl font-serif mb-8">{formatLuxuryText("The *Akwaaba* Style")}</h2>
-            <p className="text-white/60 text-lg font-light leading-relaxed">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif mb-6 md:mb-8">{formatLuxuryText("The *Akwaaba* Style")}</h2>
+            <p className="text-white/60 text-sm md:text-lg font-light leading-relaxed">
               We make sure your stay in Accra is perfect, with great service and a warm Ghanaian welcome.
             </p>
           </div>
@@ -283,8 +283,8 @@ const Home: React.FC = () => {
             <div className="flex flex-col gap-10">
               <div className="space-y-6">
                 <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px]">The Neighbourhood</span>
-                <h2 className="text-5xl md:text-6xl font-serif text-charcoal leading-tight">The Accra <br /><span className="italic">Style</span></h2>
-                <p className="text-gray-500 text-lg leading-relaxed font-light italic border-l-2 border-gold/30 pl-8 py-2">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-charcoal leading-tight">The Accra <br /><span className="italic">Style</span></h2>
+                <p className="text-gray-500 text-sm md:text-lg leading-relaxed font-light italic border-l-2 border-gold/30 pl-6 md:pl-8 py-2">
                   "Perfectly placed in the nice area of Spintex, {config.brand.name} is your home in Ghana's busy capital."
                 </p>
               </div>

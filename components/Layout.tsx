@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import Concierge from './Concierge';
@@ -12,6 +12,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isConciergeOpen, setIsConciergeOpen] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const location = useLocation();
   const isHome = location.pathname === '/';
@@ -51,6 +52,26 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      // Prevent body scroll when mobile menu is open
+      document.body.style.overflow = 'hidden';
+      // Reset window scroll position
+      window.scrollTo(0, 0);
+      // Reset mobile menu scroll position
+      if (mobileMenuRef.current) {
+        mobileMenuRef.current.scrollTop = 0;
+      }
+    } else {
+      // Restore body scroll when mobile menu is closed
+      document.body.style.overflow = '';
+    }
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,13 +136,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </Link>
             <Link
               to="/rooms"
-              className="hidden sm:flex min-w-[120px] items-center justify-center rounded-lg h-10 px-6 bg-primary text-white text-sm font-bold tracking-wide hover:bg-primary/90 transition-all shadow-md shadow-primary/20"
+              className="hidden sm:flex min-w-[100px] sm:min-w-[120px] items-center justify-center rounded-lg h-9 sm:h-10 px-4 sm:px-6 bg-primary text-white text-xs sm:text-sm font-bold tracking-wide hover:bg-primary/90 transition-all shadow-md shadow-primary/20"
             >
               Book Now
             </Link>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-black/5"
+              className="md:hidden p-2 rounded-lg hover:bg-black/5 relative z-[101]"
               aria-label="Toggle Mobile Menu"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,9 +152,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </div>
 
-        <div className={`fixed inset-0 z-50 bg-charcoal transition-transform duration-500 md:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-          <div className="flex flex-col h-full pt-32 px-10 pb-10 overflow-y-auto">
-            <nav className="flex flex-col gap-8">
+        <div className={`fixed top-0 left-0 w-screen h-screen z-[100] bg-charcoal transition-transform duration-500 md:hidden overscroll-contain ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div ref={mobileMenuRef} className="flex flex-col h-full pt-20 px-10 pb-10 overflow-y-auto overscroll-contain">
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="absolute top-6 right-6 p-2 text-white hover:text-primary transition-colors z-[101]"
+              aria-label="Close Mobile Menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <nav className="flex flex-col gap-6">
               {config.navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
@@ -141,7 +171,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     key={link.id}
                     to={link.path}
                     onClick={handleNavClick}
-                    className={`text-4xl font-serif transition-colors ${
+                    className={`text-2xl font-serif transition-colors ${
                       isActive 
                         ? 'text-primary' 
                         : 'text-white hover:text-primary'
@@ -154,7 +184,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <Link 
                 to="/wishlist" 
                 onClick={handleNavClick}
-                className={`text-4xl font-serif transition-colors ${
+                className={`text-2xl font-serif transition-colors ${
                   location.pathname === '/wishlist' 
                     ? 'text-primary' 
                     : 'text-white hover:text-primary'
@@ -173,7 +203,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       <main className="flex-1">{children}</main>
 
-      <div className="fixed bottom-8 right-8 z-[60] flex flex-col items-end gap-4">
+      <div className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[70] flex flex-col items-end gap-4 ${isMobileMenuOpen ? 'hidden' : ''}`}>
         <Concierge isOpen={isConciergeOpen} onClose={() => setIsConciergeOpen(false)} />
         {!isConciergeOpen && (
           <button
@@ -186,8 +216,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </div>
             <div className="relative">
               <div className="absolute inset-0 bg-primary rounded-full animate-pulse opacity-30"></div>
-              <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/40 relative z-10 transition-transform hover:scale-110 active:scale-95">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/40 relative z-10 transition-transform hover:scale-110 active:scale-95">
+                <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
               </div>
             </div>
           </button>
