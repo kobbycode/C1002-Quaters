@@ -1,0 +1,7 @@
+{
+  "name": "C1002 Quarters",
+  "description": "A high-end premium hotel and resort web application featuring luxury suite bookings, elite concierge services, and a seamless guest experience.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

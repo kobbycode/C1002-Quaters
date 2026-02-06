@@ -1,0 +1,331 @@
+
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useSite } from '../context/SiteContext';
+import SEO from '../components/SEO';
+import { formatLuxuryText } from '../utils/formatters';
+
+const Home: React.FC = () => {
+  const { config, rooms } = useSite();
+  const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const slides = config.heroSlides;
+  const featuredSuites = useMemo(() => rooms.slice(0, 3), [rooms]);
+
+  const today = new Date().toISOString().split('T')[0];
+  const threeDaysLater = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  const [booking, setBooking] = useState({
+    checkIn: today,
+    checkOut: threeDaysLater,
+    guests: '2 Adults'
+  });
+
+  const nextSlide = useCallback(() => {
+    if (isTransitioning || slides.length === 0) return;
+    setIsTransitioning(true);
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setTimeout(() => setIsTransitioning(false), 800);
+  }, [isTransitioning, slides.length]);
+
+  const prevSlide = useCallback(() => {
+    if (isTransitioning || slides.length === 0) return;
+    setIsTransitioning(true);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setTimeout(() => setIsTransitioning(false), 800);
+  }, [isTransitioning, slides.length]);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const timer = setInterval(nextSlide, 7000);
+    return () => clearInterval(timer);
+  }, [nextSlide, slides.length]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate(`/rooms?checkIn=${booking.checkIn}&checkOut=${booking.checkOut}&guests=${booking.guests}`);
+  };
+
+  const homeSchema = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "Hotel",
+    "name": config.brand.name,
+    "description": "Premium luxury hotel and suites located in Accra. Experience the finest Ghanaian hospitality.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": config.footer.address,
+      "addressLocality": "Accra",
+      "addressRegion": "Greater Accra",
+      "addressCountry": "GH"
+    },
+    "telephone": config.footer.phone,
+    "starRating": {
+      "@type": "Rating",
+      "ratingValue": "5"
+    },
+    "url": window.location.origin
+  }), [config]);
+
+  return (
+    <div className="flex flex-col bg-[#FDFDFD]">
+      <SEO
+        title="Luxury Suites in Accra"
+        description={`${config.brand.name} - ${config.brand.tagline}. Premium suites and authentic Ghanaian luxury.`}
+        schema={homeSchema}
+      />
+
+      {/* Hero Section */}
+      <section className="relative h-[90vh] min-h-[700px] w-full flex bg-charcoal overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          {slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out transform ${index === currentSlide
+                ? 'opacity-100 scale-100'
+                : 'opacity-0 scale-110 pointer-events-none'
+                }`}
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%), url("${slide.image}")`,
+                }}
+              />
+
+              <div className="relative h-full w-full flex flex-col items-center justify-center text-center px-6 z-10">
+                <div className={`max-w-5xl transition-all duration-1000 delay-300 ${index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                  <div className="flex items-center justify-center gap-4 mb-6">
+                    <div className="h-px w-12 bg-gold/50" />
+                    <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] md:text-xs">
+                      {slide.subtitle}
+                    </span>
+                    <div className="h-px w-12 bg-gold/50" />
+                  </div>
+                  <h1 className="text-white text-6xl md:text-8xl font-serif mb-8 leading-[1.1] drop-shadow-2xl">
+                    {formatLuxuryText(slide.title)}
+                  </h1>
+                  <p className="text-white/80 text-lg md:text-xl font-light mb-12 tracking-wide max-w-2xl mx-auto leading-relaxed italic">
+                    {slide.description}
+                  </p>
+                  <div className="flex flex-wrap gap-6 justify-center">
+                    <Link
+                      to="/rooms"
+                      className="h-16 px-12 flex items-center rounded-lg bg-white text-charcoal font-black text-[11px] hover:bg-gold hover:text-white transition-all shadow-2xl uppercase tracking-[0.2em]"
+                    >
+                      Explore The Suites
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {slides.length > 1 && (
+          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 z-20 px-10 hidden lg:flex justify-between pointer-events-none">
+            <button onClick={prevSlide} className="w-16 h-16 rounded-full border border-white/10 bg-black/5 backdrop-blur-md text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all pointer-events-auto group" aria-label="Previous Slide">
+              <svg className="w-6 h-6 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button onClick={nextSlide} className="w-16 h-16 rounded-full border border-white/10 bg-black/5 backdrop-blur-md text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all pointer-events-auto group" aria-label="Next Slide">
+              <svg className="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        )}
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-4 animate-bounce opacity-50">
+          <div className="w-px h-12 bg-white/30" />
+          <span className="text-[9px] font-black text-white uppercase tracking-[0.3em]">Scroll</span>
+        </div>
+      </section>
+
+      {/* Booking Bar - Integrated */}
+      <div className="relative z-30 -translate-y-1/2 px-6 md:px-10 lg:px-40">
+        <form onSubmit={handleSearch} className="bg-white rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] p-4 md:p-6 flex flex-col lg:flex-row items-stretch lg:items-center gap-4 w-full max-w-7xl mx-auto border border-gray-50 backdrop-blur-sm bg-white/95">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="px-6 py-4 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold mb-2 flex items-center gap-2">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                Arrival
+              </p>
+              <input type="date" value={booking.checkIn} onChange={(e) => setBooking({ ...booking, checkIn: e.target.value })} className="w-full border-none p-0 bg-transparent focus:ring-0 font-bold text-charcoal text-sm" aria-label="Check-in Date" />
+            </div>
+            <div className="px-6 py-4 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 md:border-l md:border-gray-100">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold mb-2 flex items-center gap-2">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                Departure
+              </p>
+              <input type="date" value={booking.checkOut} onChange={(e) => setBooking({ ...booking, checkOut: e.target.value })} className="w-full border-none p-0 bg-transparent focus:ring-0 font-bold text-charcoal text-sm" aria-label="Check-out Date" />
+            </div>
+            <div className="px-6 py-4 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 md:border-l md:border-gray-100">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold mb-2 flex items-center gap-2">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                Guests
+              </p>
+              <select value={booking.guests} onChange={(e) => setBooking({ ...booking, guests: e.target.value })} className="w-full border-none p-0 bg-transparent focus:ring-0 font-bold text-charcoal text-sm" aria-label="Number of Guests">
+                <option>2 Adults</option>
+                <option>1 Adult</option>
+                <option>Large Group</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" className="lg:w-auto h-16 lg:h-20 px-12 rounded-[1.25rem] bg-charcoal text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:bg-primary transition-all active:scale-[0.98]">
+            Check Availability
+          </button>
+        </form>
+      </div>
+
+      {/* Featured Collection Section */}
+      <section className="py-24 px-6 md:px-10 lg:px-40 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 animate-fade-in">
+            <div className="max-w-2xl">
+              <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">The Best Rooms</span>
+              <h2 className="text-5xl md:text-7xl font-serif text-charcoal leading-tight">
+                {formatLuxuryText("Suites of *Style*")}
+              </h2>
+            </div>
+            <Link to="/rooms" className="group flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-charcoal hover:text-gold transition-colors">
+              View All Rooms
+              <div className="w-12 h-px bg-charcoal group-hover:w-20 group-hover:bg-gold transition-all" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {featuredSuites.map((room, i) => (
+              <div key={room.id} className={`group animate-fade-in transition-all duration-700`} style={{ animationDelay: `${i * 200}ms` }}>
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] mb-8 shadow-xl group-hover:shadow-2xl transition-all">
+                  <img src={room.image} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt={room.name} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute bottom-10 left-10 right-10 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                    <p className="text-white text-sm font-light mb-6 leading-relaxed line-clamp-3 italic">"{room.description}"</p>
+                    <Link to={`/rooms/${room.id}`} className="bg-white text-charcoal px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-gold hover:text-white transition-colors">Quick View</Link>
+                  </div>
+                  <div className="absolute top-8 left-8">
+                    <span className="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest text-charcoal shadow-lg border border-white/20">
+                      {room.category}
+                    </span>
+                  </div>
+                </div>
+                <div className="px-2">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-2xl font-black font-serif text-charcoal group-hover:text-gold transition-colors">{room.name}</h3>
+                    <p className="text-xl font-bold text-primary font-serif">GH₵{room.price}</p>
+                  </div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{room.size} — {room.view}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* The Experience Section */}
+      <section className="py-32 px-6 md:px-10 lg:px-40 bg-charcoal text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
+          <svg className="w-full h-full" viewBox="0 0 100 100" fill="none"><circle cx="100" cy="0" r="100" stroke="white" strokeWidth="0.5" /></svg>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-24 max-w-3xl mx-auto">
+            <span className="text-gold font-black uppercase tracking-[0.5em] text-[10px] mb-6 block">Our Welcome</span>
+            <h2 className="text-5xl md:text-6xl font-serif mb-8">{formatLuxuryText("The *Akwaaba* Style")}</h2>
+            <p className="text-white/60 text-lg font-light leading-relaxed">
+              We make sure your stay in Accra is perfect, with great service and a warm Ghanaian welcome.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-16">
+            {[
+              {
+                title: "Butler Service",
+                desc: "Your own personal helper to make sure you have everything you need.",
+                icon: "👔"
+              },
+              {
+                title: "Great Food",
+                desc: "Enjoy traditional Ghanaian food made with fresh local ingredients.",
+                icon: "🥘"
+              },
+              {
+                title: "Quiet Spot",
+                desc: "Private gardens where you can relax and get away from the busy city.",
+                icon: "🌿"
+              }
+            ].map((exp, i) => (
+              <div key={i} className="group p-10 rounded-[3rem] border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-500 hover:-translate-y-4">
+                <div className="text-5xl mb-10 transform group-hover:scale-110 transition-transform duration-500 inline-block">{exp.icon}</div>
+                <h4 className="text-xl font-black font-serif mb-6 text-gold">{exp.title}</h4>
+                <p className="text-white/40 text-sm leading-relaxed font-medium">{exp.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Local Pulse Section */}
+      <section className="py-32 px-6 md:px-10 lg:px-40 bg-cream">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
+            <div className="relative group">
+              <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl relative">
+                <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400" className="w-full h-full object-cover transition-scale duration-[2000ms] group-hover:scale-105" alt="C1002 Quarters Exterior" />
+                <div className="absolute inset-0 bg-charcoal/20 group-hover:bg-transparent transition-colors duration-700" />
+              </div>
+              <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-gold rounded-[2rem] p-10 flex flex-col justify-center items-center text-center shadow-2xl animate-pulse delay-1000">
+                <p className="text-charcoal font-black text-3xl font-serif mb-2 italic">1957</p>
+                <p className="text-charcoal/60 text-[10px] font-black uppercase tracking-widest">Year of Vision</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-10">
+              <div className="space-y-6">
+                <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px]">The Neighbourhood</span>
+                <h2 className="text-5xl md:text-6xl font-serif text-charcoal leading-tight">The Accra <br /><span className="italic">Style</span></h2>
+                <p className="text-gray-500 text-lg leading-relaxed font-light italic border-l-2 border-gold/30 pl-8 py-2">
+                  "Perfectly placed in the nice area of Spintex, {config.brand.name} is your home in Ghana's busy capital."
+                </p>
+              </div>
+
+              <div className="space-y-8">
+                <div className="flex gap-6 items-start">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gold mt-2 shrink-0" />
+                  <div>
+                    <h5 className="font-bold text-charcoal mb-2">Artisanal Shopping</h5>
+                    <p className="text-gray-400 text-sm leading-relaxed">Moments from the finest textile and craft markets of Spintex.</p>
+                  </div>
+                </div>
+                <div className="flex gap-6 items-start">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gold mt-2 shrink-0" />
+                  <div>
+                    <h5 className="font-bold text-charcoal mb-2">Coastal Proximity</h5>
+                    <p className="text-gray-400 text-sm leading-relaxed">A short, luxury chauffeur drive to the golden sands of Labadi Beach.</p>
+                  </div>
+                </div>
+              </div>
+
+              <Link to="/about" className="w-fit bg-charcoal text-white px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-primary transition-all">
+                The Legacy Story
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social proof marquee simplified for code brevity but styled well */}
+      <section className="py-20 border-y border-gray-100">
+        <div className="flex flex-wrap justify-center gap-x-24 gap-y-10 items-center opacity-40 grayscale px-10">
+          <span className="text-2xl font-serif font-bold tracking-tighter">Condé Nast</span>
+          <span className="text-2xl font-serif font-bold tracking-tighter">Forbes Travel</span>
+          <span className="text-2xl font-serif font-bold tracking-tighter">VOGUE</span>
+          <span className="text-2xl font-serif font-bold tracking-tighter">Ghana Web</span>
+          <span className="text-2xl font-serif font-bold tracking-tighter">Luxury Retreats</span>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;
