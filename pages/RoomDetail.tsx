@@ -180,32 +180,68 @@ const RoomDetail: React.FC = () => {
     ? `https://wa.me/${whatsappNumber}?text=Hello%20C1002%20Quarters%2C%20I'm%20interested%20in%20booking%20the%20${encodeURIComponent(room.name)}.%20Can%20you%20help%20me%20with%20my%20reservation%3F`
     : `https://wa.me/${whatsappNumber}`;
 
-  const galleryImages: string[] = useMemo(() => room ? [
-    room.image,
-    `https://images.unsplash.com/photo-1590490359683-658d3d23f972?q=80&w=2000&auto=format&fit=crop`,
-    `https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2000&auto=format&fit=crop`,
-    `https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=2000&auto=format&fit=crop`,
-    `https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop`,
-    `https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=2000&auto=format&fit=crop`,
-    `https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2000&auto=format&fit=crop`,
-    `https://images.unsplash.com/photo-1540518614846-7eded433c457?q=80&w=2000&auto=format&fit=crop`,
-  ] : [], [room]);
+  const galleryImages: string[] = useMemo(() => {
+    if (!room) return [];
+    // Use room.images if available, otherwise use default gallery images
+    if (room.images && room.images.length > 0) {
+      return room.images;
+    }
+    // Fallback to default gallery with room.image as first image
+    // Always ensure we have at least the main image
+    const defaultImages = [
+      room.image,
+      `https://images.unsplash.com/photo-1590490359683-658d3d23f972?q=80&w=2000&auto=format&fit=crop`,
+      `https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2000&auto=format&fit=crop`,
+      `https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=2000&auto=format&fit=crop`,
+      `https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop`,
+      `https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=2000&auto=format&fit=crop`,
+      `https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2000&auto=format&fit=crop`,
+      `https://images.unsplash.com/photo-1540518614846-7eded433c457?q=80&w=2000&auto=format&fit=crop`,
+    ];
+    return defaultImages.filter(Boolean); // Remove any undefined/null values
+  }, [room]);
 
-  const handleNext = useCallback(() => setCurrentIndex((prev) => (prev + 1) % galleryImages.length), [galleryImages.length]);
-  const handlePrev = useCallback(() => setCurrentIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length), [galleryImages.length]);
+  const handleNext = useCallback(() => {
+    if (galleryImages.length === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
+  }, [galleryImages.length]);
+  
+  const handlePrev = useCallback(() => {
+    if (galleryImages.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  }, [galleryImages.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') handleNext();
-      if (e.key === 'ArrowLeft') handlePrev();
-      if (e.key === 'Escape' && isGalleryOpen) setIsGalleryOpen(false);
+      if (!isGalleryOpen) return;
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleNext();
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handlePrev();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setIsGalleryOpen(false);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleNext, handlePrev, isGalleryOpen]);
 
   useEffect(() => {
-    document.body.style.overflow = isGalleryOpen ? 'hidden' : 'unset';
+    if (isGalleryOpen) {
+      document.body.style.overflow = 'hidden';
+      // Reset to first image when opening gallery
+      setCurrentIndex(0);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isGalleryOpen]);
 
   const nights = useMemo(() => {
@@ -297,56 +333,64 @@ const RoomDetail: React.FC = () => {
               ))}
             </div>
 
-            <div className="absolute inset-y-0 left-0 flex items-center pl-6 opacity-0 group-hover/gallery:opacity-100 transition-opacity">
-              <button
-                onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all shadow-xl"
-                aria-label="Previous Image"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-              </button>
-            </div>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-6 opacity-0 group-hover/gallery:opacity-100 transition-opacity">
-              <button
-                onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all shadow-xl"
-                aria-label="Next Image"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </button>
-            </div>
+            {galleryImages.length > 1 && (
+              <>
+                <div className="absolute inset-y-0 left-0 flex items-center pl-4 md:pl-6 opacity-0 group-hover/gallery:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+                    className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all shadow-xl"
+                    aria-label="Previous Image"
+                  >
+                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                </div>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 md:pr-6 opacity-0 group-hover/gallery:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleNext(); }}
+                    className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all shadow-xl"
+                    aria-label="Next Image"
+                  >
+                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
+              </>
+            )}
 
-            <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between pointer-events-none">
-              <div className="flex items-center gap-4 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-                <span className="text-white text-[10px] font-black uppercase tracking-widest">{currentIndex + 1} / {galleryImages.length}</span>
-                <span className="w-px h-3 bg-white/20"></span>
-                <span className="text-gold text-[10px] font-black uppercase tracking-widest">Gallery Mode</span>
-              </div>
+            <div className="absolute bottom-4 md:bottom-6 left-4 md:left-6 right-4 md:right-6 flex items-center justify-between pointer-events-none">
+              {galleryImages.length > 1 && (
+                <div className="flex items-center gap-3 md:gap-4 bg-black/30 backdrop-blur-md px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-white/10">
+                  <span className="text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest">{currentIndex + 1} / {galleryImages.length}</span>
+                  <span className="w-px h-3 bg-white/20"></span>
+                  <span className="text-gold text-[9px] md:text-[10px] font-black uppercase tracking-widest">Gallery</span>
+                </div>
+              )}
               <button
                 onClick={(e) => { e.stopPropagation(); setIsGalleryOpen(true); }}
-                className="pointer-events-auto bg-white px-6 py-2.5 rounded-full text-charcoal text-[10px] font-black uppercase tracking-widest hover:bg-gold hover:text-white transition-all shadow-2xl"
+                className="pointer-events-auto bg-white px-4 md:px-6 py-2 md:py-2.5 rounded-full text-charcoal text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-gold hover:text-white transition-all shadow-2xl ml-auto"
               >
-                Expand View
+                {galleryImages.length > 1 ? 'Expand View' : 'View Image'}
               </button>
             </div>
           </div>
 
-          <div className="mt-6 flex justify-center gap-3 overflow-x-auto no-scrollbar pb-2">
-            {galleryImages.map((src, idx) => (
-              <button
-                onClick={() => setCurrentIndex(idx)}
-                key={idx}
-                className={`relative h-20 aspect-video rounded-xl overflow-hidden shrink-0 transition-all duration-300 border-2 ${currentIndex === idx ? 'border-gold scale-105 shadow-lg' : 'border-transparent opacity-40 hover:opacity-100'
-                  }`}
-                aria-label={`View Image ${idx + 1}`}
-              >
-                <img src={src} alt="Room thumbnail" className="w-full h-full object-cover" loading="lazy" />
-                {currentIndex === idx && (
-                  <div className="absolute inset-0 bg-gold/10" />
-                )}
-              </button>
-            ))}
-          </div>
+          {galleryImages.length > 1 && (
+            <div className="mt-6 flex justify-center gap-3 overflow-x-auto no-scrollbar pb-2">
+              {galleryImages.map((src, idx) => (
+                <button
+                  onClick={() => setCurrentIndex(idx)}
+                  key={idx}
+                  className={`relative h-20 aspect-video rounded-xl overflow-hidden shrink-0 transition-all duration-300 border-2 ${currentIndex === idx ? 'border-gold scale-105 shadow-lg' : 'border-transparent opacity-40 hover:opacity-100'
+                    }`}
+                  aria-label={`View Image ${idx + 1}`}
+                >
+                  <img src={src} alt="Room thumbnail" className="w-full h-full object-cover" loading="lazy" />
+                  {currentIndex === idx && (
+                    <div className="absolute inset-0 bg-gold/10" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-16">

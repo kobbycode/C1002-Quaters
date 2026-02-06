@@ -5,6 +5,7 @@ export interface Room {
   description: string;
   price: number;
   image: string;
+  images?: string[]; // Array of images for gallery view
   rating: number;
   reviewsCount: number;
   size: string;
