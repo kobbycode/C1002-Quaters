@@ -114,7 +114,7 @@ const Wishlist: React.FC = () => {
                       <p className="text-gray-400 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Nightly</p>
                       <p className="text-2xl font-black text-charcoal font-serif">GH₵{room.price}</p>
                     </div>
-                    <Link to={`/rooms/${room.id}`} className="bg-primary hover:bg-blue-600 text-white font-black py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.2em] text-[10px]">
+                    <Link to={`/rooms/${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.2em] text-[10px]">
                       View Details
                     </Link>
                   </div>

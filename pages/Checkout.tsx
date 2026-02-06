@@ -130,7 +130,7 @@ const Checkout: React.FC = () => {
                 </div>
                 <button
                   disabled={isProcessing}
-                  className="relative w-full h-20 bg-primary text-white rounded-[1.25rem] font-black text-xs uppercase tracking-[0.3em] hover:bg-blue-600 transition-all shadow-2xl shadow-primary/30 flex items-center justify-center gap-4 overflow-hidden disabled:opacity-50"
+                  className="relative w-full h-20 bg-primary text-white rounded-[1.25rem] font-black text-xs uppercase tracking-[0.3em] hover:bg-[#6B006B] transition-all shadow-2xl shadow-primary/30 flex items-center justify-center gap-4 overflow-hidden disabled:opacity-50"
                 >
                   {isProcessing ? (
                     <>

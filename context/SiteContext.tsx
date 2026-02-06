@@ -16,8 +16,8 @@ const DEFAULT_CONFIG: SiteConfig = {
   brand: {
     name: "C1002 Quarters",
     tagline: "Accra's Best Place to Stay",
-    primaryColor: "#137fec",
-    accentColor: "#C5A059",
+    primaryColor: "#8B008B",
+    accentColor: "#8B008B",
     voice: "Regal & Sophisticated",
     socials: {
       instagram: "@c1002quarters",
@@ -31,8 +31,8 @@ const DEFAULT_CONFIG: SiteConfig = {
   ],
   footer: {
     aboutText: "Modern comfort in the heart of Accra. Experience the Landmark of Distinction.",
-    address: "No. 12 Spintex Road, Accra, Ghana",
-    phone: "+233 (0) 55 123 4567",
+    address: "Market High Street, 33, GZ-121-1024",
+    phone: "+233243177596",
     email: "reservations@c1002quarters.com.gh"
   },
   categories: ['Deluxe', 'Executive', 'Presidential', 'Villa'],

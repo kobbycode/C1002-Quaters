@@ -282,7 +282,7 @@ const Rooms: React.FC = () => {
                           <p className="text-gray-400 text-[9px] uppercase font-black tracking-[0.2em]">Nightly rate</p>
                           <p className="text-3xl font-black text-charcoal font-serif">GH₵{room.price}<span className="text-sm font-normal text-gray-400">.00</span></p>
                         </div>
-                        <Link to={`/checkout?room=${room.id}`} className="bg-primary hover:bg-blue-600 text-white font-black py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.15em] text-xs">
+                        <Link to={`/checkout?room=${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.15em] text-xs">
                           Book Now
                         </Link>
                       </div>

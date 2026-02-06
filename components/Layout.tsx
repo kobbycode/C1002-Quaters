@@ -17,6 +17,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isHome = location.pathname === '/';
   const isAdmin = location.pathname.startsWith('/admin');
 
+  const handleNavClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -66,31 +70,36 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen font-sans">
       <header
-        className={`fixed top-0 z-50 w-full transition-all duration-300 px-6 md:px-10 lg:px-40 py-4 flex items-center justify-between border-b ${isScrolled || !isHome
+        className={`fixed top-0 z-50 w-full transition-all duration-300 px-6 md:px-10 lg:px-40 py-0 flex items-center justify-between border-b ${isScrolled || !isHome
           ? 'bg-white text-charcoal border-gray-100 shadow-sm'
           : 'bg-black/10 backdrop-blur-md text-white border-white/10'
           }`}
       >
         <Link to="/" className="flex items-center gap-3 group z-[60]">
-          <div className={`transition-colors ${isScrolled || !isHome ? 'text-primary' : 'text-gold'}`}>
-            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 48 48">
-              <path d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 34.1455Z" />
-            </svg>
+          <div className="transition-transform hover:scale-105 -my-12">
+            <img src="/logo.png" alt="C1002 Quarters" className={`h-40 w-auto object-contain ${isScrolled || !isHome ? '' : 'brightness-0 invert'}`} />
           </div>
-          <h2 className="text-xl font-bold tracking-[0.1em] uppercase">C1002 Quarters</h2>
         </Link>
 
         <div className="flex flex-1 justify-end gap-4 md:gap-6 items-center">
           <nav className="hidden md:flex items-center gap-9">
-            {config.navLinks.map((link) => (
-              <Link
-                key={link.id}
-                to={link.path}
-                className="text-sm font-medium hover:text-gold transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {config.navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.id}
+                  to={link.path}
+                  onClick={handleNavClick}
+                  className={`text-sm font-medium transition-colors ${
+                    isActive 
+                      ? 'text-primary' 
+                      : 'hover:text-primary'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4 z-[60]">
@@ -125,16 +134,34 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div className={`fixed inset-0 z-50 bg-charcoal transition-transform duration-500 md:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="flex flex-col h-full pt-32 px-10 pb-10 overflow-y-auto">
             <nav className="flex flex-col gap-8">
-              {config.navLinks.map((link) => (
-                <Link
-                  key={link.id}
-                  to={link.path}
-                  className="text-4xl font-serif text-white hover:text-gold transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <Link to="/wishlist" className="text-4xl font-serif text-white hover:text-gold transition-colors">Wishlist</Link>
+              {config.navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.id}
+                    to={link.path}
+                    onClick={handleNavClick}
+                    className={`text-4xl font-serif transition-colors ${
+                      isActive 
+                        ? 'text-primary' 
+                        : 'text-white hover:text-primary'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+              <Link 
+                to="/wishlist" 
+                onClick={handleNavClick}
+                className={`text-4xl font-serif transition-colors ${
+                  location.pathname === '/wishlist' 
+                    ? 'text-primary' 
+                    : 'text-white hover:text-primary'
+                }`}
+              >
+                Wishlist
+              </Link>
             </nav>
             <div className="mt-12 pt-10 border-t border-white/10">
               <p className="text-gold font-black uppercase tracking-[0.2em] text-[10px] mb-4">Concierge 24/7</p>
@@ -158,8 +185,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               AI Concierge
             </div>
             <div className="relative">
-              <div className="absolute inset-0 bg-gold rounded-full animate-pulse opacity-30"></div>
-              <div className="w-16 h-16 rounded-full bg-gold text-white flex items-center justify-center shadow-2xl shadow-gold/40 relative z-10 transition-transform hover:scale-110 active:scale-95">
+              <div className="absolute inset-0 bg-primary rounded-full animate-pulse opacity-30"></div>
+              <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/40 relative z-10 transition-transform hover:scale-110 active:scale-95">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
               </div>
             </div>
@@ -171,12 +198,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-3 text-charcoal">
-              <div className="text-gold">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 48 48">
-                  <path d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 34.1455Z" />
-                </svg>
-              </div>
-              <h2 className="text-lg font-bold tracking-widest uppercase">C1002 Quarters</h2>
+              <img src="/logo.png" alt="C1002 Quarters" className="h-40 w-auto object-contain" />
             </div>
             <p className="text-gray-500 text-sm leading-loose">
               {config.footer.aboutText}
@@ -185,9 +207,20 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex flex-col gap-6">
             <h4 className="text-sm font-bold uppercase tracking-widest text-gold">Explore</h4>
             <ul className="flex flex-col gap-4 text-sm text-gray-500">
-              {config.navLinks.map((link) => (
-                <li key={link.id}><Link to={link.path} className="hover:text-gold">{link.label}</Link></li>
-              ))}
+              {config.navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <li key={link.id}>
+                    <Link 
+                      to={link.path} 
+                      onClick={handleNavClick}
+                      className={isActive ? 'text-primary' : 'hover:text-primary'}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
           <div className="flex flex-col gap-6">

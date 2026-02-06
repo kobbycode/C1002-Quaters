@@ -59,24 +59,24 @@ const RevenueChart: React.FC<{ data: { date: string, value: number }[] }> = ({ d
         <path d={areaPath} fill="url(#revenueGradient)" opacity="0.1" />
         <defs>
           <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#C5A059" />
-            <stop offset="100%" stopColor="#C5A059" stopOpacity="0" />
+            <stop offset="0%" stopColor="#8B008B" />
+            <stop offset="100%" stopColor="#8B008B" stopOpacity="0" />
           </linearGradient>
         </defs>
 
         {/* Main Line */}
-        <path d={linePath} fill="none" stroke="#C5A059" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={linePath} fill="none" stroke="#8B008B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
         {/* Data Points */}
         {points.map((p, i) => (
           <g key={i} className="group/point">
-            <circle cx={p.x} cy={p.y} r="4" fill="white" stroke="#C5A059" strokeWidth="2" />
+            <circle cx={p.x} cy={p.y} r="4" fill="white" stroke="#8B008B" strokeWidth="2" />
             <rect
               x={p.x - 1}
               y={p.y - 100}
               width="2"
               height="100"
-              fill="#C5A059"
+              fill="#8B008B"
               opacity="0"
               className="group-hover/point:opacity-20 transition-opacity"
             />
@@ -472,8 +472,8 @@ const Admin: React.FC = () => {
   }, [config.bookings, bookingSearch, bookingCategoryFilter, bookingDateFilter, rooms]);
 
   const stats = [
-    { label: 'Realized Revenue', value: `GH₵${financialData.realizedRevenue.toLocaleString()}`, sub: 'Settled Ledger', growth: '+15.2%', icon: '💰', trend: [30, 45, 35, 60, 55, 80, 75], color: '#C5A059' },
-    { label: 'Portfolio Value', value: `GH₵${financialData.totalPotentialValue.toLocaleString()}`, sub: 'Nightly Cap', growth: '+12.5%', icon: '🏢', trend: [20, 30, 45, 40, 55, 50, 65], color: '#137fec' },
+    { label: 'Realized Revenue', value: `GH₵${financialData.realizedRevenue.toLocaleString()}`, sub: 'Settled Ledger', growth: '+15.2%', icon: '💰', trend: [30, 45, 35, 60, 55, 80, 75], color: '#8B008B' },
+    { label: 'Portfolio Value', value: `GH₵${financialData.totalPotentialValue.toLocaleString()}`, sub: 'Nightly Cap', growth: '+12.5%', icon: '🏢', trend: [20, 30, 45, 40, 55, 50, 65], color: '#8B008B' },
     { label: 'Subscribers', value: config.newsletterSubscribers.length.toString(), sub: 'Active Audience', growth: '+5.2%', icon: '📧', trend: [10, 15, 12, 20, 25, 30, 35], color: '#10b981' },
     { label: 'Guest Sentiment', value: '4.92', sub: 'Avg Rating', growth: 'Stable', icon: '⭐', trend: [4.8, 4.9, 4.85, 4.9, 4.92, 4.91, 4.92], color: '#f59e0b' },
   ];
@@ -563,7 +563,7 @@ const Admin: React.FC = () => {
             {activeTab === 'amenities' && (
               <button
                 onClick={() => setEditingAmenity({ name: '', detail: { icon: 'star', description: '', category: 'General' } })}
-                className="bg-primary text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-primary/20"
+                className="bg-primary text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#6B006B] transition-all shadow-xl shadow-primary/20"
               >
                 + Register Amenity
               </button>
@@ -1011,7 +1011,7 @@ const Admin: React.FC = () => {
                         <td className="py-6 text-right">
                           <button
                             onClick={() => setViewingBooking(booking)}
-                            className="text-[10px] font-black uppercase text-primary hover:text-blue-600 transition-colors"
+                            className="text-[10px] font-black uppercase text-primary hover:text-[#6B006B] transition-colors"
                           >
                             View Node
                           </button>
@@ -1125,7 +1125,7 @@ const Admin: React.FC = () => {
                         <div>
                           <p className="text-[9px] font-bold text-gray-400 uppercase mb-2">Quick Presets</p>
                           <div className="flex gap-2 flex-wrap">
-                            {['#C5A059', '#1a1a2e', '#137fec', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'].map(color => (
+                            {['#8B008B', '#1a1a2e', '#8B008B', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'].map(color => (
                               <button
                                 key={color}
                                 onClick={() => updateConfig({ ...config, brand: { ...config.brand, primaryColor: color } })}
@@ -1165,7 +1165,7 @@ const Admin: React.FC = () => {
                         <div>
                           <p className="text-[9px] font-bold text-gray-400 uppercase mb-2">Quick Presets</p>
                           <div className="flex gap-2 flex-wrap">
-                            {['#1a1a2e', '#C5A059', '#0d9488', '#7c3aed', '#db2777', '#ea580c', '#059669', '#2563eb'].map(color => (
+                            {['#1a1a2e', '#8B008B', '#0d9488', '#7c3aed', '#db2777', '#ea580c', '#059669', '#2563eb'].map(color => (
                               <button
                                 key={color}
                                 onClick={() => updateConfig({ ...config, brand: { ...config.brand, accentColor: color } })}
@@ -1510,7 +1510,7 @@ const Admin: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setEditingNav({ id: Date.now().toString(), label: '', path: '/' })}
-                  className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all"
+                  className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#6B006B] transition-all"
                 >
                   + Add Link
                 </button>

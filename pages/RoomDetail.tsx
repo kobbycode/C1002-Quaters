@@ -487,7 +487,7 @@ const RoomDetail: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-3">
-                <Link to={`/checkout?room=${room.id}`} className="w-full flex items-center justify-center bg-primary hover:bg-blue-600 text-white font-black py-6 rounded-2xl shadow-xl shadow-primary/30 transition-all uppercase tracking-[0.3em] text-[10px]">Confirm Booking</Link>
+                <Link to={`/checkout?room=${room.id}`} className="w-full flex items-center justify-center bg-primary hover:bg-[#6B006B] text-white font-black py-6 rounded-2xl shadow-xl shadow-primary/30 transition-all uppercase tracking-[0.3em] text-[10px]">Confirm Booking</Link>
 
                 <a
                   href={whatsappUrl}

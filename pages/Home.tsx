@@ -97,11 +97,11 @@ const Home: React.FC = () => {
               <div className="relative h-full w-full flex flex-col items-center justify-center text-center px-6 z-10">
                 <div className={`max-w-5xl transition-all duration-1000 delay-300 ${index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                   <div className="flex items-center justify-center gap-4 mb-6">
-                    <div className="h-px w-12 bg-gold/50" />
-                    <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] md:text-xs">
+                    <div className="h-px w-12 bg-white/50" />
+                    <span className="text-white font-black uppercase tracking-[0.4em] text-[10px] md:text-xs">
                       {slide.subtitle}
                     </span>
-                    <div className="h-px w-12 bg-gold/50" />
+                    <div className="h-px w-12 bg-white/50" />
                   </div>
                   <h1 className="text-white text-6xl md:text-8xl font-serif mb-8 leading-[1.1] drop-shadow-2xl">
                     {formatLuxuryText(slide.title)}
@@ -171,7 +171,7 @@ const Home: React.FC = () => {
               </select>
             </div>
           </div>
-          <button type="submit" className="lg:w-auto h-16 lg:h-20 px-12 rounded-[1.25rem] bg-charcoal text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:bg-primary transition-all active:scale-[0.98]">
+          <button type="submit" className="lg:w-auto h-16 lg:h-20 px-12 rounded-[1.25rem] bg-primary text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:bg-[#6B006B] transition-all active:scale-[0.98]">
             Check Availability
           </button>
         </form>
