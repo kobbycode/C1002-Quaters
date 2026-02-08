@@ -8,9 +8,7 @@ const GlobalLoader: React.FC = () => {
                 <div className="relative">
                     <div className="absolute inset-0 bg-gold/20 rounded-full animate-ping blur-xl"></div>
                     <div className="w-20 h-20 rounded-full border-4 border-white/10 border-t-gold animate-spin relative z-10"></div>
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span className="text-xl">✨</span>
-                    </div>
+
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
