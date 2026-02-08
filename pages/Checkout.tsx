@@ -55,7 +55,9 @@ const Checkout: React.FC = () => {
 
   if (isSuccess) {
     const whatsappNumber = config.footer.phone.replace(/\D/g, '');
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Hello%20C1002%20Quarters!%20My%20name%20is%20${encodeURIComponent(formData.firstName + ' ' + formData.lastName)}.%20I%20just%20completed%20a%20reservation%20for%20the%20${encodeURIComponent(room.name)}.%20Looking%20forward%20to%20my%20stay!`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+      `Hello C1002 Quarters Concierge! 🥂\n\nI just requested a reservation for the *${room.name}*.\n\n👤 *Guest:* ${formData.firstName} ${formData.lastName}\n📱 *Phone:* ${formData.phone}\n📧 *Email:* ${formData.email}\n🗓️ *Stay:* ${nights} Night${nights > 1 ? 's' : ''}\n\nLooking forward to finalizing my stay! ✨`
+    )}`;
 
     return (
       <div className="pt-40 pb-20 min-h-screen bg-white flex flex-col items-center justify-center text-center px-6">

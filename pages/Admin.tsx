@@ -414,10 +414,15 @@ const Admin: React.FC = () => {
       };
     });
 
+    const avgStayDuration = config.bookings.length
+      ? (config.bookings.reduce((acc, b) => acc + b.nights, 0) / config.bookings.length).toFixed(1)
+      : '0.0';
+
     return {
       totalPotentialValue,
       realizedRevenue,
       categoryStats,
+      avgStayDuration
     };
   }, [rooms, config.categories, config.bookings]);
 
@@ -457,6 +462,7 @@ const Admin: React.FC = () => {
     { label: 'Active Bookings', value: config.bookings.length.toString(), sub: 'Confirmed Stays', growth: `+${config.bookings.length > 5 ? '12' : '5'}.5%`, icon: '📅', trend: [20, 30, 45, 40, 55, 50, 65], color: '#8B008B' },
     { label: 'Subscribers', value: config.newsletterSubscribers.length.toString(), sub: 'Active Audience', growth: '+5.2%', icon: '📧', trend: [10, 15, 12, 20, 25, 30, 35], color: '#10b981' },
     { label: 'Portfolio Yield', value: rooms.length > 0 ? `${Math.round((financialData.realizedRevenue / (financialData.totalPotentialValue || 1)) * 100)}%` : '0%', sub: 'RevPAR Score', growth: 'Stable', icon: '📈', trend: [40, 45, 42, 48, 50, 49, 52], color: '#f59e0b' },
+    { label: 'Avg. Duration', value: `${financialData.avgStayDuration} Nights`, sub: 'Guest Commitment', growth: '+0.2%', icon: '⏳', trend: [1.2, 1.5, 1.4, 1.8, 2.1, 2.0, 2.2], color: '#3b82f6' },
   ];
 
   const handleAiWriter = async (field: 'description' | 'hero' | 'tagline', context: string) => {
