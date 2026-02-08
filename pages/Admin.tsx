@@ -234,6 +234,7 @@ const Admin: React.FC = () => {
           {activeTab === 'newsletter' && (
             <AdminNewsletter
               config={config}
+              updateConfig={updateConfig}
             />
           )}
 
