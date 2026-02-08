@@ -14,7 +14,7 @@ const GlobalLoader: React.FC = () => {
                 <div className="flex flex-col items-center gap-2">
                     <h2 className="text-white font-serif text-2xl tracking-wider">C1002 Quarters</h2>
                     <p className="text-gold text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
-                        Initializing Experience...
+                        Rooms Loading...
                     </p>
                 </div>
             </div>
