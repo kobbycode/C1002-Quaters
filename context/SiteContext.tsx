@@ -31,7 +31,8 @@ const DEFAULT_CONFIG: SiteConfig = {
   navLinks: [
     { id: '1', label: 'About', path: '/about' },
     { id: '2', label: 'Rooms', path: '/rooms' },
-    { id: '3', label: 'Contact', path: '/contact' }
+    { id: '3', label: 'Amenities', path: '/amenities' },
+    { id: '4', label: 'Contact', path: '/contact' }
   ],
   footer: {
     aboutText: "Modern comfort in the heart of Accra. Experience the Landmark of Distinction.",

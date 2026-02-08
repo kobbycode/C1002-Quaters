@@ -56,7 +56,7 @@ const Checkout: React.FC = () => {
   if (isSuccess) {
     const whatsappNumber = config.footer.phone.replace(/\D/g, '');
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      `Hello C1002 Quarters Concierge! 🥂\n\nI just requested a reservation for the *${room.name}*.\n\n👤 *Guest:* ${formData.firstName} ${formData.lastName}\n📱 *Phone:* ${formData.phone}\n📧 *Email:* ${formData.email}\n🗓️ *Stay:* ${nights} Night${nights > 1 ? 's' : ''}\n\nLooking forward to finalizing my stay! ✨`
+      `🥂 *New Reservation Request: C1002 Quarters*\n\nI would like to request a stay for the *${room.name}*.\n\n👤 *Guest:* ${formData.firstName} ${formData.lastName}\n📱 *Phone:* ${formData.phone}\n📧 *Email:* ${formData.email}\n🗓️ *Duration:* ${nights} Night${nights > 1 ? 's' : ''}\n💰 *Total Rate:* GH₵${room.price * nights}\n\nPlease let me know the next steps to finalize! ✨`
     )}`;
 
     return (
@@ -66,8 +66,8 @@ const Checkout: React.FC = () => {
           <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
         </div>
         <h1 className="text-3xl md:text-5xl font-black font-serif mb-4 md:mb-6 text-charcoal">Akwaaba Home!</h1>
-        <p className="text-gray-400 text-sm md:text-lg max-w-md mx-auto mb-8 md:mb-12 font-light">
-          Your reservation for the <span className="text-charcoal font-bold">{room.name}</span> has been received. A concierge will reach out via email shortly to arrange your arrival.
+        <p className="text-gray-400 text-sm md:text-lg max-w-md mx-auto mb-8 md:mb-12 font-light leading-relaxed">
+          Your request for the <span className="text-charcoal font-bold">{room.name}</span> has been received. To expedite your booking, please click below to notify our concierge via WhatsApp.
         </p>
 
         <div className="flex flex-col gap-4">
@@ -99,7 +99,7 @@ const Checkout: React.FC = () => {
             <div className="bg-gold h-full" style={{ width: '85%' }} />
           </div>
           <p className="text-gray-500 text-sm leading-loose">
-            No credit card required. Our concierge will follow up to finalize the billing.
+            No payment required today. Our concierge team will reach out to finalize your luxury experience.
           </p>
         </div>
 
@@ -139,10 +139,10 @@ const Checkout: React.FC = () => {
                   {isProcessing ? (
                     <>
                       <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                      Scheduling Stay...
+                      Sending Request...
                     </>
                   ) : (
-                    <>Confirm Reservation</>
+                    <>Request Reservation</>
                   )}
                 </button>
                 <p className="mt-6 text-center text-[10px] uppercase font-black tracking-widest text-gray-400">

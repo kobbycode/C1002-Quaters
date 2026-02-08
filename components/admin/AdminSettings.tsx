@@ -1,13 +1,14 @@
 import React from 'react';
 import { SiteConfig } from '../../types';
+import { useToast } from '../../context/ToastContext';
 
 interface AdminSettingsProps {
     config: SiteConfig;
     updateConfig: (config: SiteConfig) => void;
-    showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
-export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConfig, showToast }) => {
+export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConfig }) => {
+    const { showToast } = useToast();
 
     const handleExportConfig = () => {
         const dataStr = JSON.stringify(config, null, 2);

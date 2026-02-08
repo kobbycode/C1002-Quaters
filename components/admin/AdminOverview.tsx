@@ -167,11 +167,69 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         return { totalPotentialValue, realizedRevenue, categoryStats, avgStayDuration };
     }, [rooms, config.categories, config.bookings]);
 
+    const statsData = useMemo(() => {
+        const now = new Date();
+        const getRangeStats = (daysOffset: number, length: number) => {
+            const start = new Date();
+            start.setDate(now.getDate() - (daysOffset + length));
+            start.setHours(0, 0, 0, 0);
+
+            const end = new Date();
+            end.setDate(now.getDate() - daysOffset);
+            end.setHours(23, 59, 59, 999);
+
+            const rangeBookings = config.bookings.filter(b => {
+                const bDate = new Date(b.date);
+                return bDate >= start && bDate <= end;
+            });
+
+            const revenue = rangeBookings.reduce((acc, b) => acc + b.totalPrice, 0);
+            const count = rangeBookings.length;
+            const nights = rangeBookings.reduce((acc, b) => acc + b.nights, 0);
+            const avgNights = count > 0 ? nights / count : 0;
+
+            return { revenue, count, avgNights };
+        };
+
+        const currentPeriod = getRangeStats(0, 7);
+        const previousPeriod = getRangeStats(7, 7);
+
+        const calculateGrowth = (current: number, previous: number) => {
+            if (previous === 0) return current > 0 ? '+100%' : '0%';
+            const growth = ((current - previous) / previous) * 100;
+            return `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`;
+        };
+
+        const getDailyTrend = (days: number, metric: 'revenue' | 'count' | 'avgNights') => {
+            const trend: number[] = [];
+            for (let i = days - 1; i >= 0; i--) {
+                const stats = getRangeStats(i, 1);
+                trend.push(stats[metric]);
+            }
+            return trend;
+        };
+
+        return {
+            revenue: {
+                growth: calculateGrowth(currentPeriod.revenue, previousPeriod.revenue),
+                trend: getDailyTrend(7, 'revenue')
+            },
+            bookings: {
+                growth: calculateGrowth(currentPeriod.count, previousPeriod.count),
+                trend: getDailyTrend(7, 'count')
+            },
+            duration: {
+                growth: calculateGrowth(currentPeriod.avgNights, previousPeriod.avgNights),
+                trend: getDailyTrend(7, 'avgNights')
+            }
+        };
+    }, [config.bookings]);
+
     const stats = [
-        { label: 'Realized Revenue', value: `GH₵${financialData.realizedRevenue.toLocaleString()}`, sub: 'Settled Ledger', growth: '+15.2%', icon: '💰', trend: [30, 45, 35, 60, 55, 80, 75], color: '#8B008B' },
-        { label: 'Active Bookings', value: config.bookings.length.toString(), sub: 'Confirmed Stays', growth: `+${config.bookings.length > 5 ? '12' : '5'}.5%`, icon: '📅', trend: [20, 30, 45, 40, 55, 50, 65], color: '#8B008B' },
-        { label: 'Subscribers', value: config.newsletterSubscribers.length.toString(), sub: 'Active Audience', growth: '+5.2%', icon: '📧', trend: [10, 15, 12, 20, 25, 30, 35], color: '#10b981' },
-        { label: 'Avg. Duration', value: `${financialData.avgStayDuration} Nights`, sub: 'Guest Commitment', growth: '+0.2%', icon: '⏳', trend: [1.2, 1.5, 1.4, 1.8, 2.1, 2.0, 2.2], color: '#3b82f6' },
+        { label: 'Realized Revenue', value: `GH₵${financialData.realizedRevenue.toLocaleString()}`, sub: 'Settled Ledger', growth: statsData.revenue.growth, icon: '💰', trend: statsData.revenue.trend, color: '#8B008B' },
+        { label: 'Active Bookings', value: config.bookings.length.toString(), sub: 'Confirmed Stays', growth: statsData.bookings.growth, icon: '📅', trend: statsData.bookings.trend, color: '#8B008B' },
+        { label: 'Subscribers', value: config.newsletterSubscribers.length.toString(), sub: 'Active Audience', growth: '+0.0%', icon: '📧', trend: Array(7).fill(config.newsletterSubscribers.length), color: '#10b981' },
+        { label: 'Avg. Duration', value: `${financialData.avgStayDuration} Nights`, sub: 'Guest Commitment', growth: statsData.duration.growth, icon: '⏳', trend: statsData.duration.trend, color: '#3b82f6' },
     ];
 
     return (

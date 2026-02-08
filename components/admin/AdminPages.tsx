@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { SiteConfig } from '../../types';
+import { useToast } from '../../context/ToastContext';
 
 interface AdminPagesProps {
     config: SiteConfig;
     updateConfig: (config: SiteConfig) => void;
-    handleAiWriter: (field: 'description' | 'hero' | 'tagline', context: string) => Promise<void>;
+    handleAiWriter: (field: 'description' | 'hero' | 'tagline' | 'about' | 'contact', context: string) => Promise<string | null | void>;
     isAiGenerating: boolean;
-    showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 export const AdminPages: React.FC<AdminPagesProps> = ({
     config,
     updateConfig,
     handleAiWriter,
-    isAiGenerating,
-    showToast
+    isAiGenerating
 }) => {
+    const { showToast } = useToast();
     const [editingAboutPage, setEditingAboutPage] = useState(false);
     const [editingContactPage, setEditingContactPage] = useState(false);
 
@@ -131,7 +131,10 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 <div className="flex justify-between items-end mb-3">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Heritage Narrative - Phase I</label>
                                     <button
-                                        onClick={() => handleAiWriter('description', 'heritage background phase 1')}
+                                        onClick={async () => {
+                                            const result = await handleAiWriter('about', 'heritage background phase 1');
+                                            if (result) updateConfig({ ...config, aboutPage: { ...config.aboutPage, heritageDescription1: result } });
+                                        }}
                                         disabled={isAiGenerating}
                                         className="text-[9px] font-black uppercase text-primary flex items-center gap-1 hover:underline disabled:opacity-50"
                                     >
@@ -150,7 +153,10 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 <div className="flex justify-between items-end mb-3">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Heritage Narrative - Phase II</label>
                                     <button
-                                        onClick={() => handleAiWriter('description', 'heritage background phase 2')}
+                                        onClick={async () => {
+                                            const result = await handleAiWriter('about', 'heritage background phase 2');
+                                            if (result) updateConfig({ ...config, aboutPage: { ...config.aboutPage, heritageDescription2: result } });
+                                        }}
                                         disabled={isAiGenerating}
                                         className="text-[9px] font-black uppercase text-primary flex items-center gap-1 hover:underline disabled:opacity-50"
                                     >
@@ -208,7 +214,10 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                         placeholder="Inviting guests to connect..."
                                     />
                                     <button
-                                        onClick={() => handleAiWriter('description', 'contact page greeting')}
+                                        onClick={async () => {
+                                            const result = await handleAiWriter('contact', 'contact page greeting');
+                                            if (result) updateConfig({ ...config, contactPage: { ...config.contactPage, heroDescription: result } });
+                                        }}
                                         disabled={isAiGenerating}
                                         className="absolute bottom-6 right-6 text-[9px] font-black uppercase text-primary bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100 disabled:opacity-50"
                                     >

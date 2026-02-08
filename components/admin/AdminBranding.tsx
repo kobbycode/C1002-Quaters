@@ -47,7 +47,10 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                 />
                             </div>
                             <button
-                                onClick={() => handleAiWriter('tagline', config.brand.name)}
+                                onClick={async () => {
+                                    const result = await handleAiWriter('tagline', config.brand.name);
+                                    if (result) updateConfig({ ...config, brand: { ...config.brand, tagline: result } });
+                                }}
                                 disabled={isAiGenerating}
                                 className="h-[58px] px-6 bg-charcoal text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gold transition-all disabled:opacity-50 hover-lift flex items-center gap-2"
                             >

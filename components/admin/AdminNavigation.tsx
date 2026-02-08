@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { SiteConfig, NavLink } from '../../types';
+import { useToast } from '../../context/ToastContext';
 
 interface AdminNavigationProps {
     config: SiteConfig;
     updateConfig: (config: SiteConfig) => void;
     setEditingNav: (link: NavLink) => void;
-    showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 export const AdminNavigation: React.FC<AdminNavigationProps> = ({
     config,
     updateConfig,
-    setEditingNav,
-    showToast
+    setEditingNav
 }) => {
+    const { showToast } = useToast();
     // Local drag and drop state for navigation links
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);

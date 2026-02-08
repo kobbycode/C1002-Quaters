@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { SiteConfig, HeroSlide } from '../../types';
 import { formatLuxuryText } from '../../utils/formatters';
+import { useToast } from '../../context/ToastContext';
 
 interface AdminHomeProps {
     config: SiteConfig;
     updateConfig: (config: SiteConfig) => void;
     setEditingHero: (slide: HeroSlide) => void;
-    showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 export const AdminHome: React.FC<AdminHomeProps> = ({
     config,
     updateConfig,
-    setEditingHero,
-    showToast
+    setEditingHero
 }) => {
+    const { showToast } = useToast();
     // Local drag and drop state for hero slides
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
