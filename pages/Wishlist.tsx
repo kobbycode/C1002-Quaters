@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ROOMS } from '../constants';
+import { useSite } from '../context/SiteContext';
 import { Room } from '../types';
 
 const Wishlist: React.FC = () => {
+  const { rooms } = useSite();
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -19,8 +20,8 @@ const Wishlist: React.FC = () => {
   }, []);
 
   const wishlistRooms = useMemo(() => {
-    return ROOMS.filter(room => wishlistIds.includes(room.id));
-  }, [wishlistIds]);
+    return rooms.filter(room => wishlistIds.includes(room.id));
+  }, [wishlistIds, rooms]);
 
   const removeFromWishlist = (id: string) => {
     const newWishlist = wishlistIds.filter(itemId => itemId !== id);

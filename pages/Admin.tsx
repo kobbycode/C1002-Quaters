@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import { Room, NavLink, HeroSlide, AmenityDetail, Booking } from '../types';
 import { GoogleGenAI } from "@google/genai";
@@ -6,161 +7,13 @@ import { formatLuxuryText } from '../utils/formatters';
 import { db, auth } from '../utils/firebase';
 import { signOut } from 'firebase/auth';
 import ImageUpload from '../components/ImageUpload';
+import { AdminOverview } from '../components/admin/AdminOverview';
+import { AdminBookings } from '../components/admin/AdminBookings';
+import { AdminRooms } from '../components/admin/AdminRooms';
+import SEO from '../components/SEO';
 
 type Tab = 'overview' | 'bookings' | 'branding' | 'home' | 'pages' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'footer' | 'newsletter' | 'settings';
 
-const Sparkline: React.FC<{ data: number[], color: string }> = ({ data, color }) => {
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const width = 100;
-  const height = 30;
-  const points = data.map((d, i) => ({
-    x: (i / (data.length - 1)) * width,
-    y: height - ((d - min) / range) * height
-  }));
-  const pathData = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-
-  return (
-    <svg width={width} height={height} className="overflow-visible">
-      <path d={pathData} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-};
-
-const RevenueChart: React.FC<{ data: { date: string, value: number }[] }> = ({ data }) => {
-  const max = Math.max(...data.map(d => d.value)) || 1;
-  const width = 800;
-  const height = 200;
-  const padding = 40;
-
-  const points = data.map((d, i) => ({
-    x: padding + (i / (data.length - 1)) * (width - padding * 2),
-    y: (height - padding) - (d.value / max) * (height - padding * 2)
-  }));
-
-  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-  const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
-
-  return (
-    <div className="w-full h-64 relative">
-      <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="overflow-visible">
-        {/* Grid Lines */}
-        {[0, 0.25, 0.5, 0.75, 1].map(v => (
-          <line
-            key={v}
-            x1={padding}
-            y1={(height - padding) - v * (height - padding * 2)}
-            x2={width - padding}
-            y2={(height - padding) - v * (height - padding * 2)}
-            stroke="#f3f4f6"
-            strokeWidth="1"
-          />
-        ))}
-
-        {/* Area Fill */}
-        <path d={areaPath} fill="url(#revenueGradient)" opacity="0.1" />
-        <defs>
-          <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8B008B" />
-            <stop offset="100%" stopColor="#8B008B" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {/* Main Line */}
-        <path d={linePath} fill="none" stroke="#8B008B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-
-        {/* Data Points */}
-        {points.map((p, i) => (
-          <g key={i} className="group/point">
-            <circle cx={p.x} cy={p.y} r="4" fill="white" stroke="#8B008B" strokeWidth="2" />
-            <rect
-              x={p.x - 1}
-              y={p.y - 100}
-              width="2"
-              height="100"
-              fill="#8B008B"
-              opacity="0"
-              className="group-hover/point:opacity-20 transition-opacity"
-            />
-          </g>
-        ))}
-
-        {/* X-Axis Labels (Only a few) */}
-        {data.filter((_, i) => i % Math.ceil(data.length / 5) === 0 || i === data.length - 1).map((d, i) => {
-          const p = points[data.indexOf(d)];
-          return (
-            <text
-              key={i}
-              x={p.x}
-              y={height - 10}
-              textAnchor="middle"
-              className="text-[8px] font-black uppercase tracking-widest fill-gray-400"
-            >
-              {d.date}
-            </text>
-          );
-        })}
-      </svg>
-    </div>
-  );
-};
-
-const BookingCalendar: React.FC<{ bookings: Booking[] }> = ({ bookings }) => {
-  const now = new Date();
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
-
-  const dates = Array.from({ length: daysInMonth }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth(), i + 1);
-    const dateStr = d.toISOString().split('T')[0];
-    const count = bookings.filter(b => b.date.startsWith(dateStr)).length;
-    return { day: i + 1, count };
-  });
-
-  const getIntensity = (count: number) => {
-    if (count === 0) return 'bg-gray-50 text-gray-300';
-    if (count === 1) return 'bg-gold/20 text-gold';
-    if (count > 2) return 'bg-gold text-white shadow-lg shadow-gold/20';
-    return 'bg-gold/60 text-white';
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-7 gap-1">
-        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-          <div key={day} className="text-[8px] font-black text-gray-400 text-center py-2 uppercase">{day}</div>
-        ))}
-        {Array.from({ length: firstDay }).map((_, i) => (
-          <div key={`empty-${i}`} className="aspect-square" />
-        ))}
-        {dates.map(d => (
-          <div
-            key={d.day}
-            className={`aspect-square flex items-center justify-center text-[10px] font-black rounded-lg transition-all hover:scale-110 cursor-default ${getIntensity(d.count)} ${d.day === now.getDate() ? 'border-2 border-charcoal' : ''}`}
-            title={`${d.count} reservations on ${d.day}`}
-          >
-            {d.day}
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-between pt-4 border-t border-white/5">
-        <div className="flex gap-2 items-center">
-          <div className="w-2 h-2 rounded-sm bg-gray-100" />
-          <span className="text-[8px] font-bold text-gray-500 uppercase">Empty</span>
-        </div>
-        <div className="flex gap-2 items-center">
-          <div className="w-2 h-2 rounded-sm bg-gold/30" />
-          <span className="text-[8px] font-bold text-gray-500 uppercase">Light</span>
-        </div>
-        <div className="flex gap-2 items-center">
-          <div className="w-2 h-2 rounded-sm bg-gold" />
-          <span className="text-[8px] font-bold text-gray-500 uppercase">Dense</span>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Admin: React.FC = () => {
   const { rooms, config, updateConfig, updateRooms, loading } = useSite();
@@ -170,18 +23,30 @@ const Admin: React.FC = () => {
   const [editingHero, setEditingHero] = useState<HeroSlide | null>(null);
   const [editingAmenity, setEditingAmenity] = useState<{ name: string, detail: AmenityDetail } | null>(null);
   const [viewingBooking, setViewingBooking] = useState<Booking | null>(null);
-  const [bookingSearch, setBookingSearch] = useState('');
-  const [bookingStatusFilter, setBookingStatusFilter] = useState<'all' | 'confirmed' | 'pending'>('all');
-  const [bookingCategoryFilter, setBookingCategoryFilter] = useState('all');
-  const [bookingDateFilter, setBookingDateFilter] = useState('all');
-  const [bookingStartDate, setBookingStartDate] = useState('');
-  const [bookingEndDate, setBookingEndDate] = useState('');
   const [isAiGenerating, setIsAiGenerating] = useState(false);
-  const [showDateRangePicker, setShowDateRangePicker] = useState(false);
-  const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
-  const [revenueDateFilter, setRevenueDateFilter] = useState<'7d' | '30d' | '90d'>('7d');
   const [editingAboutPage, setEditingAboutPage] = useState<boolean>(false);
   const [editingContactPage, setEditingContactPage] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Sync tab and editing state with URL
+  useEffect(() => {
+    const tabParam = searchParams.get('tab') as Tab;
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+
+    const editId = searchParams.get('edit');
+    if (editId) {
+      const roomToEdit = rooms.find(r => r.id === editId);
+      if (roomToEdit) setEditingRoom(roomToEdit);
+    }
+  }, [searchParams, rooms]);
+
+  const handleTabChange = (newTab: Tab) => {
+    setActiveTab(newTab);
+    setSearchParams({ tab: newTab });
+  };
+
 
   // Drag and Drop System
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -228,52 +93,6 @@ const Admin: React.FC = () => {
     setDragOverIndex(null);
   };
 
-  const chartData = useMemo(() => {
-    const now = new Date();
-    const days = revenueDateFilter === '7d' ? 7 : revenueDateFilter === '30d' ? 30 : 90;
-    const data: { date: string, value: number }[] = [];
-
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(now.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      const dailyRev = config.bookings
-        .filter(b => b.date.startsWith(dateStr))
-        .reduce((acc, b) => acc + b.totalPrice, 0);
-      data.push({ date: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), value: dailyRev });
-    }
-    return data;
-  }, [revenueDateFilter, config.bookings]);
-
-  const handleExportCSV = useCallback(() => {
-    if (selectedBookings.length === 0) return;
-
-    const bookingsToExport = config.bookings.filter(b => selectedBookings.includes(b.id));
-    const headers = ['ID', 'Guest Name', 'Guest Email', 'Room Name', 'Nights', 'Total Price', 'Date'];
-    const csvRows = [
-      headers.join(','),
-      ...bookingsToExport.map(b => [
-        b.id,
-        `"${b.guestName}"`,
-        b.guestEmail,
-        `"${b.roomName}"`,
-        b.nights,
-        b.totalPrice,
-        new Date(b.date).toLocaleDateString()
-      ].join(','))
-    ];
-
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', `bookings_export_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    showToast(`Exported ${selectedBookings.length} bookings to CSV`);
-  }, [selectedBookings, config.bookings]);
 
   const handleExportConfig = () => {
     const dataStr = JSON.stringify(config, null, 2);
@@ -323,147 +142,9 @@ const Admin: React.FC = () => {
     setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
   };
 
-  // Global Search System
-  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
-  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
 
-  const searchResults = useMemo(() => {
-    if (!globalSearchQuery.trim()) return [];
-    const q = globalSearchQuery.toLowerCase();
-    const results: { type: 'room' | 'booking' | 'subscriber' | 'tab'; title: string; subtitle: string; action: () => void }[] = [];
 
-    // Search rooms
-    rooms.forEach(room => {
-      if (room.name.toLowerCase().includes(q) || room.category.toLowerCase().includes(q)) {
-        results.push({
-          type: 'room',
-          title: room.name,
-          subtitle: `${room.category} • $${room.price}/night`,
-          action: () => { setActiveTab('rooms'); setEditingRoom(room); setShowGlobalSearch(false); }
-        });
-      }
-    });
 
-    // Search bookings
-    config.bookings.forEach(booking => {
-      if (booking.guestName.toLowerCase().includes(q) || booking.guestEmail.toLowerCase().includes(q) || booking.roomName.toLowerCase().includes(q)) {
-        results.push({
-          type: 'booking',
-          title: booking.guestName,
-          subtitle: `${booking.roomName} • ${new Date(booking.date).toLocaleDateString()}`,
-          action: () => { setActiveTab('bookings'); setViewingBooking(booking); setShowGlobalSearch(false); }
-        });
-      }
-    });
-
-    // Search subscribers
-    config.subscribers?.forEach(sub => {
-      if (sub.email.toLowerCase().includes(q)) {
-        results.push({
-          type: 'subscriber',
-          title: sub.email,
-          subtitle: `Subscribed ${new Date(sub.subscribedAt).toLocaleDateString()}`,
-          action: () => { setActiveTab('newsletter'); setShowGlobalSearch(false); }
-        });
-      }
-    });
-
-    // Search tabs
-    const tabs: Tab[] = ['overview', 'bookings', 'branding', 'home', 'pages', 'navigation', 'rooms', 'amenities', 'concierge', 'footer', 'newsletter'];
-    tabs.forEach(tab => {
-      if (tab.includes(q)) {
-        results.push({
-          type: 'tab',
-          title: tab.charAt(0).toUpperCase() + tab.slice(1),
-          subtitle: 'Navigate to tab',
-          action: () => { setActiveTab(tab); setShowGlobalSearch(false); }
-        });
-      }
-    });
-
-    return results.slice(0, 8); // Limit results
-  }, [globalSearchQuery, rooms, config.bookings, config.subscribers]);
-
-  // Keyboard shortcut for global search
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setShowGlobalSearch(prev => !prev);
-        setGlobalSearchQuery('');
-      }
-      if (e.key === 'Escape' && showGlobalSearch) {
-        setShowGlobalSearch(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showGlobalSearch]);
-
-  // Business Intelligence Calculation
-  const financialData = useMemo(() => {
-    const totalPotentialValue = rooms.reduce((acc, r) => acc + r.price, 0);
-    const realizedRevenue = config.bookings.reduce((acc, b) => acc + b.totalPrice, 0);
-
-    const categoryStats = config.categories.map(cat => {
-      const catRooms = rooms.filter(r => r.category === cat);
-      return {
-        name: cat,
-        count: catRooms.length,
-        percent: rooms.length ? Math.round((catRooms.length / rooms.length) * 100) : 0
-      };
-    });
-
-    const avgStayDuration = config.bookings.length
-      ? (config.bookings.reduce((acc, b) => acc + b.nights, 0) / config.bookings.length).toFixed(1)
-      : '0.0';
-
-    return {
-      totalPotentialValue,
-      realizedRevenue,
-      categoryStats,
-      avgStayDuration
-    };
-  }, [rooms, config.categories, config.bookings]);
-
-  const filteredBookings = useMemo(() => {
-    return config.bookings.filter(b => {
-      const searchLower = bookingSearch.toLowerCase();
-      const matchesSearch = b.guestName.toLowerCase().includes(searchLower) ||
-        b.guestEmail.toLowerCase().includes(searchLower) ||
-        b.id.toLowerCase().includes(searchLower);
-
-      const matchesCategory = bookingCategoryFilter === 'all' ||
-        rooms.find(r => r.id === b.roomId)?.category === bookingCategoryFilter;
-
-      const bookingDate = new Date(b.date);
-      const now = new Date();
-      let matchesDate = true;
-
-      if (bookingDateFilter === 'custom' && bookingStartDate && bookingEndDate) {
-        const start = new Date(bookingStartDate);
-        const end = new Date(bookingEndDate);
-        end.setHours(23, 59, 59, 999);
-        matchesDate = bookingDate >= start && bookingDate <= end;
-      } else if (bookingDateFilter === '7d') {
-        matchesDate = (now.getTime() - bookingDate.getTime()) <= 7 * 24 * 60 * 60 * 1000;
-      } else if (bookingDateFilter === '30d') {
-        matchesDate = (now.getTime() - bookingDate.getTime()) <= 30 * 24 * 60 * 60 * 1000;
-      } else if (bookingDateFilter === '90d') {
-        matchesDate = (now.getTime() - bookingDate.getTime()) <= 90 * 24 * 60 * 60 * 1000;
-      }
-
-      return matchesSearch && matchesCategory && matchesDate;
-    });
-  }, [config.bookings, bookingSearch, bookingCategoryFilter, bookingDateFilter, rooms]);
-
-  const stats = [
-    { label: 'Realized Revenue', value: `GH₵${financialData.realizedRevenue.toLocaleString()}`, sub: 'Settled Ledger', growth: '+15.2%', icon: '💰', trend: [30, 45, 35, 60, 55, 80, 75], color: '#8B008B' },
-    { label: 'Active Bookings', value: config.bookings.length.toString(), sub: 'Confirmed Stays', growth: `+${config.bookings.length > 5 ? '12' : '5'}.5%`, icon: '📅', trend: [20, 30, 45, 40, 55, 50, 65], color: '#8B008B' },
-    { label: 'Subscribers', value: config.newsletterSubscribers.length.toString(), sub: 'Active Audience', growth: '+5.2%', icon: '📧', trend: [10, 15, 12, 20, 25, 30, 35], color: '#10b981' },
-    { label: 'Portfolio Yield', value: rooms.length > 0 ? `${Math.round((financialData.realizedRevenue / (financialData.totalPotentialValue || 1)) * 100)}%` : '0%', sub: 'RevPAR Score', growth: 'Stable', icon: '📈', trend: [40, 45, 42, 48, 50, 49, 52], color: '#f59e0b' },
-    { label: 'Avg. Duration', value: `${financialData.avgStayDuration} Nights`, sub: 'Guest Commitment', growth: '+0.2%', icon: '⏳', trend: [1.2, 1.5, 1.4, 1.8, 2.1, 2.0, 2.2], color: '#3b82f6' },
-  ];
 
   const handleAiWriter = async (field: 'description' | 'hero' | 'tagline', context: string) => {
     setIsAiGenerating(true);
@@ -531,7 +212,7 @@ const Admin: React.FC = () => {
           {(['overview', 'bookings', 'branding', 'home', 'pages', 'navigation', 'rooms', 'amenities', 'concierge', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabChange(tab)}
               className={`text-left px-5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-between group ${activeTab === tab ? 'bg-gold text-white shadow-lg shadow-gold/20' : 'hover:bg-white/5 text-gray-400'
                 }`}
             >
@@ -570,461 +251,19 @@ const Admin: React.FC = () => {
 
           {/* Overview Tab */}
           {activeTab === 'overview' && (
-            <div className="space-y-12 animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map(s => (
-                  <div key={s.label} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-6">
-                      <span className="text-2xl">{s.icon}</span>
-                      <Sparkline data={s.trend} color={s.color} />
-                    </div>
-                    <div className="relative z-10">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gold mb-1">{s.label}</p>
-                      <div className="flex items-end gap-3 mb-1">
-                        <p className="text-3xl font-black text-charcoal">{s.value}</p>
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full mb-1.5 ${s.growth.startsWith('+') ? 'bg-green-50 text-green-500' : 'bg-gray-50 text-gray-400'}`}>
-                          {s.growth}
-                        </span>
-                      </div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{s.sub}</p>
-                    </div>
-                    <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gray-50 rounded-full opacity-50 group-hover:scale-110 transition-transform" />
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Financial Performance Chart */}
-                <div className="lg:col-span-2 bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                  {/* Daily Revenue Chart */}
-                  <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm mb-8">
-                    <div className="flex items-center justify-between mb-10">
-                      <div className="flex items-center gap-4">
-                        <div className="w-1.5 h-6 bg-gold rounded-full" />
-                        <h3 className="text-2xl font-black font-serif text-charcoal">Revenue Performance</h3>
-                      </div>
-                      <div className="flex bg-gray-50 rounded-xl p-1 gap-1">
-                        {(['7d', '30d', '90d'] as const).map(f => (
-                          <button
-                            key={f}
-                            onClick={() => setRevenueDateFilter(f)}
-                            className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${revenueDateFilter === f ? 'bg-white text-gold shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
-                          >
-                            {f === '7d' ? 'Week' : f === '30d' ? 'Month' : 'Quarter'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <RevenueChart data={chartData} />
-                  </div>
-
-                  <div className="flex items-center justify-between mb-10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-1.5 h-6 bg-gold rounded-full" />
-                      <h3 className="text-2xl font-black font-serif text-charcoal">Inventory Yield</h3>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-gold" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Potential</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-charcoal" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Realized</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="h-64 flex items-end gap-12 px-4 border-b border-gray-50 pb-2">
-                    {financialData.categoryStats.map(stat => {
-                      const realizedForCat = config.bookings
-                        .filter(b => rooms.find(r => r.id === b.roomId)?.category === stat.name)
-                        .reduce((acc, b) => acc + b.totalPrice, 0);
-                      const potentialForCat = rooms
-                        .filter(r => r.category === stat.name)
-                        .reduce((acc, r) => acc + r.price, 0);
-
-                      const maxVal = Math.max(...financialData.categoryStats.map(s => {
-                        const pot = rooms.filter(r => r.category === s.name).reduce((acc, r) => acc + r.price, 0);
-                        return pot || 1;
-                      }));
-
-                      const potHeight = (potentialForCat / maxVal) * 100;
-                      const realHeight = (realizedForCat / maxVal) * 100;
-
-                      return (
-                        <div key={stat.name} className="flex-1 flex flex-col items-center gap-4 group">
-                          <div className="w-full h-full flex items-end justify-center gap-1.5 relative">
-                            <div
-                              style={{ height: `${potHeight}%` }}
-                              className="w-4 bg-gold/10 rounded-t-lg transition-all group-hover:bg-gold/20"
-                            />
-                            <div
-                              style={{ height: `${realHeight}%` }}
-                              className="w-4 bg-charcoal rounded-t-lg transition-all group-hover:bg-gold"
-                            />
-                            {/* Value Tooltip */}
-                            <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-charcoal text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
-                              GH₵{realizedForCat.toLocaleString()}
-                            </div>
-                          </div>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.name}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Booking Calendar Widget */}
-                <div className="bg-charcoal p-10 rounded-[2.5rem] shadow-xl shadow-charcoal/20 relative overflow-hidden flex flex-col">
-                  <div className="relative z-10 flex-1">
-                    <div className="flex items-center gap-4 mb-10">
-                      <div className="w-1.5 h-6 bg-gold rounded-full" />
-                      <h3 className="text-2xl font-black font-serif text-white">Occupancy Pulse</h3>
-                    </div>
-                    <BookingCalendar bookings={config.bookings} />
-                  </div>
-                </div>
-
-                {/* Top Categories Card */}
-                <div className="bg-charcoal p-10 rounded-[2.5rem] shadow-xl shadow-charcoal/20 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-bl-full pointer-events-none" />
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-4 mb-10">
-                      <div className="w-1.5 h-6 bg-gold rounded-full" />
-                      <h3 className="text-2xl font-black font-serif text-white">Portfolio DNA</h3>
-                    </div>
-                    <div className="space-y-6">
-                      {financialData.categoryStats.map(stat => (
-                        <div key={stat.name} className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.name}</span>
-                            <span className="text-[10px] font-black text-gold">{stat.percent}%</span>
-                          </div>
-                          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                            <div
-                              style={{ width: `${stat.percent}%` }}
-                              className="h-full bg-gold rounded-full transition-all duration-1000"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-12 pt-8 border-t border-white/5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-2">Total Inventory Value</p>
-                      <p className="text-4xl font-black text-white">GH₵{financialData.totalPotentialValue.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Reservations Feed */}
-              <div className="bg-white p-12 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-10">
-                  <div className="flex items-center gap-4">
-                    <div className="w-1.5 h-6 bg-charcoal rounded-full" />
-                    <h3 className="text-2xl font-black font-serif text-charcoal">Pulse Activity Feed</h3>
-                  </div>
-                  <button
-                    onClick={() => setActiveTab('bookings')}
-                    className="text-[10px] font-black uppercase text-gold hover:underline tracking-widest"
-                  >
-                    Enter Command Center
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  {config.bookings.slice(0, 3).map(booking => (
-                    <div key={booking.id} className="flex items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-gold/30 transition-all">
-                      <div className="flex items-center gap-8">
-                        <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-xl shadow-sm">
-                          👤
-                        </div>
-                        <div>
-                          <p className="text-sm font-black text-charcoal">{booking.guestName}</p>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{booking.roomName} • {new Date(booking.date).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-black text-charcoal">GH₵{booking.totalPrice.toLocaleString()}</p>
-                        <p className="text-[10px] font-black text-green-500 uppercase tracking-widest mt-1">Confirmed Node</p>
-                      </div>
-                    </div>
-                  ))}
-                  {config.bookings.length === 0 && (
-                    <div className="py-12 text-center">
-                      <p className="text-gray-400 italic font-serif">Awaiting the first signal of commerce...</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <AdminOverview
+              rooms={rooms}
+              config={config}
+              setActiveTab={setActiveTab}
+              setEditingRoom={(room) => setEditingRoom(room)}
+              setViewingBooking={setViewingBooking}
+            />
           )}
-
           {/* Bookings Tab */}
           {activeTab === 'bookings' && (
-            <div className="bg-white p-12 rounded-[2.5rem] border border-gray-100 shadow-sm animate-fade-in text-charcoal">
-              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-12">
-                <div className="flex items-center gap-4">
-                  <div className="w-1.5 h-6 bg-gold rounded-full" />
-                  <h3 className="text-2xl font-black font-serif">Global Reservations</h3>
-                </div>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-4 py-2 border border-gray-100">
-                    <span className="text-[9px] font-black uppercase text-gold">Track</span>
-                    <input
-                      type="text"
-                      placeholder="Search Guest / ID..."
-                      value={bookingSearch}
-                      onChange={(e) => setBookingSearch(e.target.value)}
-                      className="bg-transparent text-sm focus:outline-none min-w-[200px] font-bold"
-                    />
-                  </div>
-                  <select
-                    value={bookingCategoryFilter}
-                    onChange={(e) => setBookingCategoryFilter(e.target.value)}
-                    className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest focus:ring-gold outline-none hover:bg-gray-100 transition-colors"
-                  >
-                    <option value="all">All Tiers</option>
-                    {config.categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                  </select>
-
-                  {/* Enhanced Date Filter with Range Picker */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowDateRangePicker(!showDateRangePicker)}
-                      className={`bg-gray-50 border ${bookingDateFilter === 'custom' ? 'border-gold' : 'border-gray-100'} rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest focus:ring-gold outline-none hover:bg-gray-100 transition-all flex items-center gap-2`}
-                    >
-                      <svg className="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      {bookingDateFilter === 'all' && 'Any Timestamp'}
-                      {bookingDateFilter === '7d' && 'Last 7 Days'}
-                      {bookingDateFilter === '30d' && 'Last 30 Days'}
-                      {bookingDateFilter === '90d' && 'Last 90 Days'}
-                      {bookingDateFilter === 'custom' && (bookingStartDate && bookingEndDate ? `${new Date(bookingStartDate).toLocaleDateString()} - ${new Date(bookingEndDate).toLocaleDateString()}` : 'Custom Range')}
-                      <svg className={`w-3 h-3 transition-transform ${showDateRangePicker ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-
-                    {showDateRangePicker && (
-                      <div className="absolute top-full mt-2 right-0 bg-white border border-gray-100 rounded-2xl shadow-2xl p-6 z-50 min-w-[320px] animate-fade-in">
-                        <div className="space-y-4">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-gold">Quick Filters</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {[
-                              { value: 'all', label: 'All Time' },
-                              { value: '7d', label: 'Last 7 Days' },
-                              { value: '30d', label: 'Last 30 Days' },
-                              { value: '90d', label: 'Last 90 Days' },
-                            ].map(option => (
-                              <button
-                                key={option.value}
-                                onClick={() => {
-                                  setBookingDateFilter(option.value);
-                                  if (option.value !== 'custom') {
-                                    setShowDateRangePicker(false);
-                                    setBookingStartDate('');
-                                    setBookingEndDate('');
-                                  }
-                                }}
-                                className={`px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${bookingDateFilter === option.value ? 'bg-gold text-white' : 'bg-gray-50 text-charcoal hover:bg-gray-100'}`}
-                              >
-                                {option.label}
-                              </button>
-                            ))}
-                          </div>
-
-                          <div className="border-t border-gray-100 pt-4">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gold mb-3">Custom Range</p>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div>
-                                <label className="text-[9px] font-bold text-gray-400 uppercase mb-1 block">From</label>
-                                <input
-                                  type="date"
-                                  value={bookingStartDate}
-                                  onChange={(e) => {
-                                    setBookingStartDate(e.target.value);
-                                    setBookingDateFilter('custom');
-                                  }}
-                                  className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-sm font-medium outline-none focus:border-gold transition-colors"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-[9px] font-bold text-gray-400 uppercase mb-1 block">To</label>
-                                <input
-                                  type="date"
-                                  value={bookingEndDate}
-                                  onChange={(e) => {
-                                    setBookingEndDate(e.target.value);
-                                    setBookingDateFilter('custom');
-                                  }}
-                                  className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-sm font-medium outline-none focus:border-gold transition-colors"
-                                />
-                              </div>
-                            </div>
-                            {bookingStartDate && bookingEndDate && (
-                              <button
-                                onClick={() => setShowDateRangePicker(false)}
-                                className="w-full mt-4 bg-charcoal text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold transition-all"
-                              >
-                                Apply Range
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Active Filters Summary */}
-              {(bookingSearch || bookingCategoryFilter !== 'all' || bookingDateFilter !== 'all') && (
-                <div className="flex flex-wrap items-center gap-2 mb-6 pb-6 border-b border-gray-50">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Active Filters:</span>
-                  {bookingSearch && (
-                    <span className="bg-gold/10 text-gold px-3 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                      Search: "{bookingSearch}"
-                      <button onClick={() => setBookingSearch('')} className="hover:text-charcoal transition-colors">×</button>
-                    </span>
-                  )}
-                  {bookingCategoryFilter !== 'all' && (
-                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                      {bookingCategoryFilter}
-                      <button onClick={() => setBookingCategoryFilter('all')} className="hover:text-charcoal transition-colors">×</button>
-                    </span>
-                  )}
-                  {bookingDateFilter !== 'all' && (
-                    <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                      {bookingDateFilter === 'custom' ? 'Custom Range' : `Last ${bookingDateFilter.replace('d', ' Days')}`}
-                      <button onClick={() => { setBookingDateFilter('all'); setBookingStartDate(''); setBookingEndDate(''); }} className="hover:text-charcoal transition-colors">×</button>
-                    </span>
-                  )}
-                  <button
-                    onClick={() => { setBookingSearch(''); setBookingCategoryFilter('all'); setBookingDateFilter('all'); setBookingStartDate(''); setBookingEndDate(''); }}
-                    className="text-[10px] font-black uppercase text-gray-400 hover:text-charcoal transition-colors ml-auto"
-                  >
-                    Clear All
-                  </button>
-                </div>
-              )}
-
-              {/* Bulk Actions Toolbar */}
-              {selectedBookings.length > 0 && (
-                <div className="mb-6 flex items-center justify-between bg-gold/10 border border-gold/20 p-4 rounded-2xl animate-scale-in">
-                  <div className="flex items-center gap-4">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gold">{selectedBookings.length} Selected</span>
-
-                    <div className="flex bg-white rounded-xl border border-gold/20 overflow-hidden">
-                      <select
-                        onChange={(e) => {
-                          if (!e.target.value) return;
-                          const newBookings = config.bookings.map(b =>
-                            selectedBookings.includes(b.id) ? { ...b, status: e.target.value } : b
-                          );
-                          updateConfig({ ...config, bookings: newBookings });
-                          setSelectedBookings([]);
-                          showToast(`Updated ${selectedBookings.length} bookings to ${e.target.value}`);
-                        }}
-                        className="bg-transparent px-3 py-2 text-[10px] font-black uppercase tracking-widest outline-none border-none cursor-pointer hover:bg-gray-50 transition-colors"
-                        defaultValue=""
-                      >
-                        <option value="" disabled>Update Status</option>
-                        <option value="confirmed">Confirm</option>
-                        <option value="pending">Mark Pending</option>
-                        <option value="cancelled">Cancel</option>
-                      </select>
-                    </div>
-
-                    <button
-                      onClick={handleExportCSV}
-                      className="bg-gold text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold-dark transition-all flex items-center gap-2"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Export CSV
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => setSelectedBookings([])}
-                    className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-charcoal transition-colors"
-                  >
-                    Cancel Selection
-                  </button>
-                </div>
-              )}
-
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[1000px]">
-                  <thead>
-                    <tr className="text-left border-b border-gray-50">
-                      <th className="pb-6">
-                        <input
-                          type="checkbox"
-                          checked={selectedBookings.length === filteredBookings.length && filteredBookings.length > 0}
-                          onChange={(e) => {
-                            if (e.target.checked) setSelectedBookings(filteredBookings.map(b => b.id));
-                            else setSelectedBookings([]);
-                          }}
-                          className="w-4 h-4 rounded border-gray-300 text-gold focus:ring-gold"
-                        />
-                      </th>
-                      <th className="pb-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Guest Details</th>
-                      <th className="pb-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Room / Suite</th>
-                      <th className="pb-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Financials</th>
-                      <th className="pb-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Date</th>
-                      <th className="pb-6 text-right text-[10px] font-black uppercase tracking-widest text-gray-400">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {filteredBookings.map((booking) => (
-                      <tr key={booking.id} className={`group hover:bg-gray-50/50 transition-colors ${selectedBookings.includes(booking.id) ? 'bg-gold/5' : ''}`}>
-                        <td className="py-6">
-                          <input
-                            type="checkbox"
-                            checked={selectedBookings.includes(booking.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) setSelectedBookings(prev => [...prev, booking.id]);
-                              else setSelectedBookings(prev => prev.filter(id => id !== booking.id));
-                            }}
-                            className="w-4 h-4 rounded border-gray-300 text-gold focus:ring-gold"
-                          />
-                        </td>
-                        <td className="py-6">
-                          <div className="font-bold text-charcoal">{booking.guestName}</div>
-                          <div className="text-xs text-gray-400">{booking.guestEmail}</div>
-                        </td>
-                        <td className="py-6">
-                          <div className="text-sm font-medium text-charcoal">{booking.roomName}</div>
-                          <div className="text-[10px] font-black uppercase text-gold">{booking.nights} Nights</div>
-                        </td>
-                        <td className="py-6">
-                          <div className="text-sm font-black text-charcoal">GH₵{booking.totalPrice.toLocaleString()}</div>
-                        </td>
-                        <td className="py-6">
-                          <div className="text-sm text-gray-500">{new Date(booking.date).toLocaleDateString()}</div>
-                        </td>
-                        <td className="py-6 text-right">
-                          <button
-                            onClick={() => setViewingBooking(booking)}
-                            className="text-[10px] font-black uppercase text-primary hover:text-[#6B006B] transition-colors"
-                          >
-                            View Node
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {filteredBookings.length === 0 && (
-                  <div className="py-24 text-center">
-                    <p className="text-gray-400 italic font-serif text-xl">No reservations found matching current filters.</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <AdminBookings
+              onViewBooking={setViewingBooking}
+            />
           )}
 
           {/* Branding Tab */}
@@ -1706,25 +945,23 @@ const Admin: React.FC = () => {
           )}
 
           {activeTab === 'rooms' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
-              {rooms.map(room => (
-                <div key={room.id} className="bg-white rounded-[2rem] overflow-hidden border border-gray-100 shadow-xl flex flex-col group hover:scale-[1.02] transition-transform">
-                  <div className="aspect-[16/10] bg-gray-100 relative">
-                    <img src={room.image} className="w-full h-full object-cover" />
-                    <div className="absolute top-4 right-4 flex gap-2">
-                      <button onClick={() => setEditingRoom(room)} className="p-3 bg-white/90 backdrop-blur rounded-xl text-primary shadow-xl hover:bg-primary hover:text-white transition-all">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="p-8">
-                    <p className="text-[9px] font-black text-gold uppercase tracking-[0.2em] mb-2">{room.category}</p>
-                    <h4 className="font-black font-serif text-xl text-charcoal mb-4">{room.name}</h4>
-                    <p className="text-2xl font-black text-charcoal">GH₵{room.price}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AdminRooms
+              onEditRoom={(room) => setEditingRoom(room)}
+              onOpenAddRoom={() => setEditingRoom({
+                id: Date.now().toString(),
+                name: '',
+                category: config.categories[0],
+                price: 0,
+                image: '',
+                description: '',
+                rating: 5,
+                reviewsCount: 0,
+                amenities: [],
+                size: '',
+                guests: '',
+                view: ''
+              })}
+            />
           )}
         </div>
       </main >
@@ -2225,112 +1462,7 @@ const Admin: React.FC = () => {
         </div>
       </div>
 
-      {/* Global Search Modal */}
-      {
-        showGlobalSearch && (
-          <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[15vh]">
-            <div
-              className="absolute inset-0 bg-charcoal/60 backdrop-blur-sm"
-              onClick={() => setShowGlobalSearch(false)}
-            />
-            <div className="relative w-full max-w-2xl mx-4 bg-white rounded-3xl shadow-2xl overflow-hidden animate-scale-in">
-              {/* Search Input */}
-              <div className="flex items-center gap-4 p-6 border-b border-gray-100">
-                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search rooms, bookings, subscribers..."
-                  value={globalSearchQuery}
-                  onChange={e => setGlobalSearchQuery(e.target.value)}
-                  className="flex-1 text-lg outline-none font-medium placeholder:text-gray-400"
-                  autoFocus
-                />
-                <kbd className="hidden sm:flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500">
-                  ESC
-                </kbd>
-              </div>
 
-              {/* Search Results */}
-              <div className="max-h-[400px] overflow-y-auto">
-                {searchResults.length > 0 ? (
-                  <div className="p-2">
-                    {searchResults.map((result, idx) => (
-                      <button
-                        key={idx}
-                        onClick={result.action}
-                        className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-all text-left group"
-                      >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${result.type === 'room' ? 'bg-gold/10 text-gold' :
-                          result.type === 'booking' ? 'bg-green-100 text-green-600' :
-                            result.type === 'subscriber' ? 'bg-blue-100 text-blue-600' :
-                              'bg-gray-100 text-gray-600'
-                          }`}>
-                          {result.type === 'room' && (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                          )}
-                          {result.type === 'booking' && (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          )}
-                          {result.type === 'subscriber' && (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                          )}
-                          {result.type === 'tab' && (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-charcoal truncate">{result.title}</p>
-                          <p className="text-sm text-gray-500 truncate">{result.subtitle}</p>
-                        </div>
-                        <svg className="w-5 h-5 text-gray-300 group-hover:text-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    ))}
-                  </div>
-                ) : globalSearchQuery && (
-                  <div className="p-12 text-center">
-                    <p className="text-gray-400 italic font-serif text-lg">No results found for "{globalSearchQuery}"</p>
-                  </div>
-                )}
-
-                {!globalSearchQuery && (
-                  <div className="p-8 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Quick Tips</p>
-                    <p className="text-sm text-gray-500">Search for room names, guest emails, or tab names</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Footer */}
-              <div className="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <span className="font-bold">Pro tip:</span>
-                  <span>Press</span>
-                  <kbd className="px-2 py-0.5 bg-white rounded border text-[10px] font-bold">⌘K</kbd>
-                  <span>anytime to search</span>
-                </div>
-                <button
-                  onClick={() => setShowGlobalSearch(false)}
-                  className="text-xs font-bold text-gray-500 hover:text-charcoal transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        )
-      }
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }

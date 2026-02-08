@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import Concierge from './Concierge';
+import { CommandSearch } from './CommandSearch';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { config, addSubscriber } = useSite();
@@ -12,6 +13,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isConciergeOpen, setIsConciergeOpen] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const location = useLocation();
@@ -49,6 +51,20 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+      if (e.key === 'Escape' && isSearchOpen) {
+        setIsSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchOpen]);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -124,6 +140,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4 z-[60]">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className={`p-2 transition-colors ${isScrolled || !isHome ? 'text-gray-400' : 'text-white/70'} hover:text-gold`}
+              aria-label="Search"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
             <Link to="/wishlist" className="relative group p-2">
               <svg className={`w-6 h-6 transition-colors ${wishlistCount > 0 ? 'text-gold' : (isScrolled || !isHome ? 'text-gray-400' : 'text-white/70')} group-hover:text-gold`} fill={wishlistCount > 0 ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -200,6 +225,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </header>
 
       <main className="flex-1">{children}</main>
+
+      <CommandSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <div className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[70] flex flex-col items-end gap-4 ${isMobileMenuOpen ? 'hidden' : ''}`}>
         <Concierge isOpen={isConciergeOpen} onClose={() => setIsConciergeOpen(false)} />
