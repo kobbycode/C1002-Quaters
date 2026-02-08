@@ -17,6 +17,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const isHome = location.pathname === '/';
   const isAdmin = location.pathname.startsWith('/admin');
+  const isLogin = location.pathname === '/login';
 
   const handleNavClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -83,8 +84,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   };
 
-  // Skip layout elements for admin panel
-  if (isAdmin) {
+  // Skip layout elements for admin panel or login page
+  if (isAdmin || isLogin) {
     return <div className="flex flex-col min-h-screen font-sans">{children}</div>;
   }
 
@@ -111,11 +112,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   key={link.id}
                   to={link.path}
                   onClick={handleNavClick}
-                  className={`text-sm font-medium transition-colors ${
-                    isActive 
-                      ? 'text-primary' 
-                      : 'hover:text-primary'
-                  }`}
+                  className={`text-sm font-medium transition-colors ${isActive
+                    ? 'text-primary'
+                    : 'hover:text-primary'
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -171,24 +171,22 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     key={link.id}
                     to={link.path}
                     onClick={handleNavClick}
-                    className={`text-2xl font-serif transition-colors ${
-                      isActive 
-                        ? 'text-primary' 
-                        : 'text-white hover:text-primary'
-                    }`}
+                    className={`text-2xl font-serif transition-colors ${isActive
+                      ? 'text-primary'
+                      : 'text-white hover:text-primary'
+                      }`}
                   >
                     {link.label}
                   </Link>
                 );
               })}
-              <Link 
-                to="/wishlist" 
+              <Link
+                to="/wishlist"
                 onClick={handleNavClick}
-                className={`text-2xl font-serif transition-colors ${
-                  location.pathname === '/wishlist' 
-                    ? 'text-primary' 
-                    : 'text-white hover:text-primary'
-                }`}
+                className={`text-2xl font-serif transition-colors ${location.pathname === '/wishlist'
+                  ? 'text-primary'
+                  : 'text-white hover:text-primary'
+                  }`}
               >
                 Wishlist
               </Link>
@@ -241,8 +239,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 const isActive = location.pathname === link.path;
                 return (
                   <li key={link.id}>
-                    <Link 
-                      to={link.path} 
+                    <Link
+                      to={link.path}
                       onClick={handleNavClick}
                       className={isActive ? 'text-primary' : 'hover:text-primary'}
                     >

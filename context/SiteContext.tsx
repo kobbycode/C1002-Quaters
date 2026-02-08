@@ -1,11 +1,15 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { collection, onSnapshot, doc, setDoc, updateDoc, arrayUnion, writeBatch } from 'firebase/firestore';
+import { db } from '../utils/firebase';
 import { Room, SiteConfig, Booking } from '../types';
 import { ROOMS as INITIAL_ROOMS } from '../constants';
+import GlobalLoader from '../components/GlobalLoader';
 
 interface SiteContextType {
   rooms: Room[];
   config: SiteConfig;
+  loading: boolean;
   updateRooms: (rooms: Room[]) => void;
   updateConfig: (config: SiteConfig) => void;
   addSubscriber: (email: string) => void;
@@ -88,51 +92,116 @@ const DEFAULT_CONFIG: SiteConfig = {
 const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [rooms, setRooms] = useState<Room[]>(() => {
-    const saved = localStorage.getItem('site_rooms');
-    return saved ? JSON.parse(saved) : INITIAL_ROOMS;
-  });
+  // Initialize with defaults so UI renders immediately (stale-while-revalidate strategy)
+  const [rooms, setRooms] = useState<Room[]>(INITIAL_ROOMS);
+  const [config, setConfig] = useState<SiteConfig>(DEFAULT_CONFIG);
+  const [loading, setLoading] = useState(true);
 
-  const [config, setConfig] = useState<SiteConfig>(() => {
-    const saved = localStorage.getItem('site_config');
-    return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
-  });
-
+  // Firestore Subscriptions
   useEffect(() => {
-    localStorage.setItem('site_rooms', JSON.stringify(rooms));
-  }, [rooms]);
+    let roomsLoaded = false;
+    let configLoaded = false;
 
-  useEffect(() => {
-    localStorage.setItem('site_config', JSON.stringify(config));
-  }, [config]);
+    // 1. Subscribe to Rooms
+    const unsubscribeRooms = onSnapshot(collection(db, 'rooms'), (snapshot) => {
+      const roomData = snapshot.docs.map(doc => doc.data() as Room);
+      // Only update if we actually have data (prevents clearing defaults if DB is empty)
+      if (roomData.length > 0) {
+        setRooms(roomData);
+      }
+      roomsLoaded = true;
+      if (configLoaded) setLoading(false);
+    }, (error) => {
+      console.error("Error listening to rooms:", error);
+      roomsLoaded = true;
+      if (configLoaded) setLoading(false);
+    });
 
-  const updateRooms = (newRooms: Room[]) => setRooms(newRooms);
-  const updateConfig = (newConfig: SiteConfig) => setConfig(newConfig);
+    // 2. Subscribe to Settings/Config
+    const unsubscribeConfig = onSnapshot(doc(db, 'settings', 'config'), (docSnap) => {
+      if (docSnap.exists()) {
+        setConfig(docSnap.data() as SiteConfig);
+      }
+      configLoaded = true;
+      if (roomsLoaded) setLoading(false);
+    }, (error) => {
+      console.error("Error listening to config:", error);
+      configLoaded = true;
+      if (roomsLoaded) setLoading(false);
+    });
 
-  const addSubscriber = (email: string) => {
-    if (!config.newsletterSubscribers.includes(email)) {
-      setConfig(prev => ({
-        ...prev,
-        newsletterSubscribers: [...prev.newsletterSubscribers, email]
-      }));
+    return () => {
+      unsubscribeRooms();
+      unsubscribeConfig();
+    };
+  }, []);
+
+  // Write Functions
+  const updateRooms = async (newRooms: Room[]) => {
+    // Optimistic update
+    setRooms(newRooms);
+
+    // Write each room to Firestore
+    try {
+      const batch = writeBatch(db);
+      newRooms.forEach(room => {
+        const ref = doc(db, 'rooms', room.id);
+        batch.set(ref, room);
+      });
+      await batch.commit();
+    } catch (err) {
+      console.error("Failed to sync rooms:", err);
+      // Revert/Fetch logic could go here, but listener usually handles correction associated errors
     }
   };
 
-  const addBooking = (bookingData: Omit<Booking, 'id' | 'date'>) => {
+  const updateConfig = async (newConfig: SiteConfig) => {
+    // Optimistic update
+    setConfig(newConfig);
+
+    // Write to Firestore
+    try {
+      await setDoc(doc(db, 'settings', 'config'), newConfig);
+    } catch (err) {
+      console.error("Failed to sync config:", err);
+    }
+  };
+
+  const addSubscriber = async (email: string) => {
+    if (!config.newsletterSubscribers.includes(email)) {
+      // Optimistic update not strictly necessary if listener is fast, but good for UI
+      // However, for arrayUnion, best to let Firestore handle the unique generic add
+      try {
+        await updateDoc(doc(db, 'settings', 'config'), {
+          newsletterSubscribers: arrayUnion(email)
+        });
+      } catch (err) {
+        console.error("Failed to add subscriber:", err);
+      }
+    }
+  };
+
+  const addBooking = async (bookingData: Omit<Booking, 'id' | 'date'>) => {
     const newBooking: Booking = {
       ...bookingData,
       id: `BK-${Date.now()}`,
       date: new Date().toISOString()
     };
-    setConfig(prev => ({
-      ...prev,
-      bookings: [newBooking, ...prev.bookings]
-    }));
+
+    // Note: In a real app, bookings might be a subcollection. 
+    // Here we are keeping the existing structure where bookings are part of the 'config' object array.
+    try {
+      await updateDoc(doc(db, 'settings', 'config'), {
+        bookings: arrayUnion(newBooking)
+      });
+    } catch (err) {
+      console.error("Failed to add booking:", err);
+    }
   };
 
   return (
-    <SiteContext.Provider value={{ rooms, config, updateRooms, updateConfig, addSubscriber, addBooking }}>
-      {children}
+    <SiteContext.Provider value={{ rooms, config, loading, updateRooms, updateConfig, addSubscriber, addBooking }}>
+      {loading ? <GlobalLoader /> : children}
     </SiteContext.Provider>
   );
 };

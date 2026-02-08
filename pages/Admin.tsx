@@ -3,6 +3,9 @@ import { useSite } from '../context/SiteContext';
 import { Room, NavLink, HeroSlide, AmenityDetail, Booking } from '../types';
 import { GoogleGenAI } from "@google/genai";
 import { formatLuxuryText } from '../utils/formatters';
+import { db, auth } from '../utils/firebase';
+import { signOut } from 'firebase/auth';
+import ImageUpload from '../components/ImageUpload';
 
 type Tab = 'overview' | 'bookings' | 'branding' | 'home' | 'pages' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'footer' | 'newsletter' | 'settings';
 
@@ -160,7 +163,7 @@ const BookingCalendar: React.FC<{ bookings: Booking[] }> = ({ bookings }) => {
 };
 
 const Admin: React.FC = () => {
-  const { rooms, config, updateRooms, updateConfig } = useSite();
+  const { rooms, config, updateConfig, updateRooms, loading } = useSite();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [editingRoom, setEditingRoom] = useState<Partial<Room> | null>(null);
   const [editingNav, setEditingNav] = useState<NavLink | null>(null);
@@ -310,29 +313,7 @@ const Admin: React.FC = () => {
     showToast('Hero slide saved!');
   };
 
-  const handleHeroImageUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number | 'modal') => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      showToast('Image too large (max 2MB)', 'error');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const b64 = event.target?.result as string;
-      if (index === 'modal' && editingHero) {
-        setEditingHero({ ...editingHero, image: b64 });
-      } else if (typeof index === 'number') {
-        const newSlides = [...config.heroSlides];
-        newSlides[index] = { ...newSlides[index], image: b64 };
-        updateConfig({ ...config, heroSlides: newSlides });
-      }
-      showToast('Hero image updated');
-    };
-    reader.readAsDataURL(file);
-  };
 
   // Toast Notification System
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; visible: boolean }>({ message: '', type: 'success', visible: false });
@@ -530,6 +511,8 @@ const Admin: React.FC = () => {
     showToast('Amenity details updated!');
   };
 
+
+
   return (
     <div className="min-h-screen bg-[#FDFDFD] flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -539,7 +522,7 @@ const Admin: React.FC = () => {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mt-1">HQ Command Node</p>
         </div>
         <nav className="flex flex-col gap-1 overflow-y-auto no-scrollbar">
-          {(['overview', 'bookings', 'branding', 'home', 'pages', 'navigation', 'rooms', 'amenities', 'concierge', 'footer', 'newsletter'] as Tab[]).map(tab => (
+          {(['overview', 'bookings', 'branding', 'home', 'pages', 'navigation', 'rooms', 'amenities', 'concierge', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -549,6 +532,15 @@ const Admin: React.FC = () => {
               <span className="capitalize">{tab}</span>
             </button>
           ))}
+
+          <div className="mt-8 border-t border-white/10 pt-8">
+            <button
+              onClick={() => signOut(auth)}
+              className="w-full text-left px-5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-red-400 hover:bg-white/5 hover:text-red-300 transition-all flex items-center gap-3"
+            >
+              <span>Logout</span>
+            </button>
+          </div>
         </nav>
       </aside>
 
@@ -1336,6 +1328,7 @@ const Admin: React.FC = () => {
                     value={config.conciergePrompt}
                     onChange={e => updateConfig({ ...config, conciergePrompt: e.target.value })}
                     className="w-full bg-gray-50 border-gray-100 rounded-2xl p-8 text-sm font-medium leading-relaxed focus:ring-gold outline-none"
+                    // Placeholder to ensure I see the file content firsterge should behave..."
                     placeholder="Describe how the concierge should behave..."
                   />
                 </div>
@@ -1624,6 +1617,26 @@ const Admin: React.FC = () => {
                       <div className="w-1.5 h-6 bg-gold rounded-full" />
                       <h3 className="text-2xl font-black font-serif text-charcoal">Data Sovereignty</h3>
                     </div>
+                    {/* Database Seeding Button */}
+                    <button
+                      onClick={async () => {
+                        if (confirm('This will upload your current local data (Rooms & Config) to Firebase Firestore. Continue?')) {
+                          try {
+                            const { seedDatabase } = await import('../utils/seedData');
+                            const success = await seedDatabase(config);
+                            if (success) showToast('Database seeded successfully!', 'success');
+                            else showToast('Failed to seed database.', 'error');
+                          } catch (e: any) {
+                            console.error(e);
+                            showToast(`Failed: ${e.message || 'Unknown error'}`, 'error');
+                          }
+                        }
+                      }}
+                      className="mb-6 w-full bg-gold/10 text-gold border border-gold/20 font-black py-4 rounded-xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold hover:text-white transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                      Initialize / Seed Database
+                    </button>
                     <p className="text-sm text-gray-500 mb-8 leading-relaxed">
                       Download a full snapshot of your system configuration. This includes branding, room data, and orders.
                     </p>
@@ -1962,8 +1975,13 @@ const Admin: React.FC = () => {
                   <textarea value={editingRoom.description} onChange={e => setEditingRoom({ ...editingRoom, description: e.target.value })} className="w-full border-gray-100 bg-gray-50 rounded-xl p-6 text-sm font-medium transition-all" rows={4} />
                 </div>
                 <div className="col-span-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Visual Index Link</label>
-                  <input type="text" value={editingRoom.image} onChange={e => setEditingRoom({ ...editingRoom, image: e.target.value })} className="w-full border-gray-100 bg-gray-50 rounded-xl p-5 text-sm font-bold" />
+                  <ImageUpload
+                    label="Visual Index Link"
+                    currentImage={editingRoom.image}
+                    onImageUploaded={(url) => setEditingRoom({ ...editingRoom, image: url })}
+                    onError={(msg) => showToast(msg, 'error')}
+                    folder="rooms"
+                  />
                 </div>
               </div>
               <div className="mt-12 flex gap-6">
@@ -2017,28 +2035,12 @@ const Admin: React.FC = () => {
 
                 <div className="space-y-6 font-serif">
                   <p className="text-[10px] font-black uppercase tracking-widest text-gold mb-1 font-sans">Imagery Node</p>
-                  <div className="aspect-[4/5] bg-gray-100 rounded-3xl overflow-hidden relative group/heroimg">
-                    {editingHero.image ? (
-                      <img src={editingHero.image} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
-                        <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <span className="text-[10px] font-black uppercase tracking-widest">Awaiting Visual</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/heroimg:opacity-100 transition-opacity flex items-center justify-center">
-                      <label className="bg-white text-charcoal px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-gold transition-colors shadow-2xl">
-                        Exchange Visual
-                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleHeroImageUpload(e, 'modal')} />
-                      </label>
-                    </div>
-                  </div>
-                  <input
-                    type="text"
-                    value={editingHero.image}
-                    onChange={e => setEditingHero({ ...editingHero, image: e.target.value })}
-                    className="w-full bg-gray-50 border-gray-100 rounded-xl p-4 text-[10px] font-mono outline-none"
-                    placeholder="External URL Index"
+                  <ImageUpload
+                    currentImage={editingHero.image}
+                    onImageUploaded={(url) => setEditingHero({ ...editingHero, image: url })}
+                    onError={(msg) => showToast(msg, 'error')}
+                    folder="hero-slides"
+                    label=""
                   />
                 </div>
               </div>

@@ -123,9 +123,8 @@ const DEFAULT_AMENITY_ICONS: Record<string, React.ReactNode> = {
 };
 
 const RoomDetail: React.FC = () => {
-  const { rooms, config } = useSite();
+  const { rooms, config, loading } = useSite();
   const { id } = useParams<{ id: string }>();
-  const [isLoading, setIsLoading] = useState(true);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -138,13 +137,11 @@ const RoomDetail: React.FC = () => {
   const room = rooms.find((r) => r.id === id);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
     const saved = localStorage.getItem('luxe_wishlist');
     if (saved && id) {
       const wishlist = JSON.parse(saved);
       setIsWishlisted(wishlist.includes(id));
     }
-    return () => clearTimeout(timer);
   }, [id]);
 
   const toggleWishlist = () => {
@@ -205,7 +202,7 @@ const RoomDetail: React.FC = () => {
     if (galleryImages.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
   }, [galleryImages.length]);
-  
+
   const handlePrev = useCallback(() => {
     if (galleryImages.length === 0) return;
     setCurrentIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
@@ -287,7 +284,6 @@ const RoomDetail: React.FC = () => {
     };
   }, [room]);
 
-  if (isLoading) return <div className="pt-24 min-h-screen bg-background-light"><RoomDetailSkeleton /></div>;
   if (!room) return <div className="pt-24 flex items-center justify-center min-h-[60vh] flex-col gap-4"><h2 className="text-3xl font-serif">Room not found.</h2><Link to="/rooms" className="text-primary font-bold hover:underline">Return to our rooms</Link></div>;
 
   return (

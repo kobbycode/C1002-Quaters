@@ -12,6 +12,7 @@ const Checkout: React.FC = () => {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -27,13 +28,16 @@ const Checkout: React.FC = () => {
     return n ? parseInt(n) : 1;
   }, [searchParams]);
 
-  const handleBooking = (e: React.FormEvent) => {
+  const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
+    setError(null);
 
-    // Simulate payment processing
-    setTimeout(() => {
-      addBooking({
+    try {
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 2500));
+
+      await addBooking({
         roomId: room.id,
         roomName: room.name,
         guestName: `${formData.firstName} ${formData.lastName}`,
@@ -42,10 +46,14 @@ const Checkout: React.FC = () => {
         nights: nights
       });
 
-      setIsProcessing(false);
       setIsSuccess(true);
       window.scrollTo(0, 0);
-    }, 2500);
+    } catch (err) {
+      console.error("Booking error:", err);
+      setError("We couldn't process your booking. Please check your connection and try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (isSuccess) {
@@ -128,6 +136,11 @@ const Checkout: React.FC = () => {
                     <input required type="password" value={formData.cvv} onChange={e => setFormData({ ...formData, cvv: e.target.value })} className="w-full rounded-2xl border-gray-100 bg-gray-50/50 py-5 px-6 focus:ring-primary focus:border-primary text-sm font-medium outline-none" placeholder="***" />
                   </div>
                 </div>
+                {error && (
+                  <div className="bg-red-50 text-red-500 p-4 rounded-xl text-xs font-bold uppercase tracking-widest text-center">
+                    {error}
+                  </div>
+                )}
                 <button
                   disabled={isProcessing}
                   className="relative w-full h-14 md:h-20 bg-primary text-white rounded-[1.25rem] font-black text-xs uppercase tracking-[0.3em] hover:bg-[#6B006B] transition-all shadow-2xl shadow-primary/30 flex items-center justify-center gap-4 overflow-hidden disabled:opacity-50"

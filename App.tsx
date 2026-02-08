@@ -11,6 +11,8 @@ import Contact from './pages/Contact';
 import About from './pages/About';
 import Wishlist from './pages/Wishlist';
 import Admin from './pages/Admin';
+import Login from './pages/Login';
+import { AuthGuard } from './components/AuthGuard';
 
 const App: React.FC = () => {
   return (
@@ -25,7 +27,15 @@ const App: React.FC = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/admin"
+              element={
+                <AuthGuard>
+                  <Admin />
+                </AuthGuard>
+              }
+            />
           </Routes>
         </Layout>
       </Router>
