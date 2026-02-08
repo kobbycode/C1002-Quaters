@@ -454,9 +454,9 @@ const Admin: React.FC = () => {
 
   const stats = [
     { label: 'Realized Revenue', value: `GH₵${financialData.realizedRevenue.toLocaleString()}`, sub: 'Settled Ledger', growth: '+15.2%', icon: '💰', trend: [30, 45, 35, 60, 55, 80, 75], color: '#8B008B' },
-    { label: 'Portfolio Value', value: `GH₵${financialData.totalPotentialValue.toLocaleString()}`, sub: 'Nightly Cap', growth: '+12.5%', icon: '🏢', trend: [20, 30, 45, 40, 55, 50, 65], color: '#8B008B' },
+    { label: 'Active Bookings', value: config.bookings.length.toString(), sub: 'Confirmed Stays', growth: `+${config.bookings.length > 5 ? '12' : '5'}.5%`, icon: '📅', trend: [20, 30, 45, 40, 55, 50, 65], color: '#8B008B' },
     { label: 'Subscribers', value: config.newsletterSubscribers.length.toString(), sub: 'Active Audience', growth: '+5.2%', icon: '📧', trend: [10, 15, 12, 20, 25, 30, 35], color: '#10b981' },
-    { label: 'Guest Sentiment', value: '4.92', sub: 'Avg Rating', growth: 'Stable', icon: '⭐', trend: [4.8, 4.9, 4.85, 4.9, 4.92, 4.91, 4.92], color: '#f59e0b' },
+    { label: 'Portfolio Yield', value: rooms.length > 0 ? `${Math.round((financialData.realizedRevenue / (financialData.totalPotentialValue || 1)) * 100)}%` : '0%', sub: 'RevPAR Score', growth: 'Stable', icon: '📈', trend: [40, 45, 42, 48, 50, 49, 52], color: '#f59e0b' },
   ];
 
   const handleAiWriter = async (field: 'description' | 'hero' | 'tagline', context: string) => {
@@ -951,7 +951,7 @@ const Admin: React.FC = () => {
               )}
 
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[1000px]">
                   <thead>
                     <tr className="text-left border-b border-gray-50">
                       <th className="pb-6">
@@ -1313,32 +1313,6 @@ const Admin: React.FC = () => {
             </div>
           )}
 
-          {/* Concierge Tab */}
-          {activeTab === 'concierge' && (
-            <div className="bg-white p-12 rounded-[2.5rem] border border-gray-100 shadow-sm animate-fade-in">
-              <div className="flex items-center gap-4 mb-10">
-                <div className="w-1.5 h-6 bg-gold rounded-full" />
-                <h3 className="text-2xl font-black font-serif text-charcoal">AI Cognitive Hub</h3>
-              </div>
-              <div className="space-y-8">
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">System Intelligence Protocol</label>
-                  <textarea
-                    rows={12}
-                    value={config.conciergePrompt}
-                    onChange={e => updateConfig({ ...config, conciergePrompt: e.target.value })}
-                    className="w-full bg-gray-50 border-gray-100 rounded-2xl p-8 text-sm font-medium leading-relaxed focus:ring-gold outline-none"
-                    // Placeholder to ensure I see the file content firsterge should behave..."
-                    placeholder="Describe how the concierge should behave..."
-                  />
-                </div>
-                <div className="p-8 bg-gray-50 rounded-2xl border border-gray-100">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">Contextual Awareness</p>
-                  <p className="text-sm text-gray-500 italic">This prompt guides the Gemini 2.5 Flash model in handling all guest inquiries. Use structured instructions to define Ghanaian hospitality charm.</p>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Home Tab */}
           {activeTab === 'home' && (
