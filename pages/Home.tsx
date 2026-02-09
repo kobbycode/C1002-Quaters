@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
@@ -73,6 +72,7 @@ const Home: React.FC = () => {
       <SEO
         title="Luxury Suites in Accra"
         description={`${config.brand.name} - ${config.brand.tagline}. Premium suites and authentic Ghanaian luxury.`}
+        type="hotel"
         schema={homeSchema}
       />
 

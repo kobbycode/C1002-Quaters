@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { useSite } from '../context/SiteContext';
 import { formatLuxuryText } from '../utils/formatters';
+import CustomMap from '../components/Map';
 
 const Contact: React.FC = () => {
   const { config } = useSite();
@@ -23,21 +23,16 @@ const Contact: React.FC = () => {
 
   return (
     <div className="pt-24 min-h-screen bg-background-light">
-      <div className="w-full h-[450px] relative bg-gray-100 overflow-hidden border-b border-gray-100">
-        <iframe
-          title="C1002 Quarters Location"
-          src={contactPage.mapEmbedUrl}
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          allowFullScreen={true}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="grayscale opacity-90 hover:grayscale-0 transition-all duration-700"
-        ></iframe>
+      <div className="w-full h-[500px] relative bg-gray-100 overflow-hidden border-b border-gray-100">
+        <CustomMap
+          center={[5.626, -0.106]} // Spintex coordinates
+          title={config.brand.name}
+          address={config.footer.address}
+          className="h-full w-full"
+        />
 
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-          <div className="bg-white/95 backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-gray-100 max-w-sm text-center transform -translate-y-8 animate-fade-in pointer-events-auto">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[400] pointer-events-none">
+          <div className="bg-white/95 backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-gray-100 max-w-sm text-center animate-fade-in pointer-events-auto">
             <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -45,7 +40,19 @@ const Contact: React.FC = () => {
               </svg>
             </div>
             <h3 className="font-black text-xl mb-1 font-serif">{config.brand.name}</h3>
-            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">{config.footer.address}</p>
+            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4">{config.footer.address}</p>
+
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=5.626,-0.106`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-primary hover:bg-[#6B006B] text-white px-6 py-3 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 active:scale-95"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              Get Directions
+            </a>
           </div>
         </div>
       </div>

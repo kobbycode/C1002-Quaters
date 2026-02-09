@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -7,17 +6,21 @@ interface SEOProps {
   description: string;
   image?: string;
   article?: boolean;
-  type?: 'website' | 'hotel' | 'profile';
+  type?: 'website' | 'hotel' | 'profile' | 'place';
   schema?: object;
 }
 
 const SEO: React.FC<SEOProps> = ({ title, description, image, type = 'website', schema }) => {
   const { pathname } = useLocation();
   const siteName = "C1002 Quarters";
-  const fullTitle = `${title} | ${siteName}`;
+  const fullTitle = `${siteName} | ${title}`;
   const siteUrl = window.location.origin;
   const currentUrl = `${siteUrl}${pathname}`;
-  const defaultImage = "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200";
+
+  // Luxury default image - pool area at night
+  const defaultImage = "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1200";
+
+  const seoImage = image?.startsWith('http') ? image : `${siteUrl}${image || defaultImage}`;
 
   useEffect(() => {
     // Update Document Title
@@ -35,20 +38,22 @@ const SEO: React.FC<SEOProps> = ({ title, description, image, type = 'website', 
     };
 
     updateMeta('description', description);
-    
+
     // Open Graph
     updateMeta('og:title', fullTitle, 'property');
     updateMeta('og:description', description, 'property');
     updateMeta('og:url', currentUrl, 'property');
     updateMeta('og:type', type, 'property');
-    updateMeta('og:image', image || defaultImage, 'property');
+    updateMeta('og:image', seoImage, 'property');
     updateMeta('og:site_name', siteName, 'property');
+    updateMeta('og:locale', 'en_GH', 'property');
 
     // Twitter
     updateMeta('twitter:card', 'summary_large_image');
     updateMeta('twitter:title', fullTitle);
     updateMeta('twitter:description', description);
-    updateMeta('twitter:image', image || defaultImage);
+    updateMeta('twitter:image', seoImage);
+    updateMeta('twitter:site', '@c1002quarters');
 
     // Canonical
     let link: HTMLLinkElement | null = document.querySelector("link[rel='canonical']");
@@ -73,7 +78,7 @@ const SEO: React.FC<SEOProps> = ({ title, description, image, type = 'website', 
     } else if (script) {
       script.remove();
     }
-  }, [fullTitle, description, image, currentUrl, type, schema]);
+  }, [fullTitle, description, seoImage, currentUrl, type, schema]);
 
   return null;
 };

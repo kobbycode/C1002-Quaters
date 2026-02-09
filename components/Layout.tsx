@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
@@ -72,19 +71,14 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     if (isMobileMenuOpen) {
-      // Prevent body scroll when mobile menu is open
       document.body.style.overflow = 'hidden';
-      // Reset window scroll position
       window.scrollTo(0, 0);
-      // Reset mobile menu scroll position
       if (mobileMenuRef.current) {
         mobileMenuRef.current.scrollTop = 0;
       }
     } else {
-      // Restore body scroll when mobile menu is closed
       document.body.style.overflow = '';
     }
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = '';
     };
@@ -96,11 +90,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       addSubscriber(newsletterEmail);
       setIsSubscribed(true);
       setNewsletterEmail('');
-      setTimeout(() => setIsSubscribed(false), 3000);
+      setTimeout(() => setIsSubscribed(false), 5000);
     }
   };
 
-  // Skip layout elements for admin panel or login page
   if (isAdmin || isLogin) {
     return <div className="flex flex-col min-h-screen font-sans">{children}</div>;
   }
@@ -289,22 +282,37 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex flex-col gap-6">
             <h4 className="text-sm font-bold uppercase tracking-widest text-gold">News</h4>
             <p className="text-sm text-gray-500">Sign up for news and special gifts.</p>
-            <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
-              <input
-                className="w-full h-12 rounded-lg border-gray-200 bg-white text-sm focus:ring-gold focus:border-gold"
-                placeholder="Email address"
-                type="email"
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                required
-              />
-              <button
-                type="submit"
-                className={`h-12 w-full rounded-lg text-white font-bold text-sm uppercase tracking-widest transition-all ${isSubscribed ? 'bg-green-500' : 'bg-charcoal hover:bg-primary'}`}
-              >
-                {isSubscribed ? 'Subscribed!' : 'Subscribe'}
-              </button>
-            </form>
+            <div className="relative group">
+              {isSubscribed ? (
+                <div className="bg-charcoal text-white p-6 rounded-2xl border border-gold/30 animate-fade-in relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gold/10 rounded-bl-full"></div>
+                  <div className="relative z-10">
+                    <p className="text-gold font-black uppercase tracking-[0.3em] text-[8px] mb-2">Welcome to</p>
+                    <h5 className="font-serif text-xl mb-2 italic">The Inner Circle</h5>
+                    <p className="text-xs text-white/60 leading-relaxed font-light">
+                      You are now part of Accra's most exclusive stay network. Expect curated gifts shortly.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
+                  <input
+                    className="w-full h-12 rounded-lg border-gray-200 bg-white text-sm focus:ring-gold focus:border-gold placeholder:text-gray-300"
+                    placeholder="Email address"
+                    type="email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="h-12 w-full rounded-lg bg-charcoal text-white font-bold text-sm uppercase tracking-widest transition-all hover:bg-primary shadow-lg"
+                  >
+                    Join The Circle
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400 uppercase tracking-widest">
