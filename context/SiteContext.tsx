@@ -157,7 +157,18 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 2. Subscribe to Settings/Config
     const unsubscribeConfig = onSnapshot(doc(db, 'settings', 'config'), (docSnap) => {
-      if (docSnap.exists()) setConfig(docSnap.data() as SiteConfig);
+      if (docSnap.exists()) {
+        // Merge Firestore config with defaults to preserve fields like heroSlides
+        const firestoreConfig = docSnap.data() as SiteConfig;
+        const mergedConfig = { ...DEFAULT_CONFIG, ...firestoreConfig };
+
+        // If Firestore config has no heroSlides, use defaults
+        if (!firestoreConfig.heroSlides || firestoreConfig.heroSlides.length === 0) {
+          mergedConfig.heroSlides = DEFAULT_CONFIG.heroSlides;
+        }
+
+        setConfig(mergedConfig);
+      }
       configLoaded = true;
       if (roomsLoaded && bookingsLoaded && reviewsLoaded) setLoading(false);
     }, (error) => console.error("Error listening to config:", error));

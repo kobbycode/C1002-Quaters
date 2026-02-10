@@ -9,9 +9,10 @@ interface ImageUploadProps {
     onError?: (error: string) => void;
     folder?: string;
     label?: string;
+    allowUnauthenticated?: boolean;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded, onError, folder = 'uploads', label = 'Upload Image' }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded, onError, folder = 'uploads', label = 'Upload Image', allowUnauthenticated = false }) => {
     const [preview, setPreview] = useState<string | null>(currentImage || null);
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -30,14 +31,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded
 
         // Create a reference to the file in Firebase Storage
         try {
-            if (!auth.currentUser) {
+            if (!allowUnauthenticated && !auth.currentUser) {
                 console.error("User not authenticated before upload!");
                 if (onError) onError("Authentication error. Please login again.");
                 else alert("You must be logged in to upload.");
                 setUploading(false);
                 return;
             }
-            console.log("Starting upload as:", auth.currentUser.email);
+            if (auth.currentUser) {
+                console.log("Starting upload as:", auth.currentUser.email);
+            }
             const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
             const uploadTask = uploadBytesResumable(storageRef, file);
 

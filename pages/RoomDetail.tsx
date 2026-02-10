@@ -4,6 +4,8 @@ import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
 import { formatLuxuryText, formatPrice } from '../utils/formatters';
 import { useToast } from '../context/ToastContext';
+import ImageUpload from '../components/ImageUpload';
+import RoomAssistant from '../components/RoomAssistant';
 
 const RoomDetailSkeleton: React.FC = () => (
   <div className="max-w-[1280px] mx-auto px-6 md:px-10 py-6 animate-pulse">
@@ -150,21 +152,31 @@ const ReviewForm: React.FC<{ roomId: string, roomName: string }> = ({ roomId, ro
   const [rating, setRating] = useState(5);
   const [guestName, setGuestName] = useState('');
   const [comment, setComment] = useState('');
+  const [images, setImages] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await addReview({ roomId, roomName, guestName, rating, comment });
+      await addReview({ roomId, roomName, guestName, rating, comment, images });
       showToast('Thank you for your review! It will be visible once approved.', 'success');
       setGuestName('');
       setComment('');
       setRating(5);
+      setImages([]);
     } catch (err) {
       showToast('Failed to submit review. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const addImage = (url: string) => {
+    setImages(prev => [...prev, url]);
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -208,6 +220,35 @@ const ReviewForm: React.FC<{ roomId: string, roomName: string }> = ({ roomId, ro
           placeholder="Share details of your stay..."
         />
       </div>
+
+      <div>
+        <label className="text-[9px] font-black uppercase text-gold tracking-widest mb-4 block">Share Your Moments (Optional)</label>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+          {images.map((url, idx) => (
+            <div key={idx} className="relative aspect-square rounded-xl overflow-hidden group">
+              <img src={url} alt={`Review ${idx}`} className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeImage(idx)}
+                className="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[10px]"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          {images.length < 4 && (
+            <ImageUpload
+              folder={`reviews/${roomId}`}
+              onImageUploaded={addImage}
+              onError={(msg) => showToast(msg, 'error')}
+              label=""
+              allowUnauthenticated={true}
+            />
+          )}
+        </div>
+        <p className="text-[8px] text-gray-400 uppercase tracking-widest">Maximum 4 photos • PNG, JPG supported</p>
+      </div>
+
       <button
         type="submit"
         disabled={isSubmitting}
@@ -510,6 +551,8 @@ const RoomDetail: React.FC = () => {
               </div>
             </div>
 
+            <RoomAssistant roomId={room.id} roomName={room.name} />
+
             {/* Guest Reviews Section */}
             <div className="py-20 border-t border-gray-100">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -556,6 +599,22 @@ const RoomDetail: React.FC = () => {
                           </div>
                         </div>
                         <p className="text-gray-500 text-sm leading-relaxed italic font-light">"{review.comment}"</p>
+
+                        {review.images && review.images.length > 0 && (
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {review.images.map((img, idx) => (
+                              <img
+                                key={idx}
+                                src={img}
+                                alt={`Review by ${review.guestName}`}
+                                className="w-16 h-16 rounded-lg object-cover border border-gray-100 hover:scale-110 transition-transform cursor-zoom-in"
+                                onClick={() => {
+                                  // Potential: Open in a light box or just allow zoom
+                                }}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))
                 ) : (

@@ -62,7 +62,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+
+    const handleOpenConcierge = (e: any) => {
+      setIsConciergeOpen(true);
+      // In a real scenario, we might want to pass the message to the Concierge state
+      // But since they share the same SiteContext/Location, the roomId will be picked up.
+    };
+    window.addEventListener('open-concierge', handleOpenConcierge);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('open-concierge', handleOpenConcierge);
+    };
   }, [isSearchOpen]);
 
   useEffect(() => {
@@ -222,7 +233,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <CommandSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <div className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[70] flex flex-col items-end gap-4 ${isMobileMenuOpen ? 'hidden' : ''}`}>
-        <Concierge isOpen={isConciergeOpen} onClose={() => setIsConciergeOpen(false)} />
+        <Concierge
+          isOpen={isConciergeOpen}
+          onClose={() => setIsConciergeOpen(false)}
+          roomId={location.pathname.startsWith('/rooms/') ? location.pathname.split('/').pop() : undefined}
+        />
         {!isConciergeOpen && (
           <button
             onClick={() => setIsConciergeOpen(true)}

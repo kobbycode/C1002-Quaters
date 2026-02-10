@@ -30,18 +30,27 @@ const Sparkline: React.FC<{ data: number[], color: string }> = ({ data, color })
     );
 };
 
-const RevenueChart: React.FC<{ data: { date: string, value: number }[] }> = ({ data }) => {
-    const max = Math.max(...data.map(d => d.value)) || 1;
+const RevenueChart: React.FC<{ data: { date: string, value: number }[], projected?: { date: string, value: number }[] }> = ({ data, projected = [] }) => {
+    const allData = [...data, ...projected];
+    const max = Math.max(...allData.map(d => d.value)) || 1;
     const width = 800;
     const height = 200;
     const padding = 40;
 
     const points = data.map((d, i) => ({
-        x: padding + (i / (data.length - 1)) * (width - padding * 2),
+        x: padding + (i / (allData.length - 1)) * (width - padding * 2),
+        y: (height - padding) - (d.value / max) * (height - padding * 2)
+    }));
+
+    const projPoints = projected.map((d, i) => ({
+        x: padding + ((data.length + i) / (allData.length - 1)) * (width - padding * 2),
         y: (height - padding) - (d.value / max) * (height - padding * 2)
     }));
 
     const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+    const projPath = projPoints.length > 0
+        ? `M ${points[points.length - 1].x} ${points[points.length - 1].y} ` + projPoints.map(p => `L ${p.x} ${p.y}`).join(' ')
+        : '';
     const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
 
     return (
@@ -66,13 +75,20 @@ const RevenueChart: React.FC<{ data: { date: string, value: number }[] }> = ({ d
                 ))}
                 <path d={areaPath} fill="url(#revenueGradient)" opacity="0.1" />
                 <path d={linePath} fill="none" stroke="#8B008B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                {projPath && (
+                    <path d={projPath} fill="none" stroke="#8B008B" strokeWidth="2" strokeDasharray="6,4" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+                )}
                 {points.map((p, i) => (
                     <g key={i} className="group/point">
                         <circle cx={p.x} cy={p.y} r="4" fill="white" stroke="#8B008B" strokeWidth="2" />
                     </g>
                 ))}
-                {data.filter((_, i) => i % Math.ceil(data.length / 5) === 0 || i === data.length - 1).map((d, i) => {
-                    const p = points[data.indexOf(d)];
+                {projPoints.map((p, i) => (
+                    <circle key={`proj-${i}`} cx={p.x} cy={p.y} r="3" fill="white" stroke="#8B008B" strokeWidth="1.5" strokeDasharray="2,1" />
+                ))}
+                {allData.filter((_, i) => i % Math.ceil(allData.length / 5) === 0 || i === allData.length - 1).map((d, i) => {
+                    const idx = allData.indexOf(d);
+                    const p = idx < data.length ? points[idx] : projPoints[idx - data.length];
                     return (
                         <text key={i} x={p.x} y={height - 10} textAnchor="middle" className="text-[8px] font-black uppercase tracking-widest fill-gray-400">
                             {d.date}
@@ -134,9 +150,9 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
     setViewingBooking
 }) => {
     const { bookings } = useSite();
+    const now = useMemo(() => new Date(), []);
     const [revenueDateFilter, setRevenueDateFilter] = useState<'7d' | '30d' | '90d'>('7d');
     const chartData = useMemo(() => {
-        const now = new Date();
         const days = revenueDateFilter === '7d' ? 7 : revenueDateFilter === '30d' ? 30 : 90;
         const data: { date: string, value: number }[] = [];
 
@@ -149,8 +165,30 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                 .reduce((acc, b) => acc + b.totalPrice, 0);
             data.push({ date: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), value: dailyRev });
         }
-        return data;
-    }, [revenueDateFilter, bookings]);
+        const projected: { date: string, value: number }[] = [];
+        const dailyAvg = data.reduce((acc, d) => acc + d.value, 0) / (data.length || 1);
+
+        // Calculate growth trend between first half and second half of historical data
+        const halfIdx = Math.floor(data.length / 2);
+        const firstHalf = data.slice(0, halfIdx);
+        const secondHalf = data.slice(halfIdx);
+        const firstAvg = firstHalf.reduce((acc, d) => acc + d.value, 0) / (firstHalf.length || 1);
+        const secondAvg = secondHalf.reduce((acc, d) => acc + d.value, 0) / (secondHalf.length || 1);
+        const growthMultiplier = firstAvg > 0 ? secondAvg / firstAvg : 1;
+
+        for (let i = 1; i <= 3; i++) {
+            const d = new Date(now);
+            d.setDate(now.getDate() + i * (days / 3));
+            projected.push({
+                date: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                value: dailyAvg * Math.pow(growthMultiplier, i / 3) * (1 + (Math.random() * 0.1 - 0.05))
+            });
+        }
+
+        return { historical: data, projected };
+    }, [revenueDateFilter, bookings, now]);
+
+    const { reviews } = useSite();
 
     const financialData = useMemo(() => {
         const totalPotentialValue = rooms.reduce((acc, r) => acc + r.price, 0);
@@ -178,11 +216,83 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
             ? Math.min(100, Math.round((bookedNightsLast30 / totalCapacityLast30) * 100))
             : 0;
 
-        return { totalPotentialValue, realizedRevenue, categoryStats, avgStayDuration, occupancyRate };
-    }, [rooms, config.categories || [], bookings]);
+        // RevPAR (Revenue Per Available Room)
+        const revenueLast30 = bookings
+            .filter(b => b.date && b.date >= thirtyDaysAgo.toISOString().split('T')[0])
+            .reduce((acc, b) => acc + b.totalPrice, 0);
+        const revPAR = totalCapacityLast30 > 0 ? (revenueLast30 / totalCapacityLast30).toFixed(0) : '0';
+
+        // Room Performance Scores
+        const roomPerformance = rooms.map(room => {
+            const roomBookings = bookings.filter(b => b.roomId === room.id);
+            const roomBookedNights = roomBookings
+                .filter(b => b.isoCheckIn && b.isoCheckIn >= thirtyDaysAgo.toISOString().split('T')[0])
+                .reduce((acc, b) => acc + b.nights, 0);
+
+            const roomOccupancy = Math.min(100, (roomBookedNights / 30) * 100);
+
+            // Integrate guest sentiment (reviews) into score
+            const roomReviews = reviews.filter(r => r.roomId === room.id && r.status === 'approved');
+            const reviewCountFactor = Math.min(1, roomReviews.length / 5); // Trust factor caps at 5 reviews
+            const avgRating = roomReviews.length > 0
+                ? roomReviews.reduce((acc, r) => acc + r.rating, 0) / roomReviews.length
+                : room.rating;
+
+            const score = (roomOccupancy * 0.6) + (avgRating * 6) + (reviewCountFactor * 10); // Max score 100
+
+            return {
+                id: room.id,
+                name: room.name,
+                score: Math.round(score),
+                revenue: roomBookings.reduce((acc, b) => acc + b.totalPrice, 0),
+                occupancy: Math.round(roomOccupancy)
+            };
+        }).sort((a, b) => b.score - a.score);
+
+        // Revenue Forecasting
+        const daysInCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const daysRemaining = daysInCurrentMonth - now.getDate();
+        const dailyAvgLast30 = revenueLast30 / 30;
+        const knownNext30 = bookings
+            .filter(b => b.isoCheckIn && b.isoCheckIn > now.toISOString().split('T')[0] && b.isoCheckIn <= new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+            .reduce((acc, b) => acc + b.totalPrice, 0);
+        const forecastedRevenue = knownNext30 + (dailyAvgLast30 * daysRemaining);
+
+        // Seasonal Occupancy Pulse (Calculated from actual bookings)
+        const seasonalPulse = [
+            { season: 'Jan-Mar', start: 0, end: 2, color: '#8B008B' },
+            { season: 'Apr-Jun', start: 3, end: 5, color: '#10b981' },
+            { season: 'Jul-Sep', start: 6, end: 8, color: '#fbbf24' },
+            { season: 'Oct-Dec', start: 9, end: 11, color: '#3b82f6' }
+        ].map(s => {
+            const seasonalBookings = bookings.filter(b => {
+                const month = new Date(b.date).getMonth();
+                return month >= s.start && month <= s.end;
+            });
+            const totalNights = seasonalBookings.reduce((acc, b) => acc + b.nights, 0);
+            const totalCapacity = rooms.length * 91; // Approx days per quarter
+            const level = totalCapacity > 0 ? Math.min(1, totalNights / totalCapacity) : 0;
+            return {
+                season: s.season,
+                level: Math.max(0.1, level), // Ensure it's at least visible
+                color: s.color
+            };
+        });
+
+        // Strategic Insight (Generated based on data trends)
+        let strategicInsight = "Portfolio yield is stable. Maintain current market positioning and housekeeping standards.";
+        if (occupancyRate > 85) {
+            strategicInsight = "Exceptional occupancy momentum. Consider a 10-15% premium adjustment for the upcoming cycle.";
+        } else if (occupancyRate < 30) {
+            strategicInsight = "Yield momentum is below target. Consider targeted digital promotions or social media showcases.";
+        } else if (roomPerformance.length > 0 && roomPerformance[0].score > 90) {
+            strategicInsight = `${roomPerformance[0].name} is performing at an elite level. Use its aesthetic as a baseline for other units.`;
+        }
+
+        return { totalPotentialValue, realizedRevenue, categoryStats, avgStayDuration, occupancyRate, revPAR, roomPerformance, forecastedRevenue, seasonalPulse, strategicInsight };
+    }, [rooms, config.categories || [], bookings, reviews]);
 
     const statsData = useMemo(() => {
-        const now = new Date();
         const getRangeStats = (daysOffset: number, length: number) => {
             const start = new Date();
             start.setDate(now.getDate() - (daysOffset + length));
@@ -240,15 +350,16 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
     }, [bookings]);
 
     const stats = [
-        { label: 'Realized Revenue', value: formatPrice(financialData.realizedRevenue, config.currency || 'GHS'), sub: 'Settled Ledger', growth: statsData.revenue.growth, icon: '💰', trend: statsData.revenue.trend, color: '#8B008B' },
-        { label: 'Occupancy Rate', value: `${financialData.occupancyRate}%`, sub: 'Inventory Yield', growth: '+0.0%', icon: '📈', trend: Array(7).fill(financialData.occupancyRate), color: '#10b981' },
-        { label: 'Active Bookings', value: bookings.length.toString(), sub: 'Confirmed Stays', growth: statsData.bookings.growth, icon: '📅', trend: statsData.bookings.trend, color: '#8B008B' },
+        { label: 'Realized Revenue', value: formatPrice(financialData.realizedRevenue, config.currency || 'GHS'), sub: `${formatPrice(parseInt(financialData.revPAR), config.currency || 'GHS')} RevPAR`, growth: statsData.revenue.growth, icon: '💰', trend: statsData.revenue.trend, color: '#8B008B' },
+        { label: 'Occupancy Rate', value: `${financialData.occupancyRate}%`, sub: '30-Day Inventory Yield', growth: '+0.0%', icon: '📈', trend: Array(7).fill(financialData.occupancyRate), color: '#10b981' },
+        { label: 'Top Performer', value: financialData.roomPerformance[0]?.score.toString() || '0', sub: financialData.roomPerformance[0]?.name || 'No data', growth: 'Elite', icon: '🏆', trend: Array(7).fill(financialData.roomPerformance[0]?.score || 0), color: '#fbbf24' },
         { label: 'Avg. Duration', value: `${financialData.avgStayDuration} Nights`, sub: 'Guest Commitment', growth: statsData.duration.growth, icon: '⏳', trend: statsData.duration.trend, color: '#3b82f6' },
+        { label: 'Monthly Forecast', value: formatPrice(financialData.forecastedRevenue, config.currency || 'GHS'), sub: 'Next 30 Days Projection', growth: 'Foresight', icon: '🔮', trend: [financialData.realizedRevenue * 0.8, financialData.realizedRevenue, financialData.forecastedRevenue], color: '#6B006B' },
     ];
 
     return (
         <div className="space-y-12 animate-fade-in">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {stats.map(s => (
                     <div key={s.label} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-6">
@@ -289,43 +400,72 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                                 ))}
                             </div>
                         </div>
-                        <RevenueChart data={chartData} />
+                        <RevenueChart data={chartData.historical} projected={chartData.projected} />
                     </div>
 
                     <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
                         <div className="flex items-center justify-between mb-10">
                             <div className="flex items-center gap-4">
-                                <div className="w-1.5 h-6 bg-gold rounded-full" />
-                                <h3 className="text-2xl font-black font-serif text-charcoal">Inventory Yield</h3>
+                                <div className="w-1.5 h-6 bg-primary rounded-full" />
+                                <h3 className="text-2xl font-black font-serif text-charcoal">Room Performance Matrix</h3>
                             </div>
                         </div>
-                        <div className="h-64 flex items-end gap-12 px-4 border-b border-gray-50 pb-2">
-                            {financialData.categoryStats.map(stat => {
-                                const realizedForCat = bookings
-                                    .filter(b => rooms.find(r => r.id === b.roomId)?.category === stat.name)
-                                    .reduce((acc, b) => acc + b.totalPrice, 0);
-                                const potentialForCat = rooms
-                                    .filter(r => r.category === stat.name)
-                                    .reduce((acc, r) => acc + r.price, 0);
-
-                                const maxVal = Math.max(...financialData.categoryStats.map(s => {
-                                    const pot = rooms.filter(r => r.category === s.name).reduce((acc, r) => acc + r.price, 0);
-                                    return pot || 1;
-                                }));
-
-                                const potHeight = (potentialForCat / maxVal) * 100;
-                                const realHeight = (realizedForCat / maxVal) * 100;
-
-                                return (
-                                    <div key={stat.name} className="flex-1 flex flex-col items-center gap-4 group">
-                                        <div className="w-full h-full flex items-end justify-center gap-1.5 relative">
-                                            <div style={{ height: `${potHeight}%` }} className="w-4 bg-gold/10 rounded-t-lg transition-all group-hover:bg-gold/20" />
-                                            <div style={{ height: `${realHeight}%` }} className="w-4 bg-charcoal rounded-t-lg transition-all group-hover:bg-gold" />
+                        <div className="space-y-6">
+                            {financialData.roomPerformance.slice(0, 5).map(room => (
+                                <div key={room.id} className="flex items-center justify-between group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-sm font-black text-gold">
+                                            {room.score}
                                         </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.name}</p>
+                                        <div>
+                                            <p className="text-sm font-black text-charcoal">{room.name}</p>
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{room.occupancy}% Occupancy</p>
+                                        </div>
                                     </div>
-                                );
-                            })}
+                                    <div className="flex-1 max-w-[200px] h-1.5 bg-gray-50 rounded-full mx-8 overflow-hidden hidden md:block">
+                                        <div style={{ width: `${room.score}%` }} className="h-full bg-primary rounded-full" />
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-black text-charcoal">{formatPrice(room.revenue, config.currency || 'GHS')}</p>
+                                        <p className="text-[9px] font-bold text-gold uppercase tracking-widest">Total Yield</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[5rem] pointer-events-none" />
+                        <div className="flex items-center justify-between mb-10">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-6 bg-primary rounded-full" />
+                                <h3 className="text-2xl font-black font-serif text-charcoal">Seasonal Occupancy Pulse</h3>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-4 gap-4 h-48 items-end px-4 border-b border-gray-50 pb-4">
+                            {financialData.seasonalPulse.map(s => (
+                                <div key={s.season} className="flex-1 flex flex-col items-center gap-3 group">
+                                    <div className="w-full relative flex flex-col items-center">
+                                        <div
+                                            className="w-8 rounded-t-xl transition-all duration-1000 group-hover:scale-y-110 origin-bottom"
+                                            style={{
+                                                height: `${s.level * 100}%`,
+                                                backgroundColor: s.color,
+                                                opacity: s.level > 0.8 ? 1 : 0.6
+                                            }}
+                                        />
+                                        {s.level > 0.8 && <div className="absolute -top-6 text-[8px] font-black text-primary uppercase">Peak</div>}
+                                    </div>
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">{s.season}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-6 flex items-start gap-4 p-4 bg-gray-50 rounded-2xl">
+                            <span className="text-xl">💡</span>
+                            <div>
+                                <p className="text-[10px] font-black text-charcoal uppercase tracking-widest mb-1">Strategic Insight</p>
+                                <p className="text-[10px] text-gray-400 font-bold leading-relaxed lowercase">{financialData.strategicInsight}</p>
+                            </div>
                         </div>
                     </div>
                 </div>

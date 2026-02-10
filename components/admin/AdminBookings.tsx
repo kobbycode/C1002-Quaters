@@ -3,6 +3,7 @@ import { useSite } from '../../context/SiteContext';
 import { formatPrice } from '../../utils/formatters';
 import { Booking } from '../../types';
 import { useToast } from '../../context/ToastContext';
+import { AdminCalendar } from './AdminCalendar';
 
 interface AdminBookingsProps {
     onViewBooking: (booking: Booking) => void;
@@ -22,6 +23,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
     const [bookingSearch, setBookingSearch] = useState('');
     const [bookingFilter, setBookingFilter] = useState<'all' | 'rent' | 'reservation'>('all');
     const [dateFilter, setDateFilter] = useState('');
+    const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
 
     const { rooms, addBooking, deleteBooking, bookings, config, isRoomAvailable } = useSite();
     const { showToast } = useToast();
@@ -199,6 +201,21 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
 
                 <div className="h-full w-px bg-gray-200 mx-2 hidden md:block"></div>
 
+                <div className="flex bg-gray-50 rounded-[1.5rem] p-1.5 gap-1.5 border border-gray-100">
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={`px-6 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'list' ? 'bg-white text-charcoal shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
+                    >
+                        List
+                    </button>
+                    <button
+                        onClick={() => setViewMode('calendar')}
+                        className={`px-6 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'calendar' ? 'bg-white text-charcoal shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
+                    >
+                        Calendar
+                    </button>
+                </div>
+
                 <button
                     onClick={() => setIsCreating(true)}
                     className="whitespace-nowrap px-8 py-5 bg-charcoal text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-gold transition-colors shadow-lg shadow-charcoal/20 flex items-center gap-3 group"
@@ -208,84 +225,102 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                 </button>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-charcoal text-white">
-                                <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Guest Information</th>
-                                <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Stay Details</th>
-                                <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Financials</th>
-                                <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Payment</th>
-                                <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.3em] text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {filteredBookings.map((booking) => (
-                                <tr key={booking.id} className="group hover:bg-gray-50/50 transition-colors">
-                                    <td className="px-10 py-8">
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">👤</div>
-                                            <div>
-                                                <p className="text-base font-black text-charcoal mb-1">{booking.guestName}</p>
-                                                <p className="text-[10px] font-bold text-gray-400 tracking-wider flex items-center gap-2">
-                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                    {booking.guestEmail}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-8">
-                                        <p className="text-sm font-black text-charcoal mb-1">{booking.roomName}</p>
-                                        <div className="flex items-center gap-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                            <span>{new Date(booking.date).toLocaleDateString()}</span>
-                                            <span className="w-1 h-1 bg-gray-200 rounded-full" />
-                                            <span>{booking.nights} Nights</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-8">
-                                        <p className="text-base font-black text-gold">{formatPrice(booking.totalPrice, config.currency)}</p>
-                                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mt-1">Confirmed</p>
-                                    </td>
-                                    <td className="px-8 py-8">
-                                        <div className="flex flex-col gap-1">
-                                            <span className={`inline-flex px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${booking.paymentStatus === 'paid' ? 'bg-green-50 text-green-500 border-green-100' : 'bg-yellow-50 text-yellow-500 border-yellow-100'} border`}>
-                                                {booking.paymentStatus}
-                                            </span>
-                                            <span className="text-[8px] font-black text-gray-400 tracking-tighter uppercase px-1">
-                                                via {booking.paymentMethod}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td className="px-10 py-8 text-right">
-                                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button
-                                                onClick={() => onViewBooking(booking)}
-                                                className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gold hover:border-gold/30 hover:shadow-lg transition-all"
-                                                title="View Details"
-                                            >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(booking.id)}
-                                                className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-100 hover:shadow-lg transition-all"
-                                                title="Delete Booking"
-                                            >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                            </button>
-                                        </div>
-                                    </td>
+            {viewMode === 'calendar' ? (
+                <AdminCalendar
+                    onViewBooking={onViewBooking}
+                    onBookSlot={(roomId, date) => {
+                        const room = rooms.find(r => r.id === roomId);
+                        setNewBooking({
+                            guestName: '',
+                            guestEmail: '',
+                            roomId,
+                            nights: 1,
+                            totalPrice: room ? room.price : 0,
+                            isoCheckIn: date
+                        });
+                        setIsCreating(true);
+                    }}
+                />
+            ) : (
+                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-charcoal text-white">
+                                    <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Guest Information</th>
+                                    <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Stay Details</th>
+                                    <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Financials</th>
+                                    <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Payment</th>
+                                    <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.3em] text-right">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {filteredBookings.length === 0 && (
-                        <div className="px-10 py-20 text-center">
-                            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">No bookings found matching your criteria</p>
-                        </div>
-                    )}
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {filteredBookings.map((booking) => (
+                                    <tr key={booking.id} className="group hover:bg-gray-50/50 transition-colors">
+                                        <td className="px-10 py-8">
+                                            <div className="flex items-center gap-6">
+                                                <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">👤</div>
+                                                <div>
+                                                    <p className="text-base font-black text-charcoal mb-1">{booking.guestName}</p>
+                                                    <p className="text-[10px] font-bold text-gray-400 tracking-wider flex items-center gap-2">
+                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                                        {booking.guestEmail}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-8">
+                                            <p className="text-sm font-black text-charcoal mb-1">{booking.roomName}</p>
+                                            <div className="flex items-center gap-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                                <span>{new Date(booking.date).toLocaleDateString()}</span>
+                                                <span className="w-1 h-1 bg-gray-200 rounded-full" />
+                                                <span>{booking.nights} Nights</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-8">
+                                            <p className="text-base font-black text-gold">{formatPrice(booking.totalPrice, config.currency)}</p>
+                                            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mt-1">Confirmed</p>
+                                        </td>
+                                        <td className="px-8 py-8">
+                                            <div className="flex flex-col gap-1">
+                                                <span className={`inline-flex px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${booking.paymentStatus === 'paid' ? 'bg-green-50 text-green-500 border-green-100' : 'bg-yellow-50 text-yellow-500 border-yellow-100'} border`}>
+                                                    {booking.paymentStatus}
+                                                </span>
+                                                <span className="text-[8px] font-black text-gray-400 tracking-tighter uppercase px-1">
+                                                    via {booking.paymentMethod}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-10 py-8 text-right">
+                                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => onViewBooking(booking)}
+                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gold hover:border-gold/30 hover:shadow-lg transition-all"
+                                                    title="View Details"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(booking.id)}
+                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-100 hover:shadow-lg transition-all"
+                                                    title="Delete Booking"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {filteredBookings.length === 0 && (
+                            <div className="px-10 py-20 text-center">
+                                <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">No bookings found matching your criteria</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

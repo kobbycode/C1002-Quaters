@@ -15,6 +15,8 @@ export interface Room {
   category: string;
   isBestSeller?: boolean;
   isElite?: boolean;
+  maintenanceCost?: number; // Monthly maintenance cost
+  operationalOverhead?: number; // % of price (e.g. 0.1 for 10%)
 }
 
 
@@ -96,6 +98,8 @@ export interface SiteConfig {
   conciergePrompt: string;
   currency?: string;
   timezone?: string;
+  aiKnowledgeBase?: { question: string; answer: string; category?: string }[];
+  aiLabInstructions?: string;
 
   // bookings: Booking[]; // Deprecated, moved to root collection
 }
@@ -131,4 +135,36 @@ export interface Review {
   comment: string;
   date: string; // ISO string
   status: 'pending' | 'approved' | 'rejected';
+  images?: string[];
 }
+
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  htmlTemplate: string;
+  textTemplate: string;
+  variables: string[];
+  enabled: boolean;
+}
+
+export interface EmailLog {
+  id: string;
+  to: string;
+  template: string;
+  subject: string;
+  sentAt: string;
+  status: 'pending' | 'sent' | 'failed';
+  bookingId?: string;
+  error?: string;
+}
+
+export interface ScheduledEmail {
+  id: string;
+  bookingId: string;
+  templateId: string;
+  scheduledFor: string; // ISO date
+  sent: boolean;
+  sentAt?: string;
+}
+

@@ -59,7 +59,23 @@ export const AdminReviews: React.FC = () => {
                 </div>
             </div>
 
-            <p className="text-gray-500 text-xs leading-relaxed italic mb-8 line-clamp-4 relative z-10">"{review.comment}"</p>
+            <p className="text-gray-500 text-xs leading-relaxed italic mb-4 line-clamp-4 relative z-10">"{review.comment}"</p>
+
+            {review.images && review.images.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mb-6 relative z-10">
+                    {review.images.map((img, idx) => (
+                        <a
+                            key={idx}
+                            href={img}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="aspect-square rounded-lg overflow-hidden border border-gray-100 hover:border-gold transition-colors"
+                        >
+                            <img src={img} alt="Guest" className="w-full h-full object-cover" />
+                        </a>
+                    ))}
+                </div>
+            )}
 
             <div className="flex items-center justify-between pt-6 border-t border-gray-50 mt-auto">
                 <span className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">

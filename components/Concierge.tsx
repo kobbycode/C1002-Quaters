@@ -4,22 +4,53 @@ import { useSite } from '../context/SiteContext';
 import { formatPrice } from '../utils/formatters';
 import type { AmenityDetail } from '../types';
 
-const Concierge: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-  const { config, rooms } = useSite();
+const Concierge: React.FC<{ isOpen: boolean; onClose: () => void; roomId?: string }> = ({ isOpen, onClose, roomId }) => {
+  const { config, rooms, isRoomAvailable } = useSite();
   const [messages, setMessages] = useState<{ role: 'user' | 'model'; text: string; links?: { title: string; uri: string }[] }[]>([
-    { role: 'model', text: "Akwaaba! I am your AI Concierge. How can I help with your stay in Accra today? I can recommend local restaurants, sights, or help with room details." }
+    {
+      role: 'model',
+      text: roomId
+        ? `Akwaaba! I'm your assistant for the ${rooms.find(r => r.id === roomId)?.name || 'suite'}. How can I help you regarding this room's details or availability?`
+        : "Akwaaba! I am your AI Concierge. How can I help with your stay in Accra today? I can recommend local restaurants, sights, or help with room details."
+    }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const tools = [
+    {
+      function_declarations: [
+        {
+          name: "check_room_availability",
+          description: "Check if a specific room is available for a range of dates.",
+          parameters: {
+            type: "object",
+            properties: {
+              roomId: { type: "string", description: "The ID of the room (e.g., standard-suite)." },
+              checkIn: { type: "string", description: "ISO date string for check-in (YYYY-MM-DD)." },
+              checkOut: { type: "string", description: "ISO date string for check-out (YYYY-MM-DD)." }
+            },
+            required: ["roomId", "checkIn", "checkOut"]
+          }
+        }
+      ]
+    }
+  ];
+
   const enhancedPrompt = useMemo(() => {
-    const roomsInfo = rooms.map(r => `${r.name}: ${r.description} (Price: ${formatPrice(r.price, config.currency)}, Amenities: ${r.amenities.join(', ')})`).join('\n');
-    const amenitiesInfo = (Object.entries(config.amenityDetails) as [string, AmenityDetail][]).map(([name, detail]) => `${name}: ${detail.description}`).join('\n');
+    const roomsInfo = rooms.map(r => `ID: ${r.id} | ${r.name}: ${r.description} (Price: ${formatPrice(r.price, config.currency)}, Amenities: ${r.amenities.join(', ')})`).join('\n');
+    const amenitiesInfo = (Object.entries(config.amenityDetails || {}) as [string, AmenityDetail][]).map(([name, detail]) => `${name}: ${detail.description}`).join('\n');
+    const knowledgeBaseInfo = (config.aiKnowledgeBase || [])
+      .map(k => `Q: ${k.question}\nA: ${k.answer}`)
+      .join('\n\n');
 
-    return `${config.conciergePrompt}
+    let context = `${config.conciergePrompt}
 
-Additional Context:
+Additional Specialized Knowledge:
+${knowledgeBaseInfo}
+
+Standard Property Context:
 Our Rooms:
 ${roomsInfo}
 
@@ -29,9 +60,17 @@ ${amenitiesInfo}
 House Rules & Local Info:
 - Check-in: 2:00 PM, Check-out: 12:00 PM.
 - Location: Spintex, Accra, near the Coastal area.
-- Beach proximity: 15-20 mins to Labadi/Teshie beaches.
 - Always be ultra-polite, luxury-focused, and use "Akwaaba" (Welcome) where appropriate.`;
-  }, [config, rooms]);
+
+    if (roomId) {
+      const selectedRoom = rooms.find(r => r.id === roomId);
+      if (selectedRoom) {
+        context += `\n\nCURRENTLY VIEWING: You are assisting a guest who is currently viewing the ${selectedRoom.name}. Focus your answers on this room unless they ask about others.`;
+      }
+    }
+
+    return context;
+  }, [config, rooms, roomId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -51,7 +90,8 @@ House Rules & Local Info:
       const ai = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '');
       const model = ai.getGenerativeModel({
         model: "gemini-1.5-flash",
-        systemInstruction: enhancedPrompt
+        systemInstruction: enhancedPrompt,
+        tools: tools as any
       });
 
       const chat = model.startChat({
@@ -61,10 +101,28 @@ House Rules & Local Info:
         }))
       });
 
-      const result = await chat.sendMessage(userMessage);
-      const response = await result.response;
-      const text = response.text();
+      let result = await chat.sendMessage(userMessage);
+      let response = await result.response;
 
+      const calls = response.functionCalls();
+      if (calls && calls.length > 0) {
+        const call = calls[0];
+        if (call.name === "check_room_availability") {
+          const { roomId: rId, checkIn, checkOut } = call.args as any;
+          const available = isRoomAvailable(rId, checkIn, checkOut);
+
+          // Send tool output back to model
+          result = await chat.sendMessage([{
+            functionResponse: {
+              name: "check_room_availability",
+              response: { available }
+            }
+          }]);
+          response = await result.response;
+        }
+      }
+
+      const text = response.text();
       setMessages(prev => [...prev, { role: 'model', text }]);
     } catch (error) {
       console.error("Concierge Error:", error);
