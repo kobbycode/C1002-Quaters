@@ -158,30 +158,61 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
 
                     {/* Amenities */}
                     <div className="col-span-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Amenities</label>
-                        <div className="flex gap-2 mb-4">
-                            <input
-                                type="text"
-                                value={newAmenity}
-                                onChange={e => setNewAmenity(e.target.value)}
-                                onKeyPress={e => e.key === 'Enter' && addAmenity()}
-                                className="flex-1 border-gray-100 bg-gray-50 rounded-xl p-4 text-sm font-bold"
-                                placeholder="Add amenity (e.g. Private Pool)"
-                            />
-                            <button
-                                onClick={addAmenity}
-                                className="bg-charcoal text-white px-6 rounded-xl text-[10px] font-black uppercase"
-                            >
-                                Add
-                            </button>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Suite Amenities</label>
+
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {(editingRoom.amenities || []).map(amenity => {
+                                const isRegistered = config.amenityDetails && config.amenityDetails[amenity];
+                                return (
+                                    <span key={amenity} className={`group flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isRegistered ? 'bg-charcoal text-white hover:bg-gold' : 'bg-red-50 text-red-500 border border-red-100'}`}>
+                                        {!isRegistered && (
+                                            <span title="Unregistered Amenity" className="flex items-center">
+                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                                            </span>
+                                        )}
+                                        {amenity}
+                                        <button onClick={() => removeAmenity(amenity)} className="hover:scale-125 transition-transform">
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                                        </button>
+                                    </span>
+                                );
+                            })}
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                            {(editingRoom.amenities || []).map(amenity => (
-                                <span key={amenity} className="bg-gray-100 text-charcoal px-3 py-1.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2">
-                                    {amenity}
-                                    <button onClick={() => removeAmenity(amenity)} className="text-red-500 hover:text-red-700 font-bold">×</button>
-                                </span>
-                            ))}
+
+                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-4">Quick Add from Registry</p>
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                {Object.keys(config.amenityDetails || {})
+                                    .filter(a => !(editingRoom.amenities || []).includes(a))
+                                    .slice(0, 12)
+                                    .map(a => (
+                                        <button
+                                            key={a}
+                                            onClick={() => setEditingRoom({ ...editingRoom, amenities: [...(editingRoom.amenities || []), a] })}
+                                            className="px-3 py-1.5 rounded-lg bg-white border border-gray-100 text-[10px] font-bold text-charcoal hover:border-gold hover:text-gold transition-all"
+                                        >
+                                            + {a}
+                                        </button>
+                                    ))
+                                }
+                            </div>
+
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newAmenity}
+                                    onChange={e => setNewAmenity(e.target.value)}
+                                    onKeyPress={e => e.key === 'Enter' && addAmenity()}
+                                    className="flex-1 bg-white border border-gray-100 rounded-xl p-4 text-xs font-bold focus:border-gold outline-none transition-all"
+                                    placeholder="Add custom amenity..."
+                                />
+                                <button
+                                    onClick={addAmenity}
+                                    className="bg-charcoal text-white px-8 rounded-xl text-[10px] font-black uppercase hover:bg-gold transition-all"
+                                >
+                                    Add Custom
+                                </button>
+                            </div>
                         </div>
                     </div>
 

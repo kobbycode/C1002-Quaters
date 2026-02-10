@@ -56,6 +56,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
             totalPrice: Number(newBooking.totalPrice),
             paymentStatus: 'pending',
             paymentMethod: 'cash',
+            status: 'pending',
             isoCheckIn,
             isoCheckOut,
             checkInDate: formattedCheckIn,
@@ -89,8 +90,15 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
     const filteredBookings = useMemo(() => {
         return bookings
             .filter(booking => {
-                const searchMatch = (booking.guestName + booking.roomName + booking.guestEmail).toLowerCase().includes(bookingSearch.toLowerCase());
-                const typeMatch = bookingFilter === 'all' || 'reservation' === bookingFilter;
+                const searchMatch = (booking.guestName + booking.roomName + booking.guestEmail + booking.id).toLowerCase().includes(bookingSearch.toLowerCase());
+
+                let typeMatch = true;
+                if (bookingFilter === 'reservation') {
+                    typeMatch = !booking.status || booking.status === 'pending';
+                } else if (bookingFilter === 'rent') {
+                    typeMatch = booking.status === 'arrived';
+                }
+
                 const dateMatch = !dateFilter || booking.date.startsWith(dateFilter);
                 return searchMatch && typeMatch && dateMatch;
             })

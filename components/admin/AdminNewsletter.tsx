@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { SiteConfig } from '../../types';
 import { useToast } from '../../context/ToastContext';
+import { AdminNewsletterModal } from './modals/AdminNewsletterModal';
 
 interface AdminNewsletterProps {
     config: SiteConfig;
@@ -10,6 +11,7 @@ interface AdminNewsletterProps {
 export const AdminNewsletter: React.FC<AdminNewsletterProps> = ({ config, updateConfig }) => {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const subscribers = config.newsletterSubscribers || [];
 
     const filteredSubscribers = useMemo(() => {
@@ -69,17 +71,29 @@ export const AdminNewsletter: React.FC<AdminNewsletterProps> = ({ config, update
                         </svg>
                     </div>
 
-                    {subscribers.length > 0 && (
-                        <button
-                            onClick={handleExportCsv}
-                            className="bg-charcoal text-white font-black px-6 py-3 rounded-xl hover:bg-gold transition-all shadow-lg shadow-charcoal/10 uppercase tracking-widest text-[10px] flex items-center justify-center gap-3"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Export CSV
-                        </button>
-                    )}
+                    <div className="flex items-center gap-2">
+                        {subscribers.length > 0 && (
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="bg-primary text-white font-black px-6 py-3 rounded-xl hover:bg-[#6B006B] transition-all shadow-lg shadow-primary/10 uppercase tracking-widest text-[10px] flex items-center justify-center gap-3"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                                Broadcast
+                            </button>
+                        )}
+
+                        {subscribers.length > 0 && (
+                            <button
+                                onClick={handleExportCsv}
+                                className="bg-charcoal text-white font-black px-6 py-3 rounded-xl hover:bg-gold transition-all shadow-lg shadow-charcoal/10 uppercase tracking-widest text-[10px] flex items-center justify-center gap-3"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Export
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -118,6 +132,12 @@ export const AdminNewsletter: React.FC<AdminNewsletterProps> = ({ config, update
                     ))}
                 </div>
             )}
+
+            <AdminNewsletterModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                config={config}
+            />
         </div>
     );
 };
