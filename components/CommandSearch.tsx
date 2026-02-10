@@ -3,6 +3,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 
+import { formatPrice } from '../utils/formatters';
+
 interface CommandSearchProps {
     isOpen: boolean;
     onClose: () => void;
@@ -26,7 +28,7 @@ export const CommandSearch: React.FC<CommandSearchProps> = ({ isOpen, onClose })
                 matches.push({
                     type: 'room',
                     title: room.name,
-                    subtitle: `${room.category} • GH₵${room.price}/night`,
+                    subtitle: `${room.category} • ${formatPrice(room.price, config.currency)}/night`,
                     action: () => {
                         if (isAdmin) {
                             navigate(`/admin?tab=rooms&edit=${room.id}`);

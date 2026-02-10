@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Room, SiteConfig, Booking } from '../../types';
+import { useSite } from '../../context/SiteContext';
+import { formatPrice } from '../../utils/formatters';
 
 interface AdminOverviewProps {
     rooms: Room[];
@@ -131,6 +133,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
     setEditingRoom,
     setViewingBooking
 }) => {
+    const { bookings } = useSite();
     const [revenueDateFilter, setRevenueDateFilter] = useState<'7d' | '30d' | '90d'>('7d');
     const chartData = useMemo(() => {
         const now = new Date();
@@ -141,18 +144,18 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
             const d = new Date();
             d.setDate(now.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
-            const dailyRev = config.bookings
+            const dailyRev = bookings
                 .filter(b => b.date.startsWith(dateStr))
                 .reduce((acc, b) => acc + b.totalPrice, 0);
             data.push({ date: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), value: dailyRev });
         }
         return data;
-    }, [revenueDateFilter, config.bookings]);
+    }, [revenueDateFilter, bookings]);
 
     const financialData = useMemo(() => {
         const totalPotentialValue = rooms.reduce((acc, r) => acc + r.price, 0);
-        const realizedRevenue = config.bookings.reduce((acc, b) => acc + b.totalPrice, 0);
-        const categoryStats = config.categories.map(cat => {
+        const realizedRevenue = bookings.reduce((acc, b) => acc + b.totalPrice, 0);
+        const categoryStats = (config.categories || []).map(cat => {
             const catRooms = rooms.filter(r => r.category === cat);
             return {
                 name: cat,
@@ -160,12 +163,23 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                 percent: rooms.length ? Math.round((catRooms.length / rooms.length) * 100) : 0
             };
         });
-        const avgStayDuration = config.bookings.length
-            ? (config.bookings.reduce((acc, b) => acc + b.nights, 0) / config.bookings.length).toFixed(1)
+        const avgStayDuration = bookings.length
+            ? (bookings.reduce((acc, b) => acc + b.nights, 0) / bookings.length).toFixed(1)
             : '0.0';
 
-        return { totalPotentialValue, realizedRevenue, categoryStats, avgStayDuration };
-    }, [rooms, config.categories, config.bookings]);
+        // Calculate Occupancy Rate for the last 30 days
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const bookedNightsLast30 = bookings
+            .filter(b => b.isoCheckIn && b.isoCheckIn >= thirtyDaysAgo.toISOString().split('T')[0])
+            .reduce((acc, b) => acc + b.nights, 0);
+        const totalCapacityLast30 = rooms.length * 30;
+        const occupancyRate = totalCapacityLast30 > 0
+            ? Math.min(100, Math.round((bookedNightsLast30 / totalCapacityLast30) * 100))
+            : 0;
+
+        return { totalPotentialValue, realizedRevenue, categoryStats, avgStayDuration, occupancyRate };
+    }, [rooms, config.categories || [], bookings]);
 
     const statsData = useMemo(() => {
         const now = new Date();
@@ -178,7 +192,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
             end.setDate(now.getDate() - daysOffset);
             end.setHours(23, 59, 59, 999);
 
-            const rangeBookings = config.bookings.filter(b => {
+            const rangeBookings = bookings.filter(b => {
                 const bDate = new Date(b.date);
                 return bDate >= start && bDate <= end;
             });
@@ -223,12 +237,12 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                 trend: getDailyTrend(7, 'avgNights')
             }
         };
-    }, [config.bookings]);
+    }, [bookings]);
 
     const stats = [
-        { label: 'Realized Revenue', value: `GH₵${financialData.realizedRevenue.toLocaleString()}`, sub: 'Settled Ledger', growth: statsData.revenue.growth, icon: '💰', trend: statsData.revenue.trend, color: '#8B008B' },
-        { label: 'Active Bookings', value: config.bookings.length.toString(), sub: 'Confirmed Stays', growth: statsData.bookings.growth, icon: '📅', trend: statsData.bookings.trend, color: '#8B008B' },
-        { label: 'Subscribers', value: config.newsletterSubscribers.length.toString(), sub: 'Active Audience', growth: '+0.0%', icon: '📧', trend: Array(7).fill(config.newsletterSubscribers.length), color: '#10b981' },
+        { label: 'Realized Revenue', value: formatPrice(financialData.realizedRevenue, config.currency || 'GHS'), sub: 'Settled Ledger', growth: statsData.revenue.growth, icon: '💰', trend: statsData.revenue.trend, color: '#8B008B' },
+        { label: 'Occupancy Rate', value: `${financialData.occupancyRate}%`, sub: 'Inventory Yield', growth: '+0.0%', icon: '📈', trend: Array(7).fill(financialData.occupancyRate), color: '#10b981' },
+        { label: 'Active Bookings', value: bookings.length.toString(), sub: 'Confirmed Stays', growth: statsData.bookings.growth, icon: '📅', trend: statsData.bookings.trend, color: '#8B008B' },
         { label: 'Avg. Duration', value: `${financialData.avgStayDuration} Nights`, sub: 'Guest Commitment', growth: statsData.duration.growth, icon: '⏳', trend: statsData.duration.trend, color: '#3b82f6' },
     ];
 
@@ -287,7 +301,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                         </div>
                         <div className="h-64 flex items-end gap-12 px-4 border-b border-gray-50 pb-2">
                             {financialData.categoryStats.map(stat => {
-                                const realizedForCat = config.bookings
+                                const realizedForCat = bookings
                                     .filter(b => rooms.find(r => r.id === b.roomId)?.category === stat.name)
                                     .reduce((acc, b) => acc + b.totalPrice, 0);
                                 const potentialForCat = rooms
@@ -322,7 +336,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                             <div className="w-1.5 h-6 bg-gold rounded-full" />
                             <h3 className="text-2xl font-black font-serif text-white">Occupancy Pulse</h3>
                         </div>
-                        <BookingCalendar bookings={config.bookings} />
+                        <BookingCalendar bookings={bookings} />
                     </div>
 
                     <div className="bg-charcoal p-10 rounded-[2.5rem] shadow-xl shadow-charcoal/20 relative overflow-hidden">
@@ -347,32 +361,70 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                 </div>
             </div>
 
-            <div className="bg-white p-12 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-10">
-                    <div className="flex items-center gap-4">
-                        <div className="w-1.5 h-6 bg-charcoal rounded-full" />
-                        <h3 className="text-2xl font-black font-serif text-charcoal">Pulse Activity Feed</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-white p-12 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center justify-between mb-10">
+                        <div className="flex items-center gap-4">
+                            <div className="w-1.5 h-6 bg-gold rounded-full" />
+                            <h3 className="text-2xl font-black font-serif text-charcoal">Upcoming Arrivals</h3>
+                        </div>
+                        <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Next 7 Days</span>
                     </div>
-                    <button onClick={() => setActiveTab('bookings')} className="text-[10px] font-black uppercase text-gold hover:underline tracking-widest">
-                        Enter Command Center
-                    </button>
+                    <div className="space-y-4">
+                        {bookings
+                            .filter(b => b.isoCheckIn && b.isoCheckIn >= new Date().toISOString().split('T')[0])
+                            .sort((a, b) => a.isoCheckIn.localeCompare(b.isoCheckIn))
+                            .slice(0, 5)
+                            .map(booking => (
+                                <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-lg">🧳</div>
+                                        <div>
+                                            <p className="text-sm font-black text-charcoal">{booking.guestName}</p>
+                                            <p className="text-[10px] font-bold text-gold uppercase tracking-widest">{booking.isoCheckIn}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-black text-charcoal uppercase tracking-widest">{booking.roomName}</p>
+                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{booking.nights} Nights</p>
+                                    </div>
+                                </div>
+                            ))}
+                        {bookings.filter(b => b.isoCheckIn && b.isoCheckIn >= new Date().toISOString().split('T')[0]).length === 0 && (
+                            <p className="text-center py-10 text-gray-400 text-xs font-bold uppercase tracking-widest">No upcoming arrivals</p>
+                        )}
+                    </div>
                 </div>
-                <div className="space-y-4">
-                    {config.bookings.slice(0, 3).map(booking => (
-                        <div key={booking.id} className="flex items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-gold/30 transition-all cursor-pointer" onClick={() => setViewingBooking(booking)}>
-                            <div className="flex items-center gap-8">
-                                <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-xl shadow-sm">👤</div>
-                                <div>
-                                    <p className="text-sm font-black text-charcoal">{booking.guestName}</p>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{booking.roomName} • {new Date(booking.date).toLocaleDateString()}</p>
+
+                <div className="bg-white p-12 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center justify-between mb-10">
+                        <div className="flex items-center gap-4">
+                            <div className="w-1.5 h-6 bg-charcoal rounded-full" />
+                            <h3 className="text-2xl font-black font-serif text-charcoal">Pulse Activity Feed</h3>
+                        </div>
+                        <button onClick={() => setActiveTab('bookings')} className="text-[10px] font-black uppercase text-gold hover:underline tracking-widest">
+                            Command Center
+                        </button>
+                    </div>
+                    <div className="space-y-4">
+                        {bookings.slice(0, 5).map(booking => (
+                            <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 group hover:border-gold/30 transition-all cursor-pointer" onClick={() => setViewingBooking(booking)}>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-lg shadow-sm">👤</div>
+                                    <div>
+                                        <p className="text-sm font-black text-charcoal">{booking.guestName}</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{booking.roomName}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-sm font-black text-charcoal">{formatPrice(booking.totalPrice, config.currency || 'GHS')}</p>
+                                    <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${booking.paymentStatus === 'paid' ? 'text-green-500' : 'text-yellow-500'}`}>
+                                        {booking.paymentStatus}
+                                    </p>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <p className="text-sm font-black text-charcoal">GH₵{booking.totalPrice.toLocaleString()}</p>
-                                <p className="text-[10px] font-black text-green-500 uppercase tracking-widest mt-1">Confirmed</p>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

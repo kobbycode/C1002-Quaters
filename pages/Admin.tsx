@@ -18,8 +18,9 @@ import { AdminPages } from '../components/admin/AdminPages';
 import { AdminFooter } from '../components/admin/AdminFooter';
 import { AdminSettings } from '../components/admin/AdminSettings';
 import { AdminAmenities } from '../components/admin/AdminAmenities';
-import { AdminConcierge } from '../components/admin/AdminConcierge';
+import { AdminReviews } from '../components/admin/AdminReviews';
 import { AdminNewsletter } from '../components/admin/AdminNewsletter';
+import { AdminConcierge } from '../components/admin/AdminConcierge';
 import { AdminHeroModal } from '../components/admin/modals/AdminHeroModal';
 import { AdminNavModal } from '../components/admin/modals/AdminNavModal';
 import { AdminRoomModal } from '../components/admin/modals/AdminRoomModal';
@@ -27,7 +28,7 @@ import { AdminAmenityModal } from '../components/admin/modals/AdminAmenityModal'
 import { AdminBookingModal } from '../components/admin/modals/AdminBookingModal';
 import SEO from '../components/SEO';
 
-type Tab = 'overview' | 'bookings' | 'branding' | 'home' | 'pages' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'footer' | 'newsletter' | 'settings';
+type Tab = 'overview' | 'bookings' | 'reviews' | 'branding' | 'home' | 'pages' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'footer' | 'newsletter' | 'settings';
 
 
 const Admin: React.FC = () => {
@@ -129,12 +130,29 @@ const Admin: React.FC = () => {
     showToast('Navigation link saved!');
   };
 
-  const handleSaveAmenity = () => {
+  const handleSaveAmenity = (originalName?: string) => {
     if (!editingAmenity) return;
-    const newDetails = { ...config.amenityDetails, [editingAmenity.name]: editingAmenity.detail };
+    const newDetails = { ...config.amenityDetails };
+
+    // If name changed, delete old one
+    if (originalName && originalName !== editingAmenity.name) {
+      delete newDetails[originalName];
+    }
+
+    newDetails[editingAmenity.name] = editingAmenity.detail;
     updateConfig({ ...config, amenityDetails: newDetails });
     setEditingAmenity(null);
     showToast('Amenity details updated!');
+  };
+
+  const handleDeleteAmenity = (name: string) => {
+    if (window.confirm(`Are you sure you want to delete "${name}"? This will remove it from the registry.`)) {
+      const newDetails = { ...config.amenityDetails };
+      delete newDetails[name];
+      updateConfig({ ...config, amenityDetails: newDetails });
+      setEditingAmenity(null);
+      showToast('Amenity removed from registry.');
+    }
   };
 
 
@@ -148,7 +166,7 @@ const Admin: React.FC = () => {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mt-1">HQ Command Node</p>
         </div>
         <nav className="flex flex-col gap-1 overflow-y-auto no-scrollbar">
-          {(['overview', 'bookings', 'branding', 'home', 'pages', 'navigation', 'rooms', 'amenities', 'concierge', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => (
+          {(['overview', 'bookings', 'reviews', 'branding', 'home', 'pages', 'navigation', 'rooms', 'amenities', 'concierge', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => (
             <button
               key={tab}
               onClick={() => handleTabChange(tab)}
@@ -205,6 +223,11 @@ const Admin: React.FC = () => {
             />
           )}
 
+          {/* Reviews Tab */}
+          {activeTab === 'reviews' && (
+            <AdminReviews />
+          )}
+
           {/* Branding Tab */}
           {activeTab === 'branding' && (
             <AdminBranding
@@ -220,6 +243,7 @@ const Admin: React.FC = () => {
             <AdminAmenities
               config={config}
               onEditAmenity={(name, detail) => setEditingAmenity({ name, detail })}
+              onDelete={handleDeleteAmenity}
             />
           )}
           {/* Concierge Tab */}
@@ -310,6 +334,7 @@ const Admin: React.FC = () => {
         editingAmenity={editingAmenity}
         setEditingAmenity={setEditingAmenity}
         onSave={handleSaveAmenity}
+        onDelete={handleDeleteAmenity}
       />
 
       <AdminBookingModal

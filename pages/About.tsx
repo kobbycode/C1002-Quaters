@@ -66,7 +66,7 @@ const About: React.FC = () => {
             </p>
             <div className="grid grid-cols-2 gap-8 pt-6">
               <div>
-                <p className="text-4xl font-serif text-gold mb-1">1957</p>
+                <p className="text-4xl font-serif text-gold mb-1">{config.foundingYear}</p>
                 <p className="text-xs font-black uppercase tracking-widest text-gray-400">Founded in Accra</p>
               </div>
               <div>

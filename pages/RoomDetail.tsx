@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
-import { formatLuxuryText } from '../utils/formatters';
+import { formatLuxuryText, formatPrice } from '../utils/formatters';
+import { useToast } from '../context/ToastContext';
 
 const RoomDetailSkeleton: React.FC = () => (
   <div className="max-w-[1280px] mx-auto px-6 md:px-10 py-6 animate-pulse">
@@ -27,9 +28,10 @@ interface CalendarProps {
   checkIn: Date | null;
   checkOut: Date | null;
   onSelect: (start: Date | null, end: Date | null) => void;
+  bookedRanges: { start: string; end: string }[];
 }
 
-const Calendar: React.FC<CalendarProps> = ({ checkIn, checkOut, onSelect }) => {
+const Calendar: React.FC<CalendarProps> = ({ checkIn, checkOut, onSelect, bookedRanges }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
@@ -44,14 +46,29 @@ const Calendar: React.FC<CalendarProps> = ({ checkIn, checkOut, onSelect }) => {
     const selected = new Date(year, month, day);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (selected < today) return;
+    const isBooked = (date: Date) => {
+      const iso = date.toISOString().split('T')[0];
+      return bookedRanges.some(range => iso >= range.start && iso < range.end);
+    };
+
+    if (selected < today || isBooked(selected)) return;
+
     if (!checkIn || (checkIn && checkOut)) {
       onSelect(selected, null);
     } else if (checkIn && !checkOut) {
-      if (selected <= checkIn) {
+      if (selected <= checkIn || isBooked(selected)) {
         onSelect(selected, null);
       } else {
-        onSelect(checkIn, selected);
+        // Ensure no booked dates within the range
+        const hasBookingInRange = bookedRanges.some(range => {
+          return (checkIn.toISOString().split('T')[0] < range.end) && (selected.toISOString().split('T')[0] > range.start);
+        });
+
+        if (hasBookingInRange) {
+          onSelect(selected, null);
+        } else {
+          onSelect(checkIn, selected);
+        }
       }
     }
   };
@@ -75,14 +92,19 @@ const Calendar: React.FC<CalendarProps> = ({ checkIn, checkOut, onSelect }) => {
     const date = new Date(year, month, d);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const iso = date.toISOString().split('T')[0];
+    const isBooked = bookedRanges.some(range => iso >= range.start && iso < range.end);
     const isPast = date < today;
+    const isDisabled = isPast || isBooked;
+
     days.push(
       <button
         key={d}
         onClick={() => handleDateClick(d)}
-        disabled={isPast}
+        disabled={isDisabled}
         className={`h-10 w-full flex items-center justify-center rounded-lg text-xs font-bold transition-all relative
-          ${isPast ? 'text-gray-200 cursor-not-allowed' : 'text-charcoal hover:bg-gray-100'}
+          ${isDisabled ? 'text-gray-200 cursor-not-allowed' : 'text-charcoal hover:bg-gray-100'}
+          ${isBooked ? 'line-through opacity-50' : ''}
           ${isSelected(d) ? 'bg-gold !text-white shadow-lg z-10' : ''}
           ${isInRange(d) ? 'bg-gold/10 !text-gold rounded-none' : ''}
         `}
@@ -121,8 +143,84 @@ const DEFAULT_AMENITY_ICONS: Record<string, React.ReactNode> = {
   'Rain Shower': <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.022.547l-2.387.477a6 6 0 01-3.86-.517" /></svg>,
 };
 
+const ReviewForm: React.FC<{ roomId: string, roomName: string }> = ({ roomId, roomName }) => {
+  const { addReview } = useSite();
+  const { showToast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [guestName, setGuestName] = useState('');
+  const [comment, setComment] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await addReview({ roomId, roomName, guestName, rating, comment });
+      showToast('Thank you for your review! It will be visible once approved.', 'success');
+      setGuestName('');
+      setComment('');
+      setRating(5);
+    } catch (err) {
+      showToast('Failed to submit review. Please try again.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="text-[9px] font-black uppercase text-gold tracking-widest mb-2 block">Your Name</label>
+          <input
+            required
+            type="text"
+            value={guestName}
+            onChange={e => setGuestName(e.target.value)}
+            className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-sm font-medium focus:border-gold outline-none transition-all"
+            placeholder="John Doe"
+          />
+        </div>
+        <div>
+          <label className="text-[9px] font-black uppercase text-gold tracking-widest mb-2 block">Rating</label>
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5].map(star => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setRating(star)}
+                className={`text-2xl transition-all ${star <= rating ? 'text-gold scale-110' : 'text-gray-200 hover:text-gold/50'}`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div>
+        <label className="text-[9px] font-black uppercase text-gold tracking-widest mb-2 block">Your Experience</label>
+        <textarea
+          required
+          rows={4}
+          value={comment}
+          onChange={e => setComment(e.target.value)}
+          className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-sm font-medium focus:border-gold outline-none transition-all resize-none"
+          placeholder="Share details of your stay..."
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="bg-charcoal text-white font-black px-8 py-4 rounded-xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-lg active:scale-95 disabled:opacity-50"
+      >
+        {isSubmitting ? 'Submitting...' : 'Post Review'}
+      </button>
+    </form>
+  );
+};
+
 const RoomDetail: React.FC = () => {
-  const { rooms, config, loading } = useSite();
+  const { rooms, config, bookings, reviews, loading } = useSite();
   const { id } = useParams<{ id: string }>();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -212,8 +310,14 @@ const RoomDetail: React.FC = () => {
   const nights = useMemo(() => {
     if (!checkIn || !checkOut) return 0;
     const diff = checkOut.getTime() - checkIn.getTime();
-    return Math.max(1, Math.ceil(diff / (1000 * 3600 * 24)));
+    return Math.max(1, Math.round(diff / (1000 * 3600 * 24)));
   }, [checkIn, checkOut]);
+
+  const roomBookings = useMemo(() => {
+    return bookings
+      .filter(b => b.roomId === id && b.isoCheckIn && b.isoCheckOut)
+      .map(b => ({ start: b.isoCheckIn, end: b.isoCheckOut }));
+  }, [bookings, id]);
 
   const totalPrice = room ? room.price * nights : 0;
   const formatDate = (date: Date | null) => date ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date) : 'Select Date';
@@ -405,6 +509,72 @@ const RoomDetail: React.FC = () => {
                 ))}
               </div>
             </div>
+
+            {/* Guest Reviews Section */}
+            <div className="py-20 border-t border-gray-100">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div>
+                  <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-2 block">Guest Experiences</span>
+                  <h3 className="text-4xl font-black font-serif text-charcoal">The Patron's Word</h3>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-charcoal">{room.rating} / 5</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Global Rating</p>
+                  </div>
+                  <div className="w-px h-10 bg-gray-100" />
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-charcoal">{room.reviewsCount}</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Reviews</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                {reviews.filter(r => r.roomId === id && r.status === 'approved').length > 0 ? (
+                  reviews
+                    .filter(r => r.roomId === id && r.status === 'approved')
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .map(review => (
+                      <div key={review.id} className="bg-white p-8 rounded-3xl border border-gray-50 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold font-black text-xs">
+                              {review.guestName.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="text-sm font-black text-charcoal">{review.guestName}</p>
+                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                {new Date(review.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex text-gold text-xs">
+                            {[...Array(5)].map((_, i) => (
+                              <span key={i}>{i < review.rating ? '★' : '☆'}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-gray-500 text-sm leading-relaxed italic font-light">"{review.comment}"</p>
+                      </div>
+                    ))
+                ) : (
+                  <div className="col-span-full py-12 text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Be the first to share your experience</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Review Form */}
+              <div className="bg-cream p-10 md:p-12 rounded-[2.5rem] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-bl-full pointer-events-none" />
+                <div className="relative z-10 max-w-2xl">
+                  <h4 className="text-2xl font-black font-serif text-charcoal mb-2">Leave a Legacy</h4>
+                  <p className="text-xs text-gray-400 mb-8 font-medium">Your feedback ensures we maintain the highest standards of Ghanaian hospitality.</p>
+                  <ReviewForm roomId={room.id} roomName={room.name} />
+                </div>
+              </div>
+            </div>
           </div>
 
           <aside className="w-full lg:w-[420px]">
@@ -412,7 +582,7 @@ const RoomDetail: React.FC = () => {
               <div className="flex justify-between items-end mb-10">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold mb-1">Nightly rate</p>
-                  <span className="text-4xl font-black text-charcoal font-serif">GH₵{room.price}</span>
+                  <span className="text-4xl font-black text-charcoal font-serif">{formatPrice(room.price, config.currency)}</span>
                   <span className="text-gray-400 font-bold ml-1 text-sm">/ night</span>
                 </div>
               </div>
@@ -430,24 +600,38 @@ const RoomDetail: React.FC = () => {
                 </div>
                 {showCalendar && (
                   <div className="absolute top-[105%] left-0 right-0 bg-white rounded-2xl border border-gray-100 shadow-2xl z-50 animate-fade-in overflow-hidden">
-                    <Calendar checkIn={checkIn} checkOut={checkOut} onSelect={(start, end) => { setCheckIn(start); setCheckOut(end); if (start && end) setShowCalendar(false); }} />
+                    <Calendar
+                      checkIn={checkIn}
+                      checkOut={checkOut}
+                      bookedRanges={roomBookings}
+                      onSelect={(start, end) => {
+                        setCheckIn(start);
+                        setCheckOut(end);
+                        if (start && end) setShowCalendar(false);
+                      }}
+                    />
                   </div>
                 )}
               </div>
 
               <div className="space-y-4 pt-8 border-t border-gray-100 mb-8">
                 <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                  <span className="text-gray-400">GH₵{room.price} x {nights} nights</span>
-                  <span className="text-charcoal">GH₵{totalPrice}.00</span>
+                  <span className="text-gray-400">{formatPrice(room.price, config.currency)} x {nights} nights</span>
+                  <span className="text-charcoal">{formatPrice(totalPrice, config.currency)}</span>
                 </div>
                 <div className="flex justify-between items-center pt-6 border-t border-gray-100">
                   <span className="text-charcoal font-black font-serif text-2xl">Total</span>
-                  <span className="text-primary font-black font-serif text-2xl">GH₵{totalPrice}.00</span>
+                  <span className="text-primary font-black font-serif text-2xl">{formatPrice(totalPrice, config.currency)}</span>
                 </div>
               </div>
 
               <div className="flex flex-col gap-3">
-                <Link to={`/checkout?room=${room.id}`} className="w-full flex items-center justify-center bg-primary hover:bg-[#6B006B] text-white font-black py-6 rounded-2xl shadow-xl shadow-primary/30 transition-all uppercase tracking-[0.3em] text-[10px]">Secure My Suite</Link>
+                <Link
+                  to={checkIn && nights > 0 ? `/checkout?room=${room.id}&checkIn=${checkIn.toISOString()}&nights=${nights}` : `/checkout?room=${room.id}`}
+                  className={`w-full flex items-center justify-center bg-primary hover:bg-[#6B006B] text-white font-black py-6 rounded-2xl shadow-xl shadow-primary/30 transition-all uppercase tracking-[0.3em] text-[10px] ${(!checkIn || nights === 0) ? 'opacity-50 pointer-events-none' : ''}`}
+                >
+                  Secure My Suite
+                </Link>
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-center gap-3 py-6 rounded-2xl bg-charcoal text-white font-black hover:bg-charcoal/90 transition-all uppercase tracking-[0.3em] text-[10px] shadow-xl">
                   Chat with Concierge
                 </a>

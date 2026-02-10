@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useSite } from '../context/SiteContext';
+import { formatPrice } from '../utils/formatters';
 import type { AmenityDetail } from '../types';
 
 const Concierge: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
@@ -13,7 +14,7 @@ const Concierge: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen,
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const enhancedPrompt = useMemo(() => {
-    const roomsInfo = rooms.map(r => `${r.name}: ${r.description} (Price: GH₵${r.price}, Amenities: ${r.amenities.join(', ')})`).join('\n');
+    const roomsInfo = rooms.map(r => `${r.name}: ${r.description} (Price: ${formatPrice(r.price, config.currency)}, Amenities: ${r.amenities.join(', ')})`).join('\n');
     const amenitiesInfo = (Object.entries(config.amenityDetails) as [string, AmenityDetail][]).map(([name, detail]) => `${name}: ${detail.description}`).join('\n');
 
     return `${config.conciergePrompt}

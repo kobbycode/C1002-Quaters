@@ -40,3 +40,21 @@ export const formatLuxuryText = (text: string) => {
         return part;
     });
 };
+
+export const formatPrice = (price: number, currency: string = 'GHS') => {
+    const formatter = new Intl.NumberFormat('en-GH', {
+        style: 'currency',
+        currency: currency === 'GHS' ? 'GHS' : currency === 'USD' ? 'USD' : currency === 'EUR' ? 'EUR' : 'GHS',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    });
+
+    let formatted = formatter.format(price);
+
+    // Custom handling for GHS symbol if needed (standard is GH₵)
+    if (currency === 'GHS') {
+        formatted = formatted.replace('GHS', 'GH₵');
+    }
+
+    return formatted;
+};

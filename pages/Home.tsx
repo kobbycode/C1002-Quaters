@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
-import { formatLuxuryText } from '../utils/formatters';
+import { formatLuxuryText, formatPrice } from '../utils/formatters';
 
 const Home: React.FC = () => {
   const { config, rooms } = useSite();
@@ -212,7 +212,7 @@ const Home: React.FC = () => {
                 <div className="px-2">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl md:text-2xl font-black font-serif text-charcoal group-hover:text-gold transition-colors">{room.name}</h3>
-                    <p className="text-lg md:text-xl font-bold text-primary font-serif">GH₵{room.price}</p>
+                    <p className="text-lg md:text-xl font-bold text-primary font-serif">{formatPrice(room.price, config.currency)}</p>
                   </div>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{room.size} — {room.view}</p>
                 </div>
@@ -238,27 +238,11 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-16">
-            {[
-              {
-                title: "Butler Service",
-                desc: "Your own personal helper to make sure you have everything you need.",
-                icon: "👔"
-              },
-              {
-                title: "Great Food",
-                desc: "Enjoy traditional Ghanaian food made with fresh local ingredients.",
-                icon: "🥘"
-              },
-              {
-                title: "Quiet Spot",
-                desc: "Private gardens where you can relax and get away from the busy city.",
-                icon: "🌿"
-              }
-            ].map((exp, i) => (
+            {config.homeExperience?.map((exp, i) => (
               <div key={i} className="group p-10 rounded-[3rem] border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-500 hover:-translate-y-4">
                 <div className="text-5xl mb-10 transform group-hover:scale-110 transition-transform duration-500 inline-block">{exp.icon}</div>
                 <h4 className="text-xl font-black font-serif mb-6 text-gold">{exp.title}</h4>
-                <p className="text-white/40 text-sm leading-relaxed font-medium">{exp.desc}</p>
+                <p className="text-white/40 text-sm leading-relaxed font-medium">{exp.description}</p>
               </div>
             ))}
           </div>
@@ -271,39 +255,34 @@ const Home: React.FC = () => {
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative group">
               <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl relative">
-                <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400" className="w-full h-full object-cover transition-scale duration-[2000ms] group-hover:scale-105" alt="C1002 Quarters Exterior" />
+                <img src={config.homePulse?.image || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400"} className="w-full h-full object-cover transition-scale duration-[2000ms] group-hover:scale-105" alt="C1002 Quarters Exterior" />
                 <div className="absolute inset-0 bg-charcoal/20 group-hover:bg-transparent transition-colors duration-700" />
               </div>
               <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-gold rounded-[2rem] p-10 flex flex-col justify-center items-center text-center shadow-2xl animate-pulse delay-1000">
-                <p className="text-charcoal font-black text-3xl font-serif mb-2 italic">1957</p>
+                <p className="text-charcoal font-black text-3xl font-serif mb-2 italic">{config.foundingYear}</p>
                 <p className="text-charcoal/60 text-[10px] font-black uppercase tracking-widest">Year of Vision</p>
               </div>
             </div>
 
             <div className="flex flex-col gap-10">
               <div className="space-y-6">
-                <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px]">The Neighbourhood</span>
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-charcoal leading-tight">The Accra <br /><span className="italic">Style</span></h2>
+                <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px]">{config.homePulse?.subtitle}</span>
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-charcoal leading-tight">{formatLuxuryText(config.homePulse?.title)}</h2>
                 <p className="text-gray-500 text-sm md:text-lg leading-relaxed font-light italic border-l-2 border-gold/30 pl-6 md:pl-8 py-2">
-                  "Perfectly placed in the nice area of Spintex, {config.brand.name} is your home in Ghana's busy capital."
+                  "{config.homePulse?.description}"
                 </p>
               </div>
 
               <div className="space-y-8">
-                <div className="flex gap-6 items-start">
-                  <div className="w-1.5 h-1.5 rounded-full bg-gold mt-2 shrink-0" />
-                  <div>
-                    <h5 className="font-bold text-charcoal mb-2">Artisanal Shopping</h5>
-                    <p className="text-gray-400 text-sm leading-relaxed">Moments from the finest textile and craft markets of Spintex.</p>
+                {config.homePulse?.pillars?.map((pillar, i) => (
+                  <div key={i} className="flex gap-6 items-start">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gold mt-2 shrink-0" />
+                    <div>
+                      <h5 className="font-bold text-charcoal mb-2">{pillar.title}</h5>
+                      <p className="text-gray-400 text-sm leading-relaxed">{pillar.description}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-6 items-start">
-                  <div className="w-1.5 h-1.5 rounded-full bg-gold mt-2 shrink-0" />
-                  <div>
-                    <h5 className="font-bold text-charcoal mb-2">Coastal Proximity</h5>
-                    <p className="text-gray-400 text-sm leading-relaxed">A short, luxury chauffeur drive to the golden sands of Labadi Beach.</p>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <Link to="/about" className="w-fit bg-charcoal text-white px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-primary transition-all">

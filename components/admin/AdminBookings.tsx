@@ -1,34 +1,168 @@
 import React, { useState, useMemo } from 'react';
 import { useSite } from '../../context/SiteContext';
+import { formatPrice } from '../../utils/formatters';
 import { Booking } from '../../types';
+import { useToast } from '../../context/ToastContext';
 
 interface AdminBookingsProps {
     onViewBooking: (booking: Booking) => void;
 }
 
 export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) => {
-    const { config, deleteBooking } = useSite();
+    const [isCreating, setIsCreating] = useState(false);
+    const [newBooking, setNewBooking] = useState({
+        guestName: '',
+        guestEmail: '',
+        roomId: '',
+        nights: 1,
+        totalPrice: 0,
+        isoCheckIn: new Date().toISOString().split('T')[0]
+    });
+
     const [bookingSearch, setBookingSearch] = useState('');
     const [bookingFilter, setBookingFilter] = useState<'all' | 'rent' | 'reservation'>('all');
     const [dateFilter, setDateFilter] = useState('');
 
-    const filteredBookings = useMemo(() => {
-        return config.bookings.filter(booking => {
-            const searchMatch = (booking.guestName + booking.roomName + booking.email).toLowerCase().includes(bookingSearch.toLowerCase());
-            const typeMatch = bookingFilter === 'all' || booking.type === bookingFilter;
-            const dateMatch = !dateFilter || booking.date.startsWith(dateFilter);
-            return searchMatch && typeMatch && dateMatch;
+    const { rooms, addBooking, deleteBooking, bookings, config, isRoomAvailable } = useSite();
+    const { showToast } = useToast();
+
+    const handleCreateBooking = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const room = rooms.find(r => r.id === newBooking.roomId);
+        if (!room || !newBooking.isoCheckIn) return;
+
+        const checkIn = new Date(newBooking.isoCheckIn);
+        const checkOut = new Date(checkIn);
+        checkOut.setDate(checkOut.getDate() + Number(newBooking.nights));
+
+        const isoCheckIn = newBooking.isoCheckIn;
+        const isoCheckOut = checkOut.toISOString().split('T')[0];
+
+        // Security Check: Availability
+        if (!isRoomAvailable(room.id, isoCheckIn, isoCheckOut)) {
+            showToast('This room is already booked for the selected dates.', 'error');
+            return;
+        }
+
+        const formattedCheckIn = checkIn.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        const formattedCheckOut = checkOut.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        await addBooking({
+            roomId: room.id,
+            roomName: room.name,
+            guestName: newBooking.guestName,
+            guestEmail: newBooking.guestEmail,
+            nights: Number(newBooking.nights),
+            totalPrice: Number(newBooking.totalPrice),
+            paymentStatus: 'pending',
+            paymentMethod: 'cash',
+            isoCheckIn,
+            isoCheckOut,
+            checkInDate: formattedCheckIn,
+            checkOutDate: formattedCheckOut
         });
-    }, [config.bookings, bookingSearch, bookingFilter, dateFilter]);
+
+        setIsCreating(false);
+        setNewBooking({ guestName: '', guestEmail: '', roomId: '', nights: 1, totalPrice: 0, isoCheckIn: new Date().toISOString().split('T')[0] });
+    };
+
+    const handleRoomChange = (roomId: string) => {
+        const room = rooms.find(r => r.id === roomId);
+        if (room) {
+            setNewBooking(prev => ({
+                ...prev,
+                roomId,
+                totalPrice: room.price * prev.nights
+            }));
+        }
+    };
+
+    const handleNightsChange = (nights: number) => {
+        const room = rooms.find(r => r.id === newBooking.roomId);
+        setNewBooking(prev => ({
+            ...prev,
+            nights,
+            totalPrice: room ? room.price * nights : 0
+        }));
+    };
+
+    const filteredBookings = useMemo(() => {
+        return bookings
+            .filter(booking => {
+                const searchMatch = (booking.guestName + booking.roomName + booking.guestEmail).toLowerCase().includes(bookingSearch.toLowerCase());
+                const typeMatch = bookingFilter === 'all' || 'reservation' === bookingFilter;
+                const dateMatch = !dateFilter || booking.date.startsWith(dateFilter);
+                return searchMatch && typeMatch && dateMatch;
+            })
+            .sort((a, b) => {
+                const dateA = a.isoCheckIn || '';
+                const dateB = b.isoCheckIn || '';
+                return dateB.localeCompare(dateA); // Newest check-ins first
+            });
+    }, [bookings, bookingSearch, bookingFilter, dateFilter]);
 
     const handleDelete = async (id: string) => {
         if (window.confirm('Are you sure you want to delete this booking?')) {
-            await deleteBooking(id);
+            try {
+                await deleteBooking(id);
+            } catch (err) {
+                console.error("Delete error:", err);
+            }
         }
     };
 
     return (
-        <div className="space-y-8 animate-fade-in">
+        <div className="space-y-8 animate-fade-in relative">
+            {isCreating && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">
+                        <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                            <h3 className="text-xl font-serif font-black text-charcoal">New Manual Reservation</h3>
+                            <button onClick={() => setIsCreating(false)} className="text-gray-400 hover:text-charcoal transition-colors">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateBooking} className="p-8 space-y-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Guest Name</label>
+                                    <input required type="text" value={newBooking.guestName} onChange={e => setNewBooking({ ...newBooking, guestName: e.target.value })} className="w-full bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all" placeholder="John Doe" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Guest Email</label>
+                                    <input required type="email" value={newBooking.guestEmail} onChange={e => setNewBooking({ ...newBooking, guestEmail: e.target.value })} className="w-full bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all" placeholder="guest@example.com" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Check-In Date</label>
+                                        <input required type="date" value={newBooking.isoCheckIn} onChange={e => setNewBooking({ ...newBooking, isoCheckIn: e.target.value })} className="w-full bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Duration (Nights)</label>
+                                        <input required type="number" min="1" value={newBooking.nights} onChange={e => handleNightsChange(Number(e.target.value))} className="w-full bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Room Selection</label>
+                                    <select required value={newBooking.roomId} onChange={e => handleRoomChange(e.target.value)} className="w-full bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all">
+                                        <option value="">Select Room</option>
+                                        {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({formatPrice(r.price, config.currency)})</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Total Rate ({config.currency || 'GHS'})</label>
+                                    <input type="number" value={newBooking.totalPrice} onChange={e => setNewBooking({ ...newBooking, totalPrice: Number(e.target.value) })} className="w-full bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all font-bold text-lg text-gold" />
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t border-gray-50 flex gap-3">
+                                <button type="button" onClick={() => setIsCreating(false)} className="flex-1 py-4 rounded-xl font-bold text-xs uppercase tracking-widest text-gray-400 hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button type="submit" className="flex-1 py-4 bg-charcoal text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-gold transition-colors shadow-lg shadow-charcoal/20">Create Reservation</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm transition-all focus-within:shadow-md">
                 <div className="relative flex-1 w-full group">
                     <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-gray-400 group-focus-within:text-gold transition-colors">
@@ -55,14 +189,15 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                     ))}
                 </div>
 
-                <div className="relative group">
-                    <input
-                        type="date"
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
-                        className="pl-6 pr-6 py-4 bg-gray-50 border-transparent rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest text-gray-500 focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all"
-                    />
-                </div>
+                <div className="h-full w-px bg-gray-200 mx-2 hidden md:block"></div>
+
+                <button
+                    onClick={() => setIsCreating(true)}
+                    className="whitespace-nowrap px-8 py-5 bg-charcoal text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-gold transition-colors shadow-lg shadow-charcoal/20 flex items-center gap-3 group"
+                >
+                    <span>New Booking</span>
+                    <svg className="w-4 h-4 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                </button>
             </div>
 
             <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
@@ -73,7 +208,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                                 <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Guest Information</th>
                                 <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Stay Details</th>
                                 <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Financials</th>
-                                <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Status</th>
+                                <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Payment</th>
                                 <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.3em] text-right">Actions</th>
                             </tr>
                         </thead>
@@ -87,7 +222,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                                                 <p className="text-base font-black text-charcoal mb-1">{booking.guestName}</p>
                                                 <p className="text-[10px] font-bold text-gray-400 tracking-wider flex items-center gap-2">
                                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                    {booking.email}
+                                                    {booking.guestEmail}
                                                 </p>
                                             </div>
                                         </div>
@@ -101,13 +236,18 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                                         </div>
                                     </td>
                                     <td className="px-8 py-8">
-                                        <p className="text-base font-black text-gold">GH₵{booking.totalPrice.toLocaleString()}</p>
+                                        <p className="text-base font-black text-gold">{formatPrice(booking.totalPrice, config.currency)}</p>
                                         <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mt-1">Confirmed</p>
                                     </td>
                                     <td className="px-8 py-8">
-                                        <span className={`inline-flex px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${booking.type === 'rent' ? 'bg-blue-50 text-blue-500 border border-blue-100' : 'bg-purple-50 text-purple-500 border border-purple-100'}`}>
-                                            {booking.type}
-                                        </span>
+                                        <div className="flex flex-col gap-1">
+                                            <span className={`inline-flex px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${booking.paymentStatus === 'paid' ? 'bg-green-50 text-green-500 border-green-100' : 'bg-yellow-50 text-yellow-500 border-yellow-100'} border`}>
+                                                {booking.paymentStatus}
+                                            </span>
+                                            <span className="text-[8px] font-black text-gray-400 tracking-tighter uppercase px-1">
+                                                via {booking.paymentMethod}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td className="px-10 py-8 text-right">
                                         <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">

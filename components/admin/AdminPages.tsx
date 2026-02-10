@@ -108,8 +108,8 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Hero Headline</label>
                                 <input
                                     type="text"
-                                    value={config.aboutPage.heroTitle}
-                                    onChange={e => updateConfig({ ...config, aboutPage: { ...config.aboutPage, heroTitle: e.target.value } })}
+                                    value={config.aboutPage?.heroTitle || ''}
+                                    onChange={e => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heroTitle: e.target.value } })}
                                     className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold outline-none focus:ring-2 ring-gold/20"
                                     placeholder="e.g. A Legacy of Elegance"
                                 />
@@ -118,8 +118,8 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Hero Sub-Anchor</label>
                                 <input
                                     type="text"
-                                    value={config.aboutPage.heroSubtitle}
-                                    onChange={e => updateConfig({ ...config, aboutPage: { ...config.aboutPage, heroSubtitle: e.target.value } })}
+                                    value={config.aboutPage?.heroSubtitle || ''}
+                                    onChange={e => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heroSubtitle: e.target.value } })}
                                     className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold outline-none focus:ring-2 ring-gold/20"
                                     placeholder="e.g. Est. 2024"
                                 />
@@ -133,7 +133,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                     <button
                                         onClick={async () => {
                                             const result = await handleAiWriter('about', 'heritage background phase 1');
-                                            if (result) updateConfig({ ...config, aboutPage: { ...config.aboutPage, heritageDescription1: result } });
+                                            if (result) updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription1: result } });
                                         }}
                                         disabled={isAiGenerating}
                                         className="text-[9px] font-black uppercase text-primary flex items-center gap-1 hover:underline disabled:opacity-50"
@@ -143,8 +143,8 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 </div>
                                 <textarea
                                     rows={4}
-                                    value={config.aboutPage.heritageDescription1}
-                                    onChange={e => updateConfig({ ...config, aboutPage: { ...config.aboutPage, heritageDescription1: e.target.value } })}
+                                    value={config.aboutPage?.heritageDescription1 || ''}
+                                    onChange={e => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription1: e.target.value } })}
                                     className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium leading-relaxed outline-none focus:ring-2 ring-gold/20"
                                     placeholder="The beginning of the story..."
                                 />
@@ -155,7 +155,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                     <button
                                         onClick={async () => {
                                             const result = await handleAiWriter('about', 'heritage background phase 2');
-                                            if (result) updateConfig({ ...config, aboutPage: { ...config.aboutPage, heritageDescription2: result } });
+                                            if (result) updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription2: result } });
                                         }}
                                         disabled={isAiGenerating}
                                         className="text-[9px] font-black uppercase text-primary flex items-center gap-1 hover:underline disabled:opacity-50"
@@ -165,11 +165,70 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 </div>
                                 <textarea
                                     rows={4}
-                                    value={config.aboutPage.heritageDescription2}
-                                    onChange={e => updateConfig({ ...config, aboutPage: { ...config.aboutPage, heritageDescription2: e.target.value } })}
+                                    value={config.aboutPage?.heritageDescription2 || ''}
+                                    onChange={e => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription2: e.target.value } })}
                                     className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium leading-relaxed outline-none focus:ring-2 ring-gold/20"
                                     placeholder="The growth and evolution..."
                                 />
+                            </div>
+                        </div>
+
+                        {/* Pillars Section */}
+                        <div className="mt-12 border-t border-gray-100 pt-10">
+                            <div className="flex justify-between items-center mb-6">
+                                <div>
+                                    <h4 className="text-xl font-black font-serif text-charcoal">Structural Pillars</h4>
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-gold mt-1">Core Values & Mission</p>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        const newPillars = [...(config.aboutPage?.pillars || []), { title: 'New Pillar', description: '' }];
+                                        updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), pillars: newPillars } });
+                                    }}
+                                    className="px-4 py-2 bg-charcoal text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gold transition-all"
+                                >
+                                    + Add Pillar
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                {(config.aboutPage?.pillars || []).map((pillar, idx) => (
+                                    <div key={idx} className="bg-gray-50 rounded-2xl p-6 border border-gray-100 relative group">
+                                        <button
+                                            onClick={() => {
+                                                const newPillars = (config.aboutPage?.pillars || []).filter((_, i) => i !== idx);
+                                                updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), pillars: newPillars } });
+                                            }}
+                                            className="absolute top-4 right-4 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                        <div className="grid grid-cols-1 gap-4">
+                                            <input
+                                                type="text"
+                                                value={pillar.title}
+                                                onChange={e => {
+                                                    const newPillars = [...(config.aboutPage?.pillars || [])];
+                                                    newPillars[idx].title = e.target.value;
+                                                    updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), pillars: newPillars } });
+                                                }}
+                                                className="bg-transparent border-none p-0 text-sm font-black text-charcoal focus:ring-0 w-full"
+                                                placeholder="Pillar Title"
+                                            />
+                                            <textarea
+                                                rows={2}
+                                                value={pillar.description}
+                                                onChange={e => {
+                                                    const newPillars = [...(config.aboutPage?.pillars || [])];
+                                                    newPillars[idx].description = e.target.value;
+                                                    updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), pillars: newPillars } });
+                                                }}
+                                                className="bg-transparent border-none p-0 text-xs font-medium text-gray-400 focus:ring-0 w-full resize-none"
+                                                placeholder="Pillar Narrative..."
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
@@ -208,15 +267,15 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 <div className="relative">
                                     <textarea
                                         rows={3}
-                                        value={config.contactPage.heroDescription}
-                                        onChange={e => updateConfig({ ...config, contactPage: { ...config.contactPage, heroDescription: e.target.value } })}
+                                        value={config.contactPage?.heroDescription || ''}
+                                        onChange={e => updateConfig({ ...config, contactPage: { ...(config.contactPage || {}), heroDescription: e.target.value } })}
                                         className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium outline-none focus:ring-2 ring-gold/20 pr-24"
                                         placeholder="Inviting guests to connect..."
                                     />
                                     <button
                                         onClick={async () => {
                                             const result = await handleAiWriter('contact', 'contact page greeting');
-                                            if (result) updateConfig({ ...config, contactPage: { ...config.contactPage, heroDescription: result } });
+                                            if (result) updateConfig({ ...config, contactPage: { ...(config.contactPage || {}), heroDescription: result } });
                                         }}
                                         disabled={isAiGenerating}
                                         className="absolute bottom-6 right-6 text-[9px] font-black uppercase text-primary bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100 disabled:opacity-50"
@@ -230,8 +289,8 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Geospatial Embed Index (Map URL)</label>
                                 <input
                                     type="text"
-                                    value={config.contactPage.mapEmbedUrl}
-                                    onChange={e => updateConfig({ ...config, contactPage: { ...config.contactPage, mapEmbedUrl: e.target.value } })}
+                                    value={config.contactPage?.mapEmbedUrl || ''}
+                                    onChange={e => updateConfig({ ...config, contactPage: { ...(config.contactPage || {}), mapEmbedUrl: e.target.value } })}
                                     className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-[10px] font-mono font-bold outline-none focus:ring-2 ring-gold/20"
                                     placeholder="https://www.google.com/maps/embed?..."
                                 />
@@ -253,6 +312,45 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                     </div>
                 </div>
             )}
+            {/* Global Registry Summary */}
+            <div className="bg-white p-12 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                <div className="flex items-center gap-4 mb-10">
+                    <div className="w-1.5 h-6 bg-gold rounded-full" />
+                    <h2 className="text-2xl font-black font-serif text-charcoal">Global Registry</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Founding Year</label>
+                        <input
+                            type="text"
+                            value={config.foundingYear}
+                            onChange={e => updateConfig({ ...config, foundingYear: e.target.value })}
+                            className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold outline-none focus:ring-2 ring-gold/20"
+                            placeholder="e.g. 1957"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Latitude</label>
+                        <input
+                            type="number"
+                            step="0.000001"
+                            value={config.contactPage?.coordinates?.lat || 0}
+                            onChange={e => updateConfig({ ...config, contactPage: { ...(config.contactPage || {}), coordinates: { ...(config.contactPage?.coordinates || { lat: 0, lng: 0 }), lat: parseFloat(e.target.value) } } })}
+                            className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold outline-none focus:ring-2 ring-gold/20"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Longitude</label>
+                        <input
+                            type="number"
+                            step="0.000001"
+                            value={config.contactPage?.coordinates?.lng || 0}
+                            onChange={e => updateConfig({ ...config, contactPage: { ...(config.contactPage || {}), coordinates: { ...(config.contactPage?.coordinates || { lat: 0, lng: 0 }), lng: parseFloat(e.target.value) } } })}
+                            className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold outline-none focus:ring-2 ring-gold/20"
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

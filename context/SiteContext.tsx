@@ -1,19 +1,31 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, onSnapshot, doc, setDoc, updateDoc, arrayUnion, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, updateDoc, arrayUnion, writeBatch, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
-import { Room, SiteConfig, Booking } from '../types';
+import { Room, SiteConfig, Booking, Review } from '../types';
 import { ROOMS as INITIAL_ROOMS } from '../constants';
 import GlobalLoader from '../components/GlobalLoader';
+
 
 interface SiteContextType {
   rooms: Room[];
   config: SiteConfig;
+  bookings: Booking[];
+  reviews: Review[];
   loading: boolean;
   updateRooms: (rooms: Room[]) => void;
+  updateRoom: (id: string, data: Partial<Room>) => Promise<void>;
+  deleteRoom: (id: string) => Promise<void>;
   updateConfig: (config: SiteConfig) => void;
   addSubscriber: (email: string) => void;
-  addBooking: (booking: Omit<Booking, 'id' | 'date'>) => void;
+  addBooking: (booking: Omit<Booking, 'id' | 'date'>) => Promise<void>;
+  deleteBooking: (id: string) => Promise<void>;
+  isRoomAvailable: (roomId: string, checkIn: string, checkOut: string) => boolean;
+  updateBooking: (id: string, data: Partial<Booking>) => Promise<void>;
+  addReview: (review: Omit<Review, 'id' | 'date' | 'status'>) => Promise<void>;
+  updateReview: (id: string, data: Partial<Review>) => Promise<void>;
+  deleteReview: (id: string) => Promise<void>;
+  sendEmail: (to: string[], subject: string, html: string) => Promise<void>;
 }
 
 const DEFAULT_CONFIG: SiteConfig = {
@@ -84,10 +96,38 @@ const DEFAULT_CONFIG: SiteConfig = {
   contactPage: {
     heroTitle: "Connect With *Us*",
     heroDescription: "Experience the heart of Accra. Located in the quiet area of Okpoi Gonno, our place is perfect for both work and rest.",
-    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15882.493649520443!2d-0.11681326442008882!3d5.622557404456953!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf851356e9f1a7%3A0x6f9984999999999!2sOkpoi%20Gonno%2C%20Accra!5e0!3m2!1sen!2sgh!4v1715622000000!5m2!1sen!2sgh"
+    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15882.493649520443!2d-0.11681326442008882!3d5.622557404456953!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf851356e9f1a7%3A0x6f9984999999999!2sOkpoi%20Gonno%2C%20Accra!5e0!3m2!1sen!2sgh!4v1715622000000!5m2!1sen!2sgh",
+    coordinates: { lat: 5.626, lng: -0.106 }
   },
+  homeExperience: [
+    {
+      title: "Butler Service",
+      description: "Your own personal helper to make sure you have everything you need.",
+      icon: "👔"
+    },
+    {
+      title: "Great Food",
+      description: "Enjoy traditional Ghanaian food made with fresh local ingredients.",
+      icon: "🥘"
+    },
+    {
+      title: "Quiet Spot",
+      description: "Private gardens where you can relax and get away from the busy city.",
+      icon: "🌿"
+    }
+  ],
+  homePulse: {
+    title: "The Accra *Style*",
+    subtitle: "The Neighbourhood",
+    description: "Perfectly placed in the nice area of Spintex, C1002 Quarters is your home in Ghana's busy capital.",
+    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400",
+    pillars: [
+      { title: "Artisanal Shopping", description: "Moments from the finest textile and craft markets of Spintex." },
+      { title: "Coastal Proximity", description: "A short, luxury chauffeur drive to the golden sands of Labadi Beach." }
+    ]
+  },
+  foundingYear: "1957",
   conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Akwaaba'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
-  bookings: []
 };
 
 const SiteContext = createContext<SiteContextType | undefined>(undefined);
@@ -96,53 +136,58 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize with defaults so UI renders immediately (stale-while-revalidate strategy)
   const [rooms, setRooms] = useState<Room[]>(INITIAL_ROOMS);
   const [config, setConfig] = useState<SiteConfig>(DEFAULT_CONFIG);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Firestore Subscriptions
   useEffect(() => {
     let roomsLoaded = false;
     let configLoaded = false;
+    let bookingsLoaded = false;
+    let reviewsLoaded = false;
 
     // 1. Subscribe to Rooms
     const unsubscribeRooms = onSnapshot(collection(db, 'rooms'), (snapshot) => {
       const roomData = snapshot.docs.map(doc => doc.data() as Room);
-      // Only update if we actually have data (prevents clearing defaults if DB is empty)
-      if (roomData.length > 0) {
-        setRooms(roomData);
-      }
+      if (roomData.length > 0) setRooms(roomData);
       roomsLoaded = true;
-      if (configLoaded) setLoading(false);
-    }, (error) => {
-      console.error("Error listening to rooms:", error);
-      roomsLoaded = true;
-      if (configLoaded) setLoading(false);
-    });
+      if (configLoaded && bookingsLoaded && reviewsLoaded) setLoading(false);
+    }, (error) => console.error("Error listening to rooms:", error));
 
     // 2. Subscribe to Settings/Config
     const unsubscribeConfig = onSnapshot(doc(db, 'settings', 'config'), (docSnap) => {
-      if (docSnap.exists()) {
-        setConfig(docSnap.data() as SiteConfig);
-      }
+      if (docSnap.exists()) setConfig(docSnap.data() as SiteConfig);
       configLoaded = true;
-      if (roomsLoaded) setLoading(false);
-    }, (error) => {
-      console.error("Error listening to config:", error);
-      configLoaded = true;
-      if (roomsLoaded) setLoading(false);
-    });
+      if (roomsLoaded && bookingsLoaded && reviewsLoaded) setLoading(false);
+    }, (error) => console.error("Error listening to config:", error));
+
+    // 3. Subscribe to Bookings
+    const unsubscribeBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
+      const bookingData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Booking));
+      setBookings(bookingData);
+      bookingsLoaded = true;
+      if (roomsLoaded && configLoaded && reviewsLoaded) setLoading(false);
+    }, (error) => console.error("Error listening to bookings:", error));
+
+    // 4. Subscribe to Reviews
+    const unsubscribeReviews = onSnapshot(collection(db, 'reviews'), (snapshot) => {
+      const reviewData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Review));
+      setReviews(reviewData);
+      reviewsLoaded = true;
+      if (roomsLoaded && configLoaded && bookingsLoaded) setLoading(false);
+    }, (error) => console.error("Error listening to reviews:", error));
 
     return () => {
       unsubscribeRooms();
       unsubscribeConfig();
+      unsubscribeBookings();
+      unsubscribeReviews();
     };
   }, []);
 
-  // Write Functions
   const updateRooms = async (newRooms: Room[]) => {
-    // Optimistic update
     setRooms(newRooms);
-
-    // Write each room to Firestore
     try {
       const batch = writeBatch(db);
       newRooms.forEach(room => {
@@ -150,58 +195,146 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         batch.set(ref, room);
       });
       await batch.commit();
-    } catch (err) {
-      console.error("Failed to sync rooms:", err);
-      // Revert/Fetch logic could go here, but listener usually handles correction associated errors
-    }
+    } catch (err) { console.error("Failed to sync rooms:", err); }
+  };
+
+  const updateRoom = async (id: string, data: Partial<Room>) => {
+    try {
+      await updateDoc(doc(db, 'rooms', id), data);
+    } catch (err) { console.error("Failed to update room:", err); }
+  };
+
+  const deleteRoom = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'rooms', id));
+    } catch (err) { console.error("Failed to delete room:", err); }
   };
 
   const updateConfig = async (newConfig: SiteConfig) => {
-    // Optimistic update
     setConfig(newConfig);
-
-    // Write to Firestore
     try {
       await setDoc(doc(db, 'settings', 'config'), newConfig);
-    } catch (err) {
-      console.error("Failed to sync config:", err);
-    }
+    } catch (err) { console.error("Failed to sync config:", err); }
   };
 
   const addSubscriber = async (email: string) => {
     if (!config.newsletterSubscribers.includes(email)) {
-      // Optimistic update not strictly necessary if listener is fast, but good for UI
-      // However, for arrayUnion, best to let Firestore handle the unique generic add
       try {
-        await updateDoc(doc(db, 'settings', 'config'), {
-          newsletterSubscribers: arrayUnion(email)
-        });
-      } catch (err) {
-        console.error("Failed to add subscriber:", err);
-      }
+        await updateDoc(doc(db, 'settings', 'config'), { newsletterSubscribers: arrayUnion(email) });
+      } catch (err) { console.error("Failed to add subscriber:", err); }
     }
   };
 
   const addBooking = async (bookingData: Omit<Booking, 'id' | 'date'>) => {
-    const newBooking: Booking = {
-      ...bookingData,
-      id: `BK-${Date.now()}`,
-      date: new Date().toISOString()
-    };
-
-    // Note: In a real app, bookings might be a subcollection. 
-    // Here we are keeping the existing structure where bookings are part of the 'config' object array.
     try {
-      await updateDoc(doc(db, 'settings', 'config'), {
-        bookings: arrayUnion(newBooking)
+      await addDoc(collection(db, 'bookings'), {
+        ...bookingData,
+        date: new Date().toISOString()
       });
     } catch (err) {
       console.error("Failed to add booking:", err);
+      throw err;
+    }
+  };
+
+  const deleteBooking = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'bookings', id));
+    } catch (err) {
+      console.error("Failed to delete booking:", err);
+      throw err;
+    }
+  };
+
+  const updateBooking = async (id: string, data: Partial<Booking>) => {
+    try {
+      await updateDoc(doc(db, 'bookings', id), data);
+    } catch (err) {
+      console.error("Failed to update booking:", err);
+      throw err;
+    }
+  };
+  const addReview = async (reviewData: Omit<Review, 'id' | 'date' | 'status'>) => {
+    try {
+      await addDoc(collection(db, 'reviews'), {
+        ...reviewData,
+        date: new Date().toISOString(),
+        status: 'pending'
+      });
+    } catch (err) {
+      console.error("Failed to add review:", err);
+      throw err;
+    }
+  };
+
+  const updateReview = async (id: string, data: Partial<Review>) => {
+    try {
+      await updateDoc(doc(db, 'reviews', id), data);
+    } catch (err) {
+      console.error("Failed to update review:", err);
+      throw err;
+    }
+  };
+
+  const deleteReview = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'reviews', id));
+    } catch (err) {
+      console.error("Failed to delete review:", err);
+      throw err;
+    }
+  };
+
+  const isRoomAvailable = (roomId: string, checkIn: string, checkOut: string) => {
+    return !bookings
+      .filter(b => b.roomId === roomId)
+      .some(b => {
+        // Fallback for older bookings that don't have isoCheckIn/isoCheckOut
+        const bStart = b.isoCheckIn || (b.checkInDate ? new Date(b.checkInDate).toISOString().split('T')[0] : null);
+        const bEnd = b.isoCheckOut || (b.checkOutDate ? new Date(b.checkOutDate).toISOString().split('T')[0] : null);
+
+        if (!bStart || !bEnd || bStart === 'Invalid Date' || bEnd === 'Invalid Date') return false;
+
+        // Overlap logic: (StartA < EndB) && (EndA > StartB)
+        return checkIn < bEnd && checkOut > bStart;
+      });
+  };
+
+  const sendEmail = async (to: string[], subject: string, html: string) => {
+    try {
+      await addDoc(collection(db, 'mail'), {
+        to,
+        message: {
+          subject,
+          html
+        }
+      });
+    } catch (err) {
+      console.error("Failed to queue email:", err);
     }
   };
 
   return (
-    <SiteContext.Provider value={{ rooms, config, loading, updateRooms, updateConfig, addSubscriber, addBooking }}>
+    <SiteContext.Provider value={{
+      rooms,
+      config,
+      bookings,
+      loading,
+      updateRooms,
+      updateRoom,
+      deleteRoom,
+      updateConfig,
+      addSubscriber,
+      addBooking,
+      deleteBooking,
+      updateBooking,
+      reviews,
+      addReview,
+      updateReview,
+      deleteReview,
+      isRoomAvailable,
+      sendEmail
+    }}>
       {loading ? <GlobalLoader /> : children}
     </SiteContext.Provider>
   );

@@ -25,7 +25,7 @@ const Contact: React.FC = () => {
     <div className="pt-24 min-h-screen bg-background-light">
       <div className="w-full h-[500px] relative bg-gray-100 overflow-hidden border-b border-gray-100">
         <CustomMap
-          center={[5.626, -0.106]} // Spintex coordinates
+          center={[contactPage.coordinates?.lat || 5.626, contactPage.coordinates?.lng || -0.106]} // Spintex coordinates
           title={config.brand.name}
           address={config.footer.address}
           className="h-full w-full"
@@ -43,7 +43,7 @@ const Contact: React.FC = () => {
             <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4">{config.footer.address}</p>
 
             <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=5.626,-0.106`}
+              href={`https://www.google.com/maps/dir/?api=1&destination=${contactPage.coordinates?.lat || 5.626},${contactPage.coordinates?.lng || -0.106}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-primary hover:bg-[#6B006B] text-white px-6 py-3 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 active:scale-95"

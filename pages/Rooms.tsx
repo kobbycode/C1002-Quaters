@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
-import { formatLuxuryText } from '../utils/formatters';
+import { formatLuxuryText, formatPrice } from '../utils/formatters';
 import { Room } from '../types';
 
 const RoomSkeleton: React.FC = () => (
@@ -33,8 +33,9 @@ const RoomSkeleton: React.FC = () => (
 );
 
 const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id: string, e: React.MouseEvent) => void; onOpenGallery: (room: Room, index: number) => void }> = ({ room, wishlist, onToggleWishlist, onOpenGallery }) => {
+  const { config } = useSite();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
+
   const roomImages = useMemo(() => {
     if (room.images && room.images.length > 0) {
       return room.images;
@@ -75,7 +76,7 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
             </div>
           ))}
         </div>
-        
+
         {roomImages.length > 1 && (
           <>
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -115,7 +116,7 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
             </div>
           </>
         )}
-        
+
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           {room.isBestSeller && (
             <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider text-primary shadow-sm">Popular Choice</div>
@@ -157,7 +158,7 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
         <div className="mt-auto flex items-center justify-between pt-4">
           <div>
             <p className="text-gray-400 text-[9px] uppercase font-black tracking-[0.2em]">Nightly rate</p>
-            <p className="text-2xl md:text-3xl font-black text-charcoal font-serif">GH₵{room.price}<span className="text-sm font-normal text-gray-400">.00</span></p>
+            <p className="text-2xl md:text-3xl font-black text-charcoal font-serif">{formatPrice(room.price, config.currency)}</p>
           </div>
           <Link to={`/checkout?room=${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.15em] text-xs">
             Book Now
@@ -376,7 +377,7 @@ const Rooms: React.FC = () => {
               <div className="border-t border-gray-100 pt-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-charcoal text-[10px] font-black uppercase tracking-[0.2em] text-gold">Max Price</h3>
-                  <span className="text-primary font-black text-sm">GH₵{priceRange}</span>
+                  <span className="text-primary font-black text-sm">{formatPrice(priceRange, config.currency)}</span>
                 </div>
                 <input
                   type="range"
@@ -422,10 +423,10 @@ const Rooms: React.FC = () => {
             ) : filteredRooms.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {filteredRooms.map((room) => (
-                  <RoomCard 
-                    key={room.id} 
-                    room={room} 
-                    wishlist={wishlist} 
+                  <RoomCard
+                    key={room.id}
+                    room={room}
+                    wishlist={wishlist}
                     onToggleWishlist={toggleWishlist}
                     onOpenGallery={handleOpenGallery}
                   />
@@ -461,8 +462,8 @@ const Rooms: React.FC = () => {
                 {galleryIndex + 1} <span className="text-white/30 mx-1 md:mx-2">/</span> {galleryImages.length}
               </div>
             </div>
-            <button 
-              onClick={handleCloseGallery} 
+            <button
+              onClick={handleCloseGallery}
               className="group flex items-center gap-3 md:gap-4 text-white hover:text-primary transition-all font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px]"
             >
               Close Gallery
@@ -473,18 +474,18 @@ const Rooms: React.FC = () => {
               </div>
             </button>
           </div>
-          
+
           <div className="flex-1 relative flex items-center justify-center px-4 md:px-12 lg:px-24 overflow-hidden">
-            <button 
-              onClick={handleGalleryPrev} 
-              className="absolute left-4 md:left-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center border border-white/10 transition-all shadow-2xl backdrop-blur-md" 
+            <button
+              onClick={handleGalleryPrev}
+              className="absolute left-4 md:left-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center border border-white/10 transition-all shadow-2xl backdrop-blur-md"
               aria-label="Previous Image"
             >
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            
+
             <div className="relative w-full h-full flex items-center justify-center max-w-7xl mx-auto overflow-hidden">
               <div
                 className="flex h-full w-full transition-transform duration-500 ease-out"
@@ -492,20 +493,20 @@ const Rooms: React.FC = () => {
               >
                 {galleryImages.map((src, idx) => (
                   <div key={idx} className="h-full w-full shrink-0 flex items-center justify-center p-4">
-                    <img 
-                      src={src} 
-                      alt={`${selectedRoom.name} full view ${idx + 1}`} 
-                      className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl" 
-                      loading="lazy" 
+                    <img
+                      src={src}
+                      alt={`${selectedRoom.name} full view ${idx + 1}`}
+                      className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl"
+                      loading="lazy"
                     />
                   </div>
                 ))}
               </div>
             </div>
-            
-            <button 
-              onClick={handleGalleryNext} 
-              className="absolute right-4 md:right-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center border border-white/10 transition-all shadow-2xl backdrop-blur-md" 
+
+            <button
+              onClick={handleGalleryNext}
+              className="absolute right-4 md:right-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center border border-white/10 transition-all shadow-2xl backdrop-blur-md"
               aria-label="Next Image"
             >
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -513,18 +514,17 @@ const Rooms: React.FC = () => {
               </svg>
             </button>
           </div>
-          
+
           {galleryImages.length > 1 && (
             <div className="h-32 md:h-40 w-full bg-black/40 border-t border-white/5 flex items-center justify-center p-4 md:p-6 gap-3 md:gap-5 overflow-x-auto shrink-0 no-scrollbar">
               {galleryImages.map((src, idx) => (
-                <button 
-                  key={idx} 
-                  onClick={() => setGalleryIndex(idx)} 
-                  className={`relative shrink-0 h-16 md:h-20 lg:h-24 aspect-video rounded-xl overflow-hidden transition-all duration-500 border-2 ${
-                    galleryIndex === idx 
-                      ? 'border-primary scale-110 shadow-2xl opacity-100' 
-                      : 'border-transparent opacity-30 hover:opacity-60 grayscale hover:grayscale-0'
-                  }`} 
+                <button
+                  key={idx}
+                  onClick={() => setGalleryIndex(idx)}
+                  className={`relative shrink-0 h-16 md:h-20 lg:h-24 aspect-video rounded-xl overflow-hidden transition-all duration-500 border-2 ${galleryIndex === idx
+                    ? 'border-primary scale-110 shadow-2xl opacity-100'
+                    : 'border-transparent opacity-30 hover:opacity-60 grayscale hover:grayscale-0'
+                    }`}
                   aria-label={`Go to image ${idx + 1}`}
                 >
                   <img src={src} className="w-full h-full object-cover" alt="Preview" loading="lazy" />

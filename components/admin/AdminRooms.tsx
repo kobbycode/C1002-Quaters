@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSite } from '../../context/SiteContext';
 import { Room } from '../../types';
+import { formatPrice } from '../../utils/formatters';
 
 interface AdminRoomsProps {
     onEditRoom: (room: Room) => void;
@@ -8,7 +9,7 @@ interface AdminRoomsProps {
 }
 
 export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoom }) => {
-    const { rooms, updateRoom, deleteRoom } = useSite();
+    const { rooms, updateRoom, deleteRoom, config } = useSite();
 
     const handleToggleBestSeller = async (id: string, current: boolean) => {
         await updateRoom(id, { isBestSeller: !current });
@@ -64,7 +65,7 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                             <div className="flex justify-between items-center mb-6">
                                 <div>
                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Starting from</p>
-                                    <p className="text-2xl font-black text-charcoal font-serif">GH₵{room.price}</p>
+                                    <p className="text-2xl font-black text-charcoal font-serif">{formatPrice(room.price, config.currency)}</p>
                                 </div>
                                 <div className="flex items-center text-gold text-xs font-black bg-gold/5 px-3 py-1.5 rounded-lg border border-gold/10">
                                     ★ {room.rating}

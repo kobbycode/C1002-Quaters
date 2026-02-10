@@ -30,8 +30,8 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                             <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Brand Name</label>
                             <input
                                 type="text"
-                                value={config.brand.name}
-                                onChange={e => updateConfig({ ...config, brand: { ...config.brand, name: e.target.value } })}
+                                value={config.brand?.name || ''}
+                                onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), name: e.target.value } })}
                                 className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 text-lg font-black focus:border-gold outline-none transition-all"
                             />
                         </div>
@@ -41,15 +41,15 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Brand Tagline</label>
                                 <input
                                     type="text"
-                                    value={config.brand.tagline}
-                                    onChange={e => updateConfig({ ...config, brand: { ...config.brand, tagline: e.target.value } })}
+                                    value={config.brand?.tagline || ''}
+                                    onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), tagline: e.target.value } })}
                                     className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 text-sm font-medium focus:border-gold outline-none transition-all"
                                 />
                             </div>
                             <button
                                 onClick={async () => {
-                                    const result = await handleAiWriter('tagline', config.brand.name);
-                                    if (result) updateConfig({ ...config, brand: { ...config.brand, tagline: result } });
+                                    const result = await handleAiWriter('tagline', config.brand?.name || '');
+                                    if (result) updateConfig({ ...config, brand: { ...(config.brand || {}), tagline: result } });
                                 }}
                                 disabled={isAiGenerating}
                                 className="h-[58px] px-6 bg-charcoal text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gold transition-all disabled:opacity-50 hover-lift flex items-center gap-2"
@@ -64,8 +64,8 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                         <div>
                             <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Brand Voice / Persona</label>
                             <select
-                                value={config.brand.voice}
-                                onChange={e => updateConfig({ ...config, brand: { ...config.brand, voice: e.target.value } })}
+                                value={config.brand?.voice || 'Regal & Sophisticated'}
+                                onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), voice: e.target.value } })}
                                 className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 text-sm font-bold focus:border-gold outline-none transition-all"
                             >
                                 <option>Regal & Sophisticated</option>
@@ -92,19 +92,19 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                 <div className="flex items-center gap-4">
                                     <div
                                         className="w-16 h-16 rounded-2xl shadow-lg cursor-pointer relative overflow-hidden color-swatch"
-                                        style={{ backgroundColor: config.brand.primaryColor }}
+                                        style={{ backgroundColor: config.brand?.primaryColor || '#8B008B' }}
                                     >
                                         <input
                                             type="color"
-                                            value={config.brand.primaryColor}
-                                            onChange={e => updateConfig({ ...config, brand: { ...config.brand, primaryColor: e.target.value } })}
+                                            value={config.brand?.primaryColor || '#8B008B'}
+                                            onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), primaryColor: e.target.value } })}
                                             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         />
                                     </div>
                                     <input
                                         type="text"
-                                        value={config.brand.primaryColor}
-                                        onChange={e => updateConfig({ ...config, brand: { ...config.brand, primaryColor: e.target.value } })}
+                                        value={config.brand?.primaryColor || '#8B008B'}
+                                        onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), primaryColor: e.target.value } })}
                                         className="flex-1 bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm font-mono font-bold uppercase focus:border-gold outline-none transition-all"
                                     />
                                 </div>
@@ -115,8 +115,8 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                         {['#8B008B', '#1a1a2e', '#8B008B', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'].map(color => (
                                             <button
                                                 key={color}
-                                                onClick={() => updateConfig({ ...config, brand: { ...config.brand, primaryColor: color } })}
-                                                className={`w-8 h-8 rounded-lg color-swatch ${config.brand.primaryColor === color ? 'selected ring-2 ring-offset-2 ring-gray-300' : ''}`}
+                                                onClick={() => updateConfig({ ...config, brand: { ...(config.brand || {}), primaryColor: color } })}
+                                                className={`w-8 h-8 rounded-lg color-swatch ${config.brand?.primaryColor === color ? 'selected ring-2 ring-offset-2 ring-gray-300' : ''}`}
                                                 style={{ backgroundColor: color }}
                                             />
                                         ))}
@@ -132,19 +132,19 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                 <div className="flex items-center gap-4">
                                     <div
                                         className="w-16 h-16 rounded-2xl shadow-lg cursor-pointer relative overflow-hidden color-swatch"
-                                        style={{ backgroundColor: config.brand.accentColor }}
+                                        style={{ backgroundColor: config.brand?.accentColor || '#8B008B' }}
                                     >
                                         <input
                                             type="color"
-                                            value={config.brand.accentColor}
-                                            onChange={e => updateConfig({ ...config, brand: { ...config.brand, accentColor: e.target.value } })}
+                                            value={config.brand?.accentColor || '#8B008B'}
+                                            onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), accentColor: e.target.value } })}
                                             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         />
                                     </div>
                                     <input
                                         type="text"
-                                        value={config.brand.accentColor}
-                                        onChange={e => updateConfig({ ...config, brand: { ...config.brand, accentColor: e.target.value } })}
+                                        value={config.brand?.accentColor || '#8B008B'}
+                                        onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), accentColor: e.target.value } })}
                                         className="flex-1 bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm font-mono font-bold uppercase focus:border-gold outline-none transition-all"
                                     />
                                 </div>
@@ -155,8 +155,8 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                         {['#1a1a2e', '#8B008B', '#0d9488', '#7c3aed', '#db2777', '#ea580c', '#059669', '#2563eb'].map(color => (
                                             <button
                                                 key={color}
-                                                onClick={() => updateConfig({ ...config, brand: { ...config.brand, accentColor: color } })}
-                                                className={`w-8 h-8 rounded-lg color-swatch ${config.brand.accentColor === color ? 'selected ring-2 ring-offset-2 ring-gray-300' : ''}`}
+                                                onClick={() => updateConfig({ ...config, brand: { ...(config.brand || {}), accentColor: color } })}
+                                                className={`w-8 h-8 rounded-lg color-swatch ${config.brand?.accentColor === color ? 'selected ring-2 ring-offset-2 ring-gray-300' : ''}`}
                                                 style={{ backgroundColor: color }}
                                             />
                                         ))}
@@ -182,8 +182,8 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                             </label>
                             <input
                                 type="text"
-                                value={config.brand.socials.instagram}
-                                onChange={e => updateConfig({ ...config, brand: { ...config.brand, socials: { ...config.brand.socials, instagram: e.target.value } } })}
+                                value={config.brand?.socials?.instagram || ''}
+                                onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), socials: { ...(config.brand?.socials || {}), instagram: e.target.value } } })}
                                 className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm font-bold focus:border-gold outline-none transition-all"
                                 placeholder="@yourbrand"
                             />
@@ -195,8 +195,8 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                             </label>
                             <input
                                 type="text"
-                                value={config.brand.socials.linkedin}
-                                onChange={e => updateConfig({ ...config, brand: { ...config.brand, socials: { ...config.brand.socials, linkedin: e.target.value } } })}
+                                value={config.brand?.socials?.linkedin || ''}
+                                onChange={e => updateConfig({ ...config, brand: { ...(config.brand || {}), socials: { ...(config.brand?.socials || {}), linkedin: e.target.value } } })}
                                 className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm font-bold focus:border-gold outline-none transition-all"
                                 placeholder="linkedin.com/company/yourbrand"
                             />

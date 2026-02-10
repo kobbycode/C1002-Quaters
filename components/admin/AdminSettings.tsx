@@ -115,7 +115,11 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                     <div className="space-y-6">
                         <div>
                             <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Base Currency</label>
-                            <select className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold focus:ring-gold outline-none" defaultValue="GHS">
+                            <select
+                                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold focus:ring-gold outline-none"
+                                value={config.currency || 'GHS'}
+                                onChange={e => updateConfig({ ...config, currency: e.target.value })}
+                            >
                                 <option value="GHS">GHS - Ghanaian Cedi</option>
                                 <option value="USD">USD - US Dollar</option>
                                 <option value="EUR">EUR - Euro</option>
@@ -123,7 +127,11 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                         </div>
                         <div>
                             <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Timezone Node</label>
-                            <select className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold focus:ring-gold outline-none" defaultValue="GMT">
+                            <select
+                                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-bold focus:ring-gold outline-none"
+                                value={config.timezone || 'GMT'}
+                                onChange={e => updateConfig({ ...config, timezone: e.target.value })}
+                            >
                                 <option value="GMT">GMT (Accra)</option>
                                 <option value="UTC">UTC</option>
                                 <option value="EST">EST (New York)</option>

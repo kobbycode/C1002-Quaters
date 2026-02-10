@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
+import { formatPrice } from '../utils/formatters';
 import { Room } from '../types';
 
 const Wishlist: React.FC = () => {
-  const { rooms } = useSite();
+  const { rooms, config } = useSite();
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -113,7 +113,7 @@ const Wishlist: React.FC = () => {
                   <div className="mt-auto flex items-center justify-between">
                     <div>
                       <p className="text-gray-400 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Nightly</p>
-                      <p className="text-xl md:text-2xl font-black text-charcoal font-serif">GH₵{room.price}</p>
+                      <p className="text-xl md:text-2xl font-black text-charcoal font-serif">{formatPrice(room.price, config.currency)}</p>
                     </div>
                     <Link to={`/rooms/${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.2em] text-xs">
                       View Details
