@@ -8,7 +8,7 @@ import { formatLuxuryText, formatPrice } from '../utils/formatters';
 import { PaystackButton } from 'react-paystack';
 
 const Checkout: React.FC = () => {
-  const { rooms, config, addBooking, sendEmail, isRoomAvailable } = useSite();
+  const { rooms, config, addBooking, sendEmail, isRoomAvailable, calculatePrice } = useSite();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get('room') || rooms[0]?.id;
   const room = rooms.find(r => r.id === roomId) || rooms[0];
@@ -48,7 +48,21 @@ const Checkout: React.FC = () => {
     };
   }, [searchParams, nights]);
 
-  const totalAmount = room.price * nights;
+
+
+  const pricing = useMemo(() => {
+    if (!dates) return {
+      total: room.price * nights,
+      breakdown: { basePrice: room.price, totalNights: nights, subtotal: room.price * nights, adjustments: [], finalTotal: room.price * nights, averageNightlyRate: room.price }
+    };
+    const calculation = calculatePrice(room.id, dates.checkIn, dates.checkOut);
+    return {
+      total: calculation.finalTotal,
+      breakdown: calculation
+    };
+  }, [dates, room, calculatePrice, nights]);
+
+  const totalAmount = pricing.total;
 
   const handleCashBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -315,16 +329,24 @@ const Checkout: React.FC = () => {
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                    <span className="text-gray-400">Total Rate</span>
-                    <span className="text-charcoal">{formatPrice(room.price * nights, config.currency)}</span>
+                    <span className="text-gray-400">Base Rate</span>
+                    <span className="text-charcoal">{formatPrice(pricing.breakdown.subtotal, config.currency)}</span>
                   </div>
+
+                  {pricing.breakdown.adjustments.map((adj, i) => (
+                    <div key={i} className="flex justify-between text-xs font-medium tracking-widest text-emerald-600">
+                      <span>{adj.ruleName}</span>
+                      <span>{adj.amount > 0 ? '+' : ''}{formatPrice(adj.amount, config.currency)}</span>
+                    </div>
+                  ))}
+
                   <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
                     <span className="text-gray-400">Concierge Service</span>
                     <span className="text-primary">Included</span>
                   </div>
                   <div className="flex justify-between items-center pt-8 border-t border-gray-100 font-black font-serif text-3xl">
                     <span className="text-charcoal">Total</span>
-                    <span className="text-primary">{formatPrice(room.price * nights, config.currency)}</span>
+                    <span className="text-primary">{formatPrice(totalAmount, config.currency)}</span>
                   </div>
                 </div>
               </div>

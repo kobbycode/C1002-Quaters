@@ -23,7 +23,11 @@ import { AdminNewsletter } from '../components/admin/AdminNewsletter';
 import { AdminConcierge } from '../components/admin/AdminConcierge';
 import { AdminConciergeLab } from '../components/admin/AdminConciergeLab';
 import { AdminPatrons } from '../components/admin/AdminPatrons';
+
 import { AdminFinancials } from '../components/admin/AdminFinancials';
+
+import { AdminEmails } from '../components/admin/AdminEmails';
+import { AdminPricing } from '../components/admin/AdminPricing';
 import { AdminHeroModal } from '../components/admin/modals/AdminHeroModal';
 import { AdminNavModal } from '../components/admin/modals/AdminNavModal';
 import { AdminRoomModal } from '../components/admin/modals/AdminRoomModal';
@@ -31,7 +35,7 @@ import { AdminAmenityModal } from '../components/admin/modals/AdminAmenityModal'
 import { AdminBookingModal } from '../components/admin/modals/AdminBookingModal';
 import SEO from '../components/SEO';
 
-type Tab = 'overview' | 'bookings' | 'reviews' | 'branding' | 'home' | 'pages' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'ailab' | 'patrons' | 'financials' | 'footer' | 'newsletter' | 'settings';
+type Tab = 'overview' | 'bookings' | 'reviews' | 'emails' | 'pricing' | 'branding' | 'home' | 'pages' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'ailab' | 'patrons' | 'financials' | 'footer' | 'newsletter' | 'settings';
 
 
 const Admin: React.FC = () => {
@@ -169,7 +173,7 @@ const Admin: React.FC = () => {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mt-1">HQ Command Node</p>
         </div>
         <nav className="flex flex-col gap-1 overflow-y-auto no-scrollbar">
-          {(['overview', 'bookings', 'reviews', 'branding', 'home', 'pages', 'navigation', 'rooms', 'amenities', 'concierge', 'ailab', 'patrons', 'financials', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => (
+          {(['overview', 'bookings', 'reviews', 'emails', 'pricing', 'branding', 'home', 'pages', 'navigation', 'rooms', 'amenities', 'concierge', 'ailab', 'patrons', 'financials', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => (
             <button
               key={tab}
               onClick={() => handleTabChange(tab)}
@@ -229,6 +233,16 @@ const Admin: React.FC = () => {
           {/* Reviews Tab */}
           {activeTab === 'reviews' && (
             <AdminReviews />
+          )}
+
+          {/* Emails Tab */}
+          {activeTab === 'emails' && (
+            <AdminEmails />
+          )}
+
+          {/* Pricing Tab */}
+          {activeTab === 'pricing' && (
+            <AdminPricing />
           )}
 
           {/* Branding Tab */}

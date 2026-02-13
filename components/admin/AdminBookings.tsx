@@ -4,6 +4,7 @@ import { formatPrice } from '../../utils/formatters';
 import { Booking } from '../../types';
 import { useToast } from '../../context/ToastContext';
 import { AdminCalendar } from './AdminCalendar';
+import { ExportService } from '../../utils/export-service';
 
 interface AdminBookingsProps {
     onViewBooking: (booking: Booking) => void;
@@ -25,7 +26,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
     const [dateFilter, setDateFilter] = useState('');
     const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
 
-    const { rooms, addBooking, deleteBooking, bookings, config, isRoomAvailable } = useSite();
+    const { rooms, addBooking, deleteBooking, bookings, config, isRoomAvailable, calculatePrice } = useSite();
     const { showToast } = useToast();
 
     const handleCreateBooking = async (e: React.FormEvent) => {
@@ -75,7 +76,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
             setNewBooking(prev => ({
                 ...prev,
                 roomId,
-                totalPrice: room.price * prev.nights
+                totalPrice: calculatePrice(roomId, new Date(prev.isoCheckIn), new Date(new Date(prev.isoCheckIn).getTime() + prev.nights * 24 * 60 * 60 * 1000)).finalTotal
             }));
         }
     };
@@ -85,7 +86,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
         setNewBooking(prev => ({
             ...prev,
             nights,
-            totalPrice: room ? room.price * nights : 0
+            totalPrice: room ? calculatePrice(room.id, new Date(prev.isoCheckIn), new Date(new Date(prev.isoCheckIn).getTime() + nights * 24 * 60 * 60 * 1000)).finalTotal : 0
         }));
     };
 
@@ -216,13 +217,20 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                     </button>
                 </div>
 
-                <button
-                    onClick={() => setIsCreating(true)}
-                    className="whitespace-nowrap px-8 py-5 bg-charcoal text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-gold transition-colors shadow-lg shadow-charcoal/20 flex items-center gap-3 group"
-                >
-                    <span>New Booking</span>
-                    <svg className="w-4 h-4 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                </button>
+                <div className="flex flex-wrap gap-4 items-center">
+                    <button
+                        onClick={() => ExportService.exportBookingsToExcel(filteredBookings, rooms)}
+                        className="bg-white text-green-600 px-6 py-3 rounded-xl border border-green-100 font-black text-[10px] uppercase tracking-widest hover:bg-green-50 transition-all flex items-center gap-2"
+                    >
+                        <span className="text-lg">📊</span> Export to Excel
+                    </button>
+                    <button
+                        onClick={() => setIsCreating(true)}
+                        className="bg-gold text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#C5A059] transition-all shadow-xl shadow-gold/20 flex items-center gap-2"
+                    >
+                        <span className="text-lg">+</span> New Booking
+                    </button>
+                </div>
             </div>
 
             {viewMode === 'calendar' ? (

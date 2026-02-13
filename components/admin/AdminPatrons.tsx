@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useSite } from '../../context/SiteContext';
 import { formatPrice } from '../../utils/formatters';
 import { Booking } from '../../types';
+import { ExportService } from '../../utils/export-service';
 
 export const AdminPatrons: React.FC = () => {
     const { bookings, config } = useSite();
@@ -67,6 +68,13 @@ export const AdminPatrons: React.FC = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
+
+                <button
+                    onClick={() => ExportService.exportToCSV(patrons.map(p => ({ Name: p.name, Email: p.email, 'Total Spent': p.totalSpent, 'Nights': p.totalNights, 'Last Stay': p.lastStay })), 'c1002-patrons')}
+                    className="bg-gold text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#C5A059] transition-all shadow-xl shadow-gold/20 flex items-center gap-2 whitespace-nowrap"
+                >
+                    <span className="text-lg">📥</span> Export List
+                </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">

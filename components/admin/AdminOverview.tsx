@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Room, SiteConfig, Booking } from '../../types';
 import { useSite } from '../../context/SiteContext';
 import { formatPrice } from '../../utils/formatters';
+import { EmailScheduler } from '../../utils/email-scheduler';
 
 interface AdminOverviewProps {
     rooms: Room[];
@@ -152,6 +153,31 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
     const { bookings } = useSite();
     const now = useMemo(() => new Date(), []);
     const [revenueDateFilter, setRevenueDateFilter] = useState<'7d' | '30d' | '90d'>('7d');
+
+    // Automated Email Scheduler
+    React.useEffect(() => {
+        const runScheduler = async () => {
+            const lastRun = sessionStorage.getItem('c1002_email_scheduler_last_run');
+            const nowTs = Date.now();
+            const oneHour = 60 * 60 * 1000;
+
+            if (!lastRun || (nowTs - parseInt(lastRun)) > oneHour) {
+                try {
+                    console.log('Initiating automated email checks...');
+                    const result = await EmailScheduler.runChecks(bookings, config);
+                    console.log(`Automated Email Scheduler: ${result.sent} sent, ${result.errors} errors`);
+                    sessionStorage.setItem('c1002_email_scheduler_last_run', nowTs.toString());
+                } catch (err) {
+                    console.error('Automated Email Scheduler failed:', err);
+                }
+            }
+        };
+
+        if (bookings.length > 0) {
+            runScheduler();
+        }
+    }, [bookings, config]);
+
     const chartData = useMemo(() => {
         const days = revenueDateFilter === '7d' ? 7 : revenueDateFilter === '30d' ? 30 : 90;
         const data: { date: string, value: number }[] = [];

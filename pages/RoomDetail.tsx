@@ -261,7 +261,7 @@ const ReviewForm: React.FC<{ roomId: string, roomName: string }> = ({ roomId, ro
 };
 
 const RoomDetail: React.FC = () => {
-  const { rooms, config, bookings, reviews, loading } = useSite();
+  const { rooms, config, bookings, reviews, loading, calculatePrice } = useSite();
   const { id } = useParams<{ id: string }>();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -360,7 +360,12 @@ const RoomDetail: React.FC = () => {
       .map(b => ({ start: b.isoCheckIn, end: b.isoCheckOut }));
   }, [bookings, id]);
 
-  const totalPrice = room ? room.price * nights : 0;
+  const pricing = useMemo(() => {
+    if (!room || !checkIn || !checkOut || nights === 0) return { total: 0, breakdown: null };
+    return calculatePrice(room.id, checkIn, checkOut);
+  }, [room, checkIn, checkOut, nights, calculatePrice]);
+
+  const totalPrice = pricing.total;
   const formatDate = (date: Date | null) => date ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date) : 'Select Date';
 
   const categorizedAmenities: Record<string, string[]> = useMemo(() => {
@@ -675,9 +680,15 @@ const RoomDetail: React.FC = () => {
 
               <div className="space-y-4 pt-8 border-t border-gray-100 mb-8">
                 <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                  <span className="text-gray-400">{formatPrice(room.price, config.currency)} x {nights} nights</span>
-                  <span className="text-charcoal">{formatPrice(totalPrice, config.currency)}</span>
+                  <span className="text-gray-400">Base Rate ({nights} nights)</span>
+                  <span className="text-charcoal">{pricing.breakdown ? formatPrice(pricing.breakdown.subtotal, config.currency) : '-'}</span>
                 </div>
+                {pricing.breakdown?.adjustments.map((adj, i) => (
+                  <div key={i} className="flex justify-between text-xs font-medium tracking-widest text-emerald-600">
+                    <span>{adj.ruleName}</span>
+                    <span>{adj.amount > 0 ? '+' : ''}{formatPrice(adj.amount, config.currency)}</span>
+                  </div>
+                ))}
                 <div className="flex justify-between items-center pt-6 border-t border-gray-100">
                   <span className="text-charcoal font-black font-serif text-2xl">Total</span>
                   <span className="text-primary font-black font-serif text-2xl">{formatPrice(totalPrice, config.currency)}</span>

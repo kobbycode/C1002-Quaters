@@ -100,6 +100,7 @@ export interface SiteConfig {
   timezone?: string;
   aiKnowledgeBase?: { question: string; answer: string; category?: string }[];
   aiLabInstructions?: string;
+  pricingRules?: PricingRule[];
 
   // bookings: Booking[]; // Deprecated, moved to root collection
 }
@@ -136,6 +137,20 @@ export interface Review {
   date: string; // ISO string
   status: 'pending' | 'approved' | 'rejected';
   images?: string[];
+}
+
+export interface PricingRule {
+  id: string;
+  name: string;
+  type: 'seasonal' | 'weekend' | 'long-stay' | 'last-minute' | 'custom';
+  adjustmentType: 'percentage' | 'fixed_amount';
+  value: number; // e.g., 10 for +10% or -10 for -10%
+  startDate?: string;
+  endDate?: string;
+  daysOfWeek?: number[]; // 0=Sun, 6=Sat
+  minNights?: number;
+  roomCategories?: string[]; // 'all' or specific IDs
+  isActive: boolean;
 }
 
 export interface EmailTemplate {

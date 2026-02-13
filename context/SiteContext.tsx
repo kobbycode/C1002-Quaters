@@ -1,8 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, onSnapshot, doc, setDoc, updateDoc, arrayUnion, writeBatch, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, updateDoc, arrayUnion, writeBatch, addDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../utils/firebase';
-import { Room, SiteConfig, Booking, Review } from '../types';
+import { Room, SiteConfig, Booking, Review, PricingRule } from '../types';
+import { EmailService } from '../utils/email-service';
+import { PricingEngine } from '../utils/pricing-engine';
 import { ROOMS as INITIAL_ROOMS } from '../constants';
 import GlobalLoader from '../components/GlobalLoader';
 
@@ -25,7 +27,11 @@ interface SiteContextType {
   addReview: (review: Omit<Review, 'id' | 'date' | 'status'>) => Promise<void>;
   updateReview: (id: string, data: Partial<Review>) => Promise<void>;
   deleteReview: (id: string) => Promise<void>;
+
   sendEmail: (to: string[], subject: string, html: string) => Promise<void>;
+  calculatePrice: (roomId: string, checkIn: Date, checkOut: Date) => ReturnType<typeof PricingEngine.calculatePrice>;
+  addPricingRule: (rule: Omit<PricingRule, 'id'>) => void;
+  deletePricingRule: (id: string) => void;
 }
 
 const DEFAULT_CONFIG: SiteConfig = {
@@ -238,10 +244,26 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addBooking = async (bookingData: Omit<Booking, 'id' | 'date'>) => {
     try {
-      await addDoc(collection(db, 'bookings'), {
+      const docRef = await addDoc(collection(db, 'bookings'), {
         ...bookingData,
         date: new Date().toISOString()
       });
+
+      // Send confirmation email
+      try {
+        const fullBooking: Booking = {
+          id: docRef.id,
+          ...bookingData,
+          date: new Date().toISOString(),
+          // Default values if missing
+          paymentStatus: bookingData.paymentStatus || 'pending',
+          paymentMethod: bookingData.paymentMethod || 'cash'
+        } as Booking;
+
+        await EmailService.sendBookingConfirmation(fullBooking, config);
+      } catch (emailErr) {
+        console.error("Failed to send confirmation email:", emailErr);
+      }
     } catch (err) {
       console.error("Failed to add booking:", err);
       throw err;
@@ -260,6 +282,17 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateBooking = async (id: string, data: Partial<Booking>) => {
     try {
       await updateDoc(doc(db, 'bookings', id), data);
+
+      // Check if payment was just completed and send receipt
+      const booking = bookings.find(b => b.id === id);
+      if (booking && booking.paymentStatus !== 'paid' && data.paymentStatus === 'paid') {
+        try {
+          const updatedBooking = { ...booking, ...data };
+          await EmailService.sendPaymentReceipt(updatedBooking, config);
+        } catch (emailErr) {
+          console.error("Failed to send payment receipt:", emailErr);
+        }
+      }
     } catch (err) {
       console.error("Failed to update booking:", err);
       throw err;
@@ -312,17 +345,30 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const sendEmail = async (to: string[], subject: string, html: string) => {
-    try {
-      await addDoc(collection(db, 'mail'), {
-        to,
-        message: {
-          subject,
-          html
-        }
-      });
-    } catch (err) {
-      console.error("Failed to queue email:", err);
-    }
+    // This is a helper if components want to send ad-hoc emails via the service
+    // In reality, most emails are triggered via addBooking/updateBooking using EmailService directly
+    await addDoc(collection(db, 'mail'), {
+      to,
+      message: { subject, html },
+      createdAt: new Date()
+    });
+  };
+
+  const calculatePrice = (roomId: string, checkIn: Date, checkOut: Date) => {
+    const room = rooms.find(r => r.id === roomId);
+    if (!room) throw new Error('Room not found');
+    return PricingEngine.calculatePrice(room, checkIn, checkOut, config.pricingRules || []);
+  };
+
+  const addPricingRule = (rule: Omit<PricingRule, 'id'>) => {
+    const newRule: PricingRule = { ...rule, id: Math.random().toString(36).substr(2, 9) };
+    const currentRules = config.pricingRules || [];
+    updateConfig({ ...config, pricingRules: [...currentRules, newRule] });
+  };
+
+  const deletePricingRule = (id: string) => {
+    const currentRules = config.pricingRules || [];
+    updateConfig({ ...config, pricingRules: currentRules.filter(r => r.id !== id) });
   };
 
   return (
@@ -330,6 +376,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       rooms,
       config,
       bookings,
+      reviews,
       loading,
       updateRooms,
       updateRoom,
@@ -338,13 +385,15 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addSubscriber,
       addBooking,
       deleteBooking,
+      isRoomAvailable,
       updateBooking,
-      reviews,
       addReview,
       updateReview,
       deleteReview,
-      isRoomAvailable,
-      sendEmail
+      sendEmail,
+      calculatePrice,
+      addPricingRule,
+      deletePricingRule
     }}>
       {loading ? <GlobalLoader /> : children}
     </SiteContext.Provider>

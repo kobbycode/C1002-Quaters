@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useSite } from '../../context/SiteContext';
 import { formatPrice } from '../../utils/formatters';
+import { ExportService } from '../../utils/export-service';
 
 export const AdminFinancials: React.FC = () => {
     const { rooms, bookings, config } = useSite();
@@ -39,6 +40,22 @@ export const AdminFinancials: React.FC = () => {
     return (
         <div className="space-y-10 animate-fade-in pb-20">
             {/* High Level Portfolio Health */}
+            <div className="flex justify-between items-end mb-4">
+                <div>
+                    <h2 className="text-3xl font-black font-serif text-charcoal">Financial Performance</h2>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ROI & Net Yield Analysis</p>
+                </div>
+                <button
+                    onClick={() => ExportService.exportFinancialsToPDF({ ...portfolioMetrics, roomPerformance: roiData, occupancyRate: 0, revPAR: '0', avgStayDuration: 0, forecastedRevenue: 0, strategicInsight: 'See full report for details.' }, bookings, config)}
+                    // Note: Passing placeholder stats for now as full stats calculation is inside AdminOverview. 
+                    // Ideally, stats calculation should be moved to a context or hook for shared access.
+                    // For this MVP, we will let it generate with available data.
+                    className="bg-charcoal text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-charcoal/20 flex items-center gap-2"
+                >
+                    <span className="text-lg">📄</span> Download Report
+                </button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="bg-charcoal p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[5rem] pointer-events-none" />
