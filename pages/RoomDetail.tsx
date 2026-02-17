@@ -720,20 +720,20 @@ const RoomDetail: React.FC = () => {
       </div>
 
       {isGalleryOpen && (
-        <div className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-xl flex flex-col animate-fade-in">
+        <div className="fixed inset-0 z-[100] backdrop-blur-xl flex flex-col animate-fade-in" style={{ backgroundColor: 'rgba(255, 255, 255, 0.98)' }}>
           <div className="h-24 w-full px-10 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-10">
-              <h2 className="text-charcoal text-xl font-serif italic hidden md:block">{room.name}</h2>
-              <div className="px-5 py-2 rounded-full bg-charcoal/5 border border-charcoal/10 text-charcoal text-[10px] font-black uppercase tracking-[0.3em]">{currentIndex + 1} / {galleryImages.length}</div>
+              <h2 className="text-[#101922] text-xl font-serif italic hidden md:block">{room.name}</h2>
+              <div className="px-5 py-2 rounded-full bg-[#101922]/5 border border-[#101922]/10 text-[#101922] text-[10px] font-black uppercase tracking-[0.3em]">{currentIndex + 1} / {galleryImages.length}</div>
             </div>
-            <button onClick={() => setIsGalleryOpen(false)} className="text-charcoal hover:text-gold transition-all font-black uppercase tracking-[0.3em] text-[10px]">Close Gallery</button>
+            <button onClick={() => setIsGalleryOpen(false)} className="text-[#101922] hover:text-[#8B008B] transition-all font-black uppercase tracking-[0.3em] text-[10px]">Close Gallery</button>
           </div>
           <div className="flex-1 relative flex items-center justify-center px-6 md:px-24 overflow-hidden">
-            <button onClick={handlePrev} className="absolute left-6 md:left-12 z-20 w-16 h-16 rounded-full bg-charcoal/5 hover:bg-charcoal/10 text-charcoal flex items-center justify-center border border-charcoal/10 transition-all shadow-2xl backdrop-blur-md" aria-label="Previous Image"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" /></svg></button>
+            <button onClick={handlePrev} className="absolute left-6 md:left-12 z-20 w-16 h-16 rounded-full bg-[#101922]/5 hover:bg-[#101922]/10 text-[#101922] flex items-center justify-center border border-[#101922]/10 transition-all shadow-2xl backdrop-blur-md" aria-label="Previous Image"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" /></svg></button>
             <div className="relative w-full h-full flex items-center justify-center max-w-7xl mx-auto overflow-hidden">
               <img src={galleryImages[currentIndex]} alt={`${room.name} view`} className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl" />
             </div>
-            <button onClick={handleNext} className="absolute right-6 md:right-12 z-20 w-16 h-16 rounded-full bg-charcoal/5 hover:bg-charcoal/10 text-charcoal flex items-center justify-center border border-charcoal/10 transition-all shadow-2xl backdrop-blur-md" aria-label="Next Image"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" /></svg></button>
+            <button onClick={handleNext} className="absolute right-6 md:right-12 z-20 w-16 h-16 rounded-full bg-[#101922]/5 hover:bg-[#101922]/10 text-[#101922] flex items-center justify-center border border-[#101922]/10 transition-all shadow-2xl backdrop-blur-md" aria-label="Next Image"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" /></svg></button>
           </div>
         </div>
       )}
