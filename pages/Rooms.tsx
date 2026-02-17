@@ -131,7 +131,9 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
         <div className="flex justify-between items-start mb-2">
           <div>
             <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">{room.category}</p>
-            <h3 className="text-xl md:text-2xl font-black font-serif group-hover:text-primary transition-colors">{room.name}</h3>
+            <Link to={`/rooms/${room.id}`} className="block group-Title">
+              <h3 className="text-xl md:text-2xl font-black font-serif group-hover:text-primary transition-colors">{room.name}</h3>
+            </Link>
           </div>
           <div className="flex flex-col items-end">
             <div className="flex items-center text-gold text-sm font-black">
@@ -454,20 +456,21 @@ const Rooms: React.FC = () => {
 
       {/* Full-Screen Gallery Modal */}
       {galleryOpen && selectedRoom && (
-        <div className="fixed inset-0 z-[100] bg-charcoal/98 backdrop-blur-xl flex flex-col animate-fade-in">
+        <div className="fixed inset-0 z-[500] backdrop-blur-xl flex flex-col animate-fade-in" style={{ backgroundColor: 'rgba(255, 255, 255, 0.98)' }}>
           <div className="h-20 md:h-24 w-full px-4 md:px-10 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-4 md:gap-10">
-              <h2 className="text-white text-lg md:text-xl font-serif italic">{selectedRoom.name}</h2>
-              <div className="px-4 md:px-5 py-1.5 md:py-2 rounded-full bg-white/5 border border-white/10 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">
-                {galleryIndex + 1} <span className="text-white/30 mx-1 md:mx-2">/</span> {galleryImages.length}
+              <h2 className="text-lg md:text-xl font-serif italic" style={{ color: '#101922' }}>{selectedRoom.name}</h2>
+              <div className="px-4 md:px-5 py-1.5 md:py-2 rounded-full border text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: '#101922', borderColor: 'rgba(16, 25, 34, 0.1)', backgroundColor: 'rgba(16, 25, 34, 0.05)' }}>
+                {galleryIndex + 1} <span className="opacity-30 mx-1 md:mx-2">/</span> {galleryImages.length}
               </div>
             </div>
             <button
               onClick={handleCloseGallery}
-              className="group flex items-center gap-3 md:gap-4 text-white hover:text-primary transition-all font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px]"
+              className="group flex items-center gap-3 md:gap-4 hover:text-[#8B008B] transition-all font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px]"
+              style={{ color: '#101922' }}
             >
               Close Gallery
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-white/10 group-hover:border-primary/50 flex items-center justify-center transition-all bg-white/5 group-hover:bg-primary/10">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#101922]/10 group-hover:border-[#8B008B]/50 flex items-center justify-center transition-all bg-[#101922]/5 group-hover:bg-[#8B008B]/10">
                 <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -478,7 +481,8 @@ const Rooms: React.FC = () => {
           <div className="flex-1 relative flex items-center justify-center px-4 md:px-12 lg:px-24 overflow-hidden">
             <button
               onClick={handleGalleryPrev}
-              className="absolute left-4 md:left-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center border border-white/10 transition-all shadow-2xl backdrop-blur-md"
+              className="absolute left-4 md:left-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-2xl backdrop-blur-md"
+              style={{ backgroundColor: 'rgba(16, 25, 34, 0.05)', color: '#101922', borderColor: 'rgba(16, 25, 34, 0.1)' }}
               aria-label="Previous Image"
             >
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -506,7 +510,8 @@ const Rooms: React.FC = () => {
 
             <button
               onClick={handleGalleryNext}
-              className="absolute right-4 md:right-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center border border-white/10 transition-all shadow-2xl backdrop-blur-md"
+              className="absolute right-4 md:right-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-2xl backdrop-blur-md"
+              style={{ backgroundColor: 'rgba(16, 25, 34, 0.05)', color: '#101922', borderColor: 'rgba(16, 25, 34, 0.1)' }}
               aria-label="Next Image"
             >
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -516,13 +521,13 @@ const Rooms: React.FC = () => {
           </div>
 
           {galleryImages.length > 1 && (
-            <div className="h-32 md:h-40 w-full bg-black/40 border-t border-white/5 flex items-center justify-center p-4 md:p-6 gap-3 md:gap-5 overflow-x-auto shrink-0 no-scrollbar">
+            <div className="h-32 md:h-40 w-full border-t flex items-center justify-center p-4 md:p-6 gap-3 md:gap-5 overflow-x-auto shrink-0 no-scrollbar" style={{ backgroundColor: 'rgba(255, 255, 255, 0.98)', borderColor: 'rgba(16, 25, 34, 0.1)' }}>
               {galleryImages.map((src, idx) => (
                 <button
                   key={idx}
                   onClick={() => setGalleryIndex(idx)}
                   className={`relative shrink-0 h-16 md:h-20 lg:h-24 aspect-video rounded-xl overflow-hidden transition-all duration-500 border-2 ${galleryIndex === idx
-                    ? 'border-primary scale-110 shadow-2xl opacity-100'
+                    ? 'border-[#8B008B] scale-110 shadow-2xl opacity-100'
                     : 'border-transparent opacity-30 hover:opacity-60 grayscale hover:grayscale-0'
                     }`}
                   aria-label={`Go to image ${idx + 1}`}
