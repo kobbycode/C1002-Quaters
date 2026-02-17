@@ -720,7 +720,7 @@ const RoomDetail: React.FC = () => {
       </div>
 
       {isGalleryOpen && (
-        <div className="fixed inset-0 z-[100] bg-[#05080a]/98 backdrop-blur-xl flex flex-col animate-fade-in">
+        <div className="fixed inset-0 z-[100] backdrop-blur-xl flex flex-col animate-fade-in" style={{ backgroundColor: 'rgba(5, 8, 10, 0.98)' }}>
           <div className="h-24 w-full px-10 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-10">
               <h2 className="text-white text-xl font-serif italic hidden md:block">{room.name}</h2>
