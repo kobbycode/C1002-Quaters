@@ -117,7 +117,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen font-sans">
+    <div
+      className="flex flex-col min-h-screen font-sans"
+      style={{
+        ['--primary-color' as any]: config.brand.primaryColor,
+        ['--gold-color' as any]: config.brand.primaryColor, // Mapping gold to primary for consistent luxury feel
+      }}
+    >
       <header
         className={`fixed top-0 z-50 w-full transition-all duration-300 px-6 md:px-10 lg:px-40 py-0 flex items-center justify-between border-b ${isGalleryActive ? 'opacity-0 pointer-events-none visibility-hidden' : ''} ${isScrolled || !isHome
           ? 'bg-white text-charcoal border-gray-100 shadow-sm'
@@ -126,7 +132,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       >
         <Link to="/" className="flex items-center gap-3 group z-[60]">
           <div className="transition-transform hover:scale-105 -my-12">
-            <img src="/logo.png" alt="C1002 Quarters" className={`h-40 w-auto object-contain ${isScrolled || !isHome ? '' : 'brightness-0 invert'}`} />
+            <img src="/logo.png" alt={config.brand.name} className={`h-40 w-auto object-contain ${isScrolled || !isHome ? '' : 'brightness-0 invert'}`} />
           </div>
         </Link>
 
@@ -391,7 +397,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12 md:mb-20">
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-3 text-charcoal">
-              <img src="/logo.png" alt="C1002 Quarters" className="h-24 md:h-40 w-auto object-contain" />
+              <img src="/logo.png" alt={config.brand.name} className="h-24 md:h-40 w-auto object-contain" />
             </div>
             <p className="text-gray-500 text-xs md:text-sm leading-loose">
               {config.footer.aboutText}
@@ -461,8 +467,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </div>
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] md:text-xs text-gray-400 uppercase tracking-widest">
-          <p>© {new Date().getFullYear()} C1002 Quarters. All Rights Reserved.</p>
-          <div className="flex gap-4">
+          <p>© {new Date().getFullYear()} {config.brand.name}. All Rights Reserved.</p>
+          <div className="flex gap-6 items-center">
+            {config.brand.socials?.instagram && (
+              <a href={`https://instagram.com/${config.brand.socials.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">Instagram</a>
+            )}
+            {config.brand.socials?.linkedin && (
+              <a href={config.brand.socials.linkedin.startsWith('http') ? config.brand.socials.linkedin : `https://${config.brand.socials.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">LinkedIn</a>
+            )}
+            <div className="w-px h-3 bg-gray-200 hidden md:block" />
             <Link to="#" className="hover:text-gold">Privacy</Link>
             <Link to="#" className="hover:text-gold">Terms</Link>
           </div>

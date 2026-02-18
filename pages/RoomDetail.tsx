@@ -298,8 +298,8 @@ const RoomDetail: React.FC = () => {
   const handleShare = async () => {
     if (!room) return;
     const shareData = {
-      title: `C1002 Quarters ${room.name}`,
-      text: `Experience unmatched Ghanaian luxury at C1002 Quarters in Accra. Check out the ${room.name}.`,
+      title: `${config.brand.name} ${room.name}`,
+      text: `Experience unmatched Ghanaian luxury at ${config.brand.name} in Accra. Check out the ${room.name}.`,
       url: window.location.href,
     };
     try {
@@ -314,7 +314,7 @@ const RoomDetail: React.FC = () => {
 
   const whatsappNumber = config.footer.phone.replace(/\D/g, '');
   const whatsappUrl = room
-    ? `https://wa.me/${whatsappNumber}?text=Hello%20C1002%20Quarters%2C%20I'm%20interested%20in%20booking%20the%20${encodeURIComponent(room.name)}.%20Can%20you%20help%20me%20with%20my%20reservation%3F`
+    ? `https://wa.me/${whatsappNumber}?text=Hello%20${encodeURIComponent(config.brand.name)}%2C%20I'm%20interested%20in%20booking%20the%20${encodeURIComponent(room.name)}.%20Can%20you%20help%20me%20with%20my%20reservation%3F`
     : `https://wa.me/${whatsappNumber}`;
 
   const galleryImages: string[] = useMemo(() => {
@@ -419,12 +419,12 @@ const RoomDetail: React.FC = () => {
       })),
       "offers": {
         "@type": "Offer",
-        "priceCurrency": "GHS",
+        "priceCurrency": config.currency,
         "price": room.price,
         "priceSpecification": {
           "@type": "UnitPriceSpecification",
           "price": room.price,
-          "priceCurrency": "GHS",
+          "priceCurrency": config.currency,
           "unitCode": "DAY"
         }
       }

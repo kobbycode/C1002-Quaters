@@ -82,7 +82,7 @@ const About: React.FC = () => {
         <div className="max-w-7xl mx-auto text-center mb-20">
           <span className="text-gold font-bold uppercase tracking-[0.4em] text-xs mb-4 block">Our Values</span>
           <h2 className="text-4xl md:text-5xl font-serif text-charcoal">
-            {formatLuxuryText("The Pillars of *C1002*")}
+            {formatLuxuryText(`The Pillars of *${config.brand.name}*`)}
           </h2>
         </div>
         <div className="grid md:grid-cols-3 gap-12 max-w-7xl mx-auto">

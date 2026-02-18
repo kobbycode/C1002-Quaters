@@ -10,7 +10,7 @@ const Contact: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const whatsappNumber = config.footer.phone.replace(/\D/g, '');
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Hello%20C1002%20Quarters%2C%20Akwaaba!%20I'm%20visiting%20the%20contact%20page%20and%20would%20like%20to%20speak%20with%20a%20concierge.`;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Hello%20${encodeURIComponent(config.brand.name)}%2C%20Akwaaba!%20I'm%20visiting%20the%20contact%20page%20and%20would%20like%20to%20speak%20with%20a%20concierge.`;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

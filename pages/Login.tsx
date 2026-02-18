@@ -94,7 +94,7 @@ const Login = () => {
 
                 <div className="mt-8 text-center">
                     <p className="text-xs text-gray-400 font-medium">
-                        New to C1002 Quarters?{' '}
+                        New to {config.brand.name}?{' '}
                         <Link to="/signup" state={{ from: (location.state as any)?.from }} className="text-gold font-bold hover:underline">
                             Create an Account
                         </Link>

@@ -70,7 +70,7 @@ const Home: React.FC = () => {
   return (
     <div className="flex flex-col bg-[#FDFDFD]">
       <SEO
-        title="Luxury Suites in Accra"
+        title={`${config.brand.name} | Luxury Suites in Accra`}
         description={`${config.brand.name} - ${config.brand.tagline}. Premium suites and authentic Ghanaian luxury.`}
         type="hotel"
         schema={homeSchema}
@@ -267,7 +267,7 @@ const Home: React.FC = () => {
           <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
             <div className="relative group">
               <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl relative">
-                <img src={config.homePulse?.image || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400"} className="w-full h-full object-cover transition-scale duration-[2000ms] group-hover:scale-105" alt="C1002 Quarters Exterior" />
+                <img src={config.homePulse?.image || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400"} className="w-full h-full object-cover transition-scale duration-[2000ms] group-hover:scale-105" alt={`${config.brand.name} Exterior`} />
                 <div className="absolute inset-0 bg-charcoal/20 group-hover:bg-transparent transition-colors duration-700" />
               </div>
               <div className="absolute -bottom-6 -right-6 md:-bottom-12 md:-right-12 w-48 h-48 md:w-64 md:h-64 bg-gold rounded-3xl md:rounded-[2rem] p-6 md:p-10 flex flex-col justify-center items-center text-center shadow-2xl animate-pulse delay-1000">

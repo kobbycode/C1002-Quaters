@@ -134,7 +134,7 @@ const Checkout: React.FC = () => {
       `<div>
         <h1>Booking Confirmation</h1>
         <p>Dear ${formData.firstName},</p>
-        <p>Thank you for choosing C1002 Quarters. Your reservation for <strong>${room.name}</strong> is confirmed.</p>
+        <p>Thank you for choosing {config.brand.name}. Your reservation for <strong>${room.name}</strong> is confirmed.</p>
         <ul>
           <li><strong>Check-in:</strong> ${dates?.formattedCheckIn || 'Flexible'}</li>
           <li><strong>Duration:</strong> ${nights} Night(s)</li>
@@ -143,7 +143,7 @@ const Checkout: React.FC = () => {
           <li><strong>Payment Status:</strong> ${status.toUpperCase()} (${method})</li>
         </ul>
         <p>Our concierge will contact you shortly via WhatsApp/Phone to finalize details.</p>
-        <p>Akwaaba,<br/>C1002 Quarters Team</p>
+        <p>Akwaaba,<br/>{config.brand.name} Team</p>
       </div>`
     );
 
@@ -172,7 +172,7 @@ const Checkout: React.FC = () => {
   if (isSuccess) {
     const whatsappNumber = config.footer.phone.replace(/[^0-9]/g, '');
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      `🥂 *New Reservation: C1002 Quarters*\n\nRef: ${room.name}\n👤 ${formData.firstName} ${formData.lastName}\n💰 ${paymentMethod === 'paystack' ? 'PAID' : 'PAY ON ARRIVAL'}\n\nPlease confirm reception! ✨`
+      `🥂 *New Reservation: ${config.brand.name}*\n\nRef: ${room.name}\n👤 ${formData.firstName} ${formData.lastName}\n💰 ${paymentMethod === 'paystack' ? 'PAID' : 'PAY ON ARRIVAL'}\n\nPlease confirm reception! ✨`
     )}`;
 
     return (
@@ -243,7 +243,7 @@ const Checkout: React.FC = () => {
 
   return (
     <div className="pt-24 min-h-screen bg-[#fafafa] pb-20">
-      <SEO title="Secure Reservation" description="Finalize your luxury stay at C1002 Quarters." />
+      <SEO title="Secure Reservation" description={`Finalize your luxury stay at ${config.brand.name}.`} />
       <div className="max-w-[1400px] mx-auto px-4 md:px-10 py-8 relative">
         {/* Back Button */}
         <Link

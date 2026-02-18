@@ -34,7 +34,7 @@ const Amenities: React.FC = () => {
     <div className="pt-24 min-h-screen bg-background-light">
       <SEO
         title="Luxury Amenities"
-        description="Experience the finest luxury amenities at C1002 Quarters, from 24/7 butler service to high-speed fiber WiFi."
+        description={`Experience the finest luxury amenities at ${config.brand.name}, from 24/7 butler service to high-speed fiber WiFi.`}
       />
 
       {/* Hero Section */}
@@ -52,7 +52,7 @@ const Amenities: React.FC = () => {
           <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">World Class Experience</span>
           <h1 className="text-4xl md:text-6xl font-black font-serif text-white mb-6">Unmatched *Comfort*</h1>
           <p className="text-white/70 text-sm md:text-lg max-w-2xl mx-auto font-light leading-relaxed">
-            Every detail at C1002 Quarters is curated for the modern traveler. From high-tech entertainment to restorative wellness features.
+            Every detail at {config.brand.name} is curated for the modern traveler. From high-tech entertainment to restorative wellness features.
           </p>
         </div>
       </section>
@@ -94,7 +94,7 @@ const Amenities: React.FC = () => {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-gold/10 blur-[100px] rounded-full" />
 
           <div className="relative z-10">
-            <h3 className="text-3xl md:text-5xl font-black font-serif text-white mb-8 italic">Ready for the *C1002* Experience?</h3>
+            <h3 className="text-3xl md:text-5xl font-black font-serif text-white mb-8 italic">Ready for the *{config.brand.name}* Experience?</h3>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6">
               <Link
                 to="/rooms"

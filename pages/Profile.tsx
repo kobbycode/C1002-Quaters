@@ -16,8 +16,8 @@ const BookingCard: React.FC<{ booking: Booking; roomName: string; roomImage: str
                 <div className="flex justify-between items-start mb-2">
                     <div>
                         <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full mb-2 inline-block ${isPast ? 'bg-gray-100 text-gray-400' :
-                                booking.status === 'checked-out' ? 'bg-gray-100 text-gray-400' :
-                                    booking.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-yellow-50 text-yellow-600'
+                            booking.status === 'checked-out' ? 'bg-gray-100 text-gray-400' :
+                                booking.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-yellow-50 text-yellow-600'
                             }`}>
                             {booking.status === 'checked-out' ? 'Completed' : booking.paymentStatus === 'paid' ? 'Confirmed' : 'Pending Payment'}
                         </span>
@@ -80,9 +80,8 @@ const Profile = () => {
         return { upcoming, past };
     }, [bookings, user]);
 
-    // Dummy notifications for now
     const notifications = [
-        { id: 1, title: 'Welcome to C1002 Quarters', message: 'We are delighted to have you with us.', date: 'Just now', read: false },
+        { id: 1, title: `Welcome to ${config.brand.name}`, message: 'We are delighted to have you with us.', date: 'Just now', read: false },
         { id: 2, title: 'Profile Created', message: 'Your account has been successfully set up.', date: 'Just now', read: true },
     ];
 

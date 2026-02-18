@@ -1,5 +1,6 @@
 import React from 'react';
 import { SiteConfig } from '../../types';
+import { formatLuxuryText } from '../../utils/formatters';
 
 interface AdminBrandingProps {
     config: SiteConfig;
@@ -213,70 +214,79 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                         <h3 className="text-xl font-black font-serif text-white">Live Preview</h3>
                     </div>
 
-                    {/* Mini Header Preview */}
-                    <div className="bg-white rounded-2xl overflow-hidden mb-6">
-                        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p className="text-lg font-black font-serif" style={{ color: config.brand.primaryColor }}>{config.brand.name}</p>
-                                <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{config.brand.tagline.slice(0, 40)}...</p>
+                    {/* Mini Site Preview */}
+                    <div className="bg-white rounded-[2rem] overflow-hidden mb-8 border border-white/10 shadow-2xl">
+                        {/* Header Mock */}
+                        <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white">
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full" style={{ backgroundColor: config.brand.primaryColor }} />
+                                <span className="text-[10px] font-black font-serif tracking-tight" style={{ color: config.brand.primaryColor }}>{config.brand.name}</span>
                             </div>
                             <div className="flex gap-2">
-                                <div className="w-2 h-2 rounded-full bg-gray-200" />
-                                <div className="w-2 h-2 rounded-full bg-gray-200" />
-                                <div className="w-2 h-2 rounded-full bg-gray-200" />
+                                <div className="w-10 h-1 bg-gray-100 rounded-full" />
+                                <div className="w-10 h-1 bg-gray-100 rounded-full" />
                             </div>
                         </div>
-                        <div className="h-24 bg-gradient-to-br flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${config.brand.primaryColor}, ${config.brand.accentColor})` }}>
-                            <p className="text-white text-xs font-black uppercase tracking-widest opacity-80">Hero Section</p>
-                        </div>
-                    </div>
 
-                    {/* Color Swatches */}
-                    <div className="mb-6">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-3">Color Harmony</p>
-                        <div className="flex gap-2">
-                            <div className="flex-1 h-12 rounded-xl transition-all" style={{ backgroundColor: config.brand.primaryColor }} />
-                            <div className="flex-1 h-12 rounded-xl transition-all" style={{ backgroundColor: config.brand.accentColor }} />
-                            <div className="flex-1 h-12 rounded-xl bg-white transition-all" />
-                        </div>
-                        <div className="flex justify-between mt-2">
-                            <span className="text-[8px] font-bold text-gray-500 uppercase">Primary</span>
-                            <span className="text-[8px] font-bold text-gray-500 uppercase">Accent</span>
-                            <span className="text-[8px] font-bold text-gray-500 uppercase">Background</span>
-                        </div>
-                    </div>
-
-                    {/* Sample Button */}
-                    <div className="space-y-3">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Button Styles</p>
-                        <div className="flex gap-2">
-                            <button
-                                className="flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest text-white transition-all hover:opacity-90"
-                                style={{ backgroundColor: config.brand.primaryColor }}
-                            >
-                                Primary
-                            </button>
-                            <button
-                                className="flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest text-white transition-all hover:opacity-90"
-                                style={{ backgroundColor: config.brand.accentColor }}
-                            >
-                                Accent
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Typography Preview */}
-                    <div className="mt-6 pt-6 border-t border-white/10">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-3">Typography</p>
-                        <div className="bg-white/5 rounded-xl p-4">
-                            <p className="text-2xl font-black font-serif text-white mb-1">{config.brand.name}</p>
-                            <p className="text-xs text-gray-400 italic">{config.brand.tagline}</p>
-                            <div className="mt-3 flex items-center gap-2">
-                                <span className="text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded" style={{ backgroundColor: config.brand.primaryColor, color: 'white' }}>
-                                    {config.brand.voice}
-                                </span>
+                        {/* Hero Mock */}
+                        <div className="h-40 relative flex items-center justify-center text-center px-4 overflow-hidden">
+                            <div className="absolute inset-0 bg-cover bg-center transition-all duration-700" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1000")` }} />
+                            <div className="relative z-10">
+                                <p className="text-[7px] font-black uppercase tracking-[.4em] text-white/60 mb-1">{config.brand.tagline}</p>
+                                <h4 className="text-white text-sm font-serif leading-tight">
+                                    {formatLuxuryText(`Experience *${config.brand.name}*`)}
+                                </h4>
+                                <div className="mt-4 flex justify-center">
+                                    <div className="px-4 py-1.5 rounded-lg text-[7px] font-black uppercase tracking-widest text-white shadow-lg" style={{ backgroundColor: config.brand.primaryColor }}>
+                                        Explore Suites
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        {/* Footer Mock */}
+                        <div className="p-4 bg-gray-50 flex items-center justify-between border-t border-gray-100">
+                            <span className="text-[8px] font-bold text-gray-400">© 2024 {config.brand.name}</span>
+                            <div className="flex gap-3">
+                                {config.brand?.socials?.instagram && <div className="w-3 h-3 rounded-sm opacity-30" style={{ backgroundColor: config.brand.primaryColor }} title="Instagram" />}
+                                {config.brand?.socials?.linkedin && <div className="w-3 h-3 rounded-sm opacity-30" style={{ backgroundColor: config.brand.primaryColor }} title="LinkedIn" />}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Color Utility Check */}
+                    <div className="space-y-6">
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-4">Branding Logic</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                                    <div className="w-full h-8 rounded-lg mb-3" style={{ backgroundColor: config.brand.primaryColor }} />
+                                    <p className="text-[9px] font-black text-white/60 uppercase text-center">Primary</p>
+                                </div>
+                                <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                                    <div className="w-full h-8 rounded-lg mb-3" style={{ backgroundColor: config.brand.primaryColor }} />
+                                    <p className="text-[9px] font-black text-white/60 uppercase text-center">Gold (Mapped)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Typography & Voice */}
+                        <div className="pt-6 border-t border-white/10">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-4">Typography & Voice</p>
+                            <div className="p-6 rounded-[2rem] bg-white text-charcoal shadow-xl">
+                                <h3 className="text-2xl font-black font-serif mb-2 leading-tight">
+                                    {formatLuxuryText(`The *${config.brand.voice}* Suite`)}
+                                </h3>
+                                <p className="text-xs text-gray-400 leading-relaxed font-medium italic">
+                                    "{config.brand.tagline}"
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* CTA Preview */}
+                        <button className="w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] text-white shadow-2xl transition-all" style={{ backgroundColor: config.brand.primaryColor }}>
+                            Sample Call to Action
+                        </button>
                     </div>
                 </div>
             </div>

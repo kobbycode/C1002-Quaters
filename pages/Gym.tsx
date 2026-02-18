@@ -28,7 +28,7 @@ const Gym: React.FC = () => {
         <div className="pt-24 min-h-screen bg-background-light">
             <SEO
                 title="Elite Fitness Center"
-                description="Elevate your wellness at C1002 Quarters. State-of-the-art gym facilities in the heart of Accra."
+                description={`Elevate your wellness at ${config.brand.name}. State-of-the-art gym facilities in the heart of Accra.`}
             />
 
             {/* Hero Section with Carousel */}
