@@ -138,6 +138,11 @@ export const AdminBookingModal: React.FC<AdminBookingModalProps> = ({
                                     <span className="text-xs font-black text-charcoal uppercase">Total</span>
                                     <span className="text-lg font-black text-gold">{formatPrice(viewingBooking.totalPrice, config.currency)}</span>
                                 </div>
+                                {viewingBooking.hasGymAccess && (
+                                    <div className="flex justify-between items-center pt-2">
+                                        <span className="text-[10px] font-black text-gold uppercase tracking-widest">Gym Access Included</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

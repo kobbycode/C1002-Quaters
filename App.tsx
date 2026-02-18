@@ -12,6 +12,7 @@ import Contact from './pages/Contact';
 import About from './pages/About';
 import Wishlist from './pages/Wishlist';
 import Amenities from './pages/Amenities';
+import Gym from './pages/Gym';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
@@ -39,6 +40,7 @@ const App: React.FC = () => {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/amenities" element={<Amenities />} />
+                <Route path="/gym" element={<Gym />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />

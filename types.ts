@@ -82,6 +82,18 @@ export interface SiteConfig {
     heroDescription: string;
     coordinates?: { lat: number; lng: number };
   };
+  gymPage: {
+    heroSlides: string[];
+    heroTitle: string;
+    heroSubtitle: string;
+    facilityTitle: string;
+    facilitySubtitle: string;
+    facilityQuote: string;
+    facilityDescription1: string;
+    facilityDescription2: string;
+    facilityImage: string;
+    amenities: { title: string; desc: string; icon: string }[];
+  };
   homeExperience: {
     title: string;
     description: string;
@@ -124,6 +136,7 @@ export interface Booking {
   paymentMethod: 'cash' | 'paystack';
   paymentReference?: string;
   emailSent?: boolean;
+  hasGymAccess?: boolean;
   adminNotes?: string;
   status?: 'pending' | 'arrived' | 'checked-out' | 'cancelled';
 }

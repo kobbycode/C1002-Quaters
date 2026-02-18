@@ -52,6 +52,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     { id: '1', label: 'About', path: '/about' },
     { id: '2', label: 'Rooms', path: '/rooms' },
     { id: '3', label: 'Amenities', path: '/amenities' },
+    { id: '5', label: 'Gym', path: '/gym' },
     { id: '4', label: 'Contact', path: '/contact' }
   ],
   footer: {
@@ -106,6 +107,29 @@ const DEFAULT_CONFIG: SiteConfig = {
     heroDescription: "Experience the heart of Accra. Located in the quiet area of Okpoi Gonno, our place is perfect for both work and rest.",
     mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15882.493649520443!2d-0.11681326442008882!3d5.622557404456953!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf851356e9f1a7%3A0x6f9984999999999!2sOkpoi%20Gonno%2C%20Accra!5e0!3m2!1sen!2sgh!4v1715622000000!5m2!1sen!2sgh",
     coordinates: { lat: 5.626, lng: -0.106 }
+  },
+  gymPage: {
+    heroSlides: [
+      "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=2400",
+      "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80&w=2400",
+      "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&q=80&w=2400"
+    ],
+    heroTitle: "Elevate Your *Vitality*",
+    heroSubtitle: "The Wellness Quarter",
+    facilityTitle: "Designed for *Peak Performance*",
+    facilitySubtitle: "The Facility",
+    facilityQuote: "At C1002 Quarters, we believe physical excellence is a cornerstone of the luxury experience.",
+    facilityDescription1: "Our Elite Fitness Center is curated for the global traveler who refuses to compromise on their wellness routine. Featuring a bespoke collection of Technogym™ equipment and Peloton™ cycles, every machine is positioned to offer views of our tranquil private gardens.",
+    facilityDescription2: "Whether you seek a high-intensity cardio session or a mindful yoga flow, our climate-controlled environment provides the perfect backdrop for your transformation.",
+    facilityImage: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200",
+    amenities: [
+      { title: "Smart Cardio", desc: "Integrated streaming and performance tracking on all cardio machines.", icon: "🏃" },
+      { title: "Free Weights", desc: "Extensive range of premium dumbbells and Olympic lifting stations.", icon: "🏋️" },
+      { title: "Private Yoga", desc: "Dedicated quiet space for stretching and guided meditation.", icon: "🧘" },
+      { title: "Filtered Water", desc: "Artisanal alkaline water stations and chilled towels provided.", icon: "💧" },
+      { title: "Digital Coaching", desc: "Interactive touchscreens with pre-loaded luxury workout routines.", icon: "📱" },
+      { title: "Garden View", desc: "Floor-to-ceiling glass walls overlooking our lush botanic spaces.", icon: "🌿" }
+    ]
   },
   homeExperience: [
     {
@@ -170,12 +194,30 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (docSnap.exists()) {
         // Merge Firestore config with defaults to preserve fields like heroSlides
         const firestoreConfig = docSnap.data() as SiteConfig;
-        const mergedConfig = { ...DEFAULT_CONFIG, ...firestoreConfig };
 
-        // If Firestore config has no heroSlides, use defaults
-        if (!firestoreConfig.heroSlides || firestoreConfig.heroSlides.length === 0) {
-          mergedConfig.heroSlides = DEFAULT_CONFIG.heroSlides;
-        }
+        // Smarter merge for navLinks to ensure structural links like 'Gym' appear
+        const mergedNavLinks = [...DEFAULT_CONFIG.navLinks];
+        firestoreConfig.navLinks?.forEach(fLink => {
+          const index = mergedNavLinks.findIndex(dLink => dLink.path === fLink.path);
+          if (index > -1) {
+            // Update fields but preserve default structure
+            mergedNavLinks[index] = { ...mergedNavLinks[index], ...fLink };
+          } else {
+            mergedNavLinks.push(fLink);
+          }
+        });
+
+        // Re-index all IDs to prevent React duplicate key errors from DB/Code collisions
+        const finalNavLinks = mergedNavLinks.map((link, idx) => ({
+          ...link,
+          id: String(idx + 1)
+        }));
+
+        const mergedConfig = {
+          ...DEFAULT_CONFIG,
+          ...firestoreConfig,
+          navLinks: finalNavLinks
+        };
 
         setConfig(mergedConfig);
       }

@@ -151,10 +151,7 @@ const Home: React.FC = () => {
         )}
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-4 animate-bounce opacity-40">
-          <div className="w-px h-10 md:h-12 bg-white/30" />
-          <span className="text-[11px] font-black text-white uppercase tracking-[0.3em]">Scroll</span>
-        </div>
+
       </section>
 
       {/* Booking Bar - Integrated */}

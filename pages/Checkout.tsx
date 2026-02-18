@@ -20,6 +20,9 @@ const Checkout: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDateError, setIsDateError] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'paystack'>('paystack');
+  const [hasGymAccess, setHasGymAccess] = useState(false);
+
+  const GYM_DAILY_FEE = 10;
 
   const [formData, setFormData] = useState({
     firstName: user?.displayName?.split(' ')[0] || '',
@@ -59,11 +62,25 @@ const Checkout: React.FC = () => {
       breakdown: { basePrice: room.price, totalNights: nights, subtotal: room.price * nights, adjustments: [], finalTotal: room.price * nights, averageNightlyRate: room.price }
     };
     const calculation = calculatePrice(room.id, dates.checkIn, dates.checkOut);
+
+    // Add Gym Fee if selected
+    const gymTotal = hasGymAccess ? (GYM_DAILY_FEE * nights) : 0;
+    const finalTotal = calculation.finalTotal + gymTotal;
+
+    const adjustments = [...calculation.adjustments];
+    if (hasGymAccess) {
+      adjustments.push({ ruleName: 'Elite Gym Access', amount: gymTotal });
+    }
+
     return {
-      total: calculation.finalTotal,
-      breakdown: calculation
+      total: finalTotal,
+      breakdown: {
+        ...calculation,
+        adjustments,
+        finalTotal
+      }
     };
-  }, [dates, room, calculatePrice, nights]);
+  }, [dates, room, calculatePrice, nights, hasGymAccess]);
 
   const totalAmount = pricing.total;
 
@@ -104,7 +121,8 @@ const Checkout: React.FC = () => {
       checkInDate: dates?.formattedCheckIn || 'Flexible',
       checkOutDate: dates?.formattedCheckOut || 'Flexible',
       isoCheckIn: dates?.isoCheckIn || '',
-      isoCheckOut: dates?.isoCheckOut || ''
+      isoCheckOut: dates?.isoCheckOut || '',
+      hasGymAccess
     };
 
     await addBooking(bookingData);
@@ -120,6 +138,7 @@ const Checkout: React.FC = () => {
         <ul>
           <li><strong>Check-in:</strong> ${dates?.formattedCheckIn || 'Flexible'}</li>
           <li><strong>Duration:</strong> ${nights} Night(s)</li>
+          <li><strong>Addons:</strong> ${hasGymAccess ? 'Elite Gym Access Included' : 'None'}</li>
           <li><strong>Total:</strong> ${formatPrice(totalAmount, config.currency)}</li>
           <li><strong>Payment Status:</strong> ${status.toUpperCase()} (${method})</li>
         </ul>
@@ -317,6 +336,43 @@ const Checkout: React.FC = () => {
                     <input required type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full rounded-2xl border-gray-100 bg-gray-50/50 py-5 pl-14 pr-6 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all text-sm font-semibold outline-none" placeholder="+233..." />
                   </div>
                 </div>
+              </div>
+
+              {/* Enhance Your Stay Section */}
+              <div className="mt-14 pt-14 border-t border-gray-100">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black font-serif text-charcoal">Enhance Your Stay</h3>
+                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Exclusive Addons</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setHasGymAccess(!hasGymAccess)}
+                  className={`w-full p-6 rounded-[2rem] border-2 transition-all flex items-center justify-between group/addon ${hasGymAccess
+                    ? 'border-emerald-500 bg-emerald-50/30'
+                    : 'border-gray-50 bg-gray-50/30 hover:border-gray-200'
+                    }`}
+                >
+                  <div className="flex items-center gap-6">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${hasGymAccess ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' : 'bg-white text-charcoal/30'}`}>
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 10v4m0-4h2m-2 4h2m10-4v4m0-4h-2m2 4h-2m-10 2h8m-12-4v8m0-8h2m-2 8h2m16-8v8m0-8h-2m2 8h-2" />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <div className="font-black text-charcoal text-base font-serif italic">Elite Gym Access</div>
+                      <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-0.5">Stay active in our world-class facility • {formatPrice(GYM_DAILY_FEE, config.currency)}/day</div>
+                    </div>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${hasGymAccess ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-200'}`}>
+                    {hasGymAccess && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                  </div>
+                </button>
               </div>
             </section>
 

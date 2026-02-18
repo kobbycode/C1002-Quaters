@@ -387,19 +387,19 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         )}
       </div>
 
-      <footer className="bg-white border-t border-gray-200 pt-20 pb-10 px-6 md:px-10 lg:px-40">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+      <footer className="bg-white border-t border-gray-200 pt-12 md:pt-20 pb-10 px-6 md:px-10 lg:px-40">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12 md:mb-20">
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-3 text-charcoal">
-              <img src="/logo.png" alt="C1002 Quarters" className="h-40 w-auto object-contain" />
+              <img src="/logo.png" alt="C1002 Quarters" className="h-24 md:h-40 w-auto object-contain" />
             </div>
-            <p className="text-gray-500 text-sm leading-loose">
+            <p className="text-gray-500 text-xs md:text-sm leading-loose">
               {config.footer.aboutText}
             </p>
           </div>
           <div className="flex flex-col gap-6">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-gold">Explore</h4>
-            <ul className="flex flex-col gap-4 text-sm text-gray-500">
+            <h4 className="text-xs md:text-sm font-bold uppercase tracking-widest text-gold">Explore</h4>
+            <ul className="flex flex-col gap-4 text-xs md:text-sm text-gray-500">
               {config.navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
@@ -417,16 +417,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </ul>
           </div>
           <div className="flex flex-col gap-6">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-gold">Contact</h4>
-            <ul className="flex flex-col gap-4 text-sm text-gray-500">
+            <h4 className="text-xs md:text-sm font-bold uppercase tracking-widest text-gold">Contact</h4>
+            <ul className="flex flex-col gap-4 text-xs md:text-sm text-gray-500">
               <li className="flex gap-3">{config.footer.address}</li>
               <li className="flex gap-3 font-bold text-charcoal">{config.footer.phone}</li>
               <li className="flex gap-3">{config.footer.email}</li>
             </ul>
           </div>
           <div className="flex flex-col gap-6">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-gold">News</h4>
-            <p className="text-sm text-gray-500">Sign up for news and special gifts.</p>
+            <h4 className="text-xs md:text-sm font-bold uppercase tracking-widest text-gold">News</h4>
+            <p className="text-xs md:text-sm text-gray-500">Sign up for news and special gifts.</p>
             <div className="relative group">
               {isSubscribed ? (
                 <div className="bg-charcoal text-white p-6 rounded-2xl border border-gold/30 animate-fade-in relative overflow-hidden">
@@ -442,7 +442,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               ) : (
                 <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
                   <input
-                    className="w-full h-12 rounded-lg border-gray-200 bg-white text-sm focus:ring-gold focus:border-gold placeholder:text-gray-300"
+                    className="w-full h-12 rounded-lg border-gray-200 bg-white text-xs md:text-sm focus:ring-gold focus:border-gold placeholder:text-gray-300"
                     placeholder="Email address"
                     type="email"
                     value={newsletterEmail}
@@ -451,7 +451,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   />
                   <button
                     type="submit"
-                    className="h-12 w-full rounded-lg bg-charcoal text-white font-bold text-sm uppercase tracking-widest transition-all hover:bg-primary shadow-lg"
+                    className="h-12 w-full rounded-lg bg-charcoal text-white font-bold text-xs md:text-sm uppercase tracking-widest transition-all hover:bg-primary shadow-lg"
                   >
                     Join The Circle
                   </button>
@@ -460,7 +460,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400 uppercase tracking-widest">
+        <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] md:text-xs text-gray-400 uppercase tracking-widest">
           <p>© {new Date().getFullYear()} C1002 Quarters. All Rights Reserved.</p>
           <div className="flex gap-4">
             <Link to="#" className="hover:text-gold">Privacy</Link>

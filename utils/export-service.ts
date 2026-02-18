@@ -30,6 +30,7 @@ export const ExportService = {
                 'Check-Out': b.checkOutDate,
                 'Nights': b.nights,
                 'Total Price': b.totalPrice,
+                'Gym Access': b.hasGymAccess ? 'Yes' : 'No',
                 'Status': b.status,
                 'Payment Status': b.paymentStatus,
                 'Booked On': new Date(b.date).toLocaleDateString()

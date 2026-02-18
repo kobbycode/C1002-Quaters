@@ -18,7 +18,8 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
         roomId: '',
         nights: 1,
         totalPrice: 0,
-        isoCheckIn: new Date().toISOString().split('T')[0]
+        isoCheckIn: new Date().toISOString().split('T')[0],
+        hasGymAccess: false
     });
 
     const [bookingSearch, setBookingSearch] = useState('');
@@ -63,11 +64,12 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
             isoCheckIn,
             isoCheckOut,
             checkInDate: formattedCheckIn,
-            checkOutDate: formattedCheckOut
+            checkOutDate: formattedCheckOut,
+            hasGymAccess: newBooking.hasGymAccess
         });
 
         setIsCreating(false);
-        setNewBooking({ guestName: '', guestEmail: '', roomId: '', nights: 1, totalPrice: 0, isoCheckIn: new Date().toISOString().split('T')[0] });
+        setNewBooking({ guestName: '', guestEmail: '', roomId: '', nights: 1, totalPrice: 0, isoCheckIn: new Date().toISOString().split('T')[0], hasGymAccess: false });
     };
 
     const handleRoomChange = (roomId: string) => {
@@ -76,7 +78,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
             setNewBooking(prev => ({
                 ...prev,
                 roomId,
-                totalPrice: calculatePrice(roomId, new Date(prev.isoCheckIn), new Date(new Date(prev.isoCheckIn).getTime() + prev.nights * 24 * 60 * 60 * 1000)).finalTotal
+                totalPrice: calculatePrice(roomId, new Date(prev.isoCheckIn), new Date(new Date(prev.isoCheckIn).getTime() + prev.nights * 24 * 60 * 60 * 1000), prev.hasGymAccess).finalTotal
             }));
         }
     };
@@ -86,7 +88,16 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
         setNewBooking(prev => ({
             ...prev,
             nights,
-            totalPrice: room ? calculatePrice(room.id, new Date(prev.isoCheckIn), new Date(new Date(prev.isoCheckIn).getTime() + nights * 24 * 60 * 60 * 1000)).finalTotal : 0
+            totalPrice: room ? calculatePrice(room.id, new Date(prev.isoCheckIn), new Date(new Date(prev.isoCheckIn).getTime() + nights * 24 * 60 * 60 * 1000), prev.hasGymAccess).finalTotal : 0
+        }));
+    };
+
+    const handleGymChange = (hasGymAccess: boolean) => {
+        const room = rooms.find(r => r.id === newBooking.roomId);
+        setNewBooking(prev => ({
+            ...prev,
+            hasGymAccess,
+            totalPrice: room ? calculatePrice(room.id, new Date(prev.isoCheckIn), new Date(new Date(prev.isoCheckIn).getTime() + prev.nights * 24 * 60 * 60 * 1000), hasGymAccess).finalTotal : 0
         }));
     };
 
@@ -159,6 +170,18 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                                         <option value="">Select Room</option>
                                         {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({formatPrice(r.price, config.currency)})</option>)}
                                     </select>
+                                </div>
+                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-transparent hover:border-gold/20 transition-all cursor-pointer" onClick={() => handleGymChange(!newBooking.hasGymAccess)}>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xl">🏋️</span>
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-charcoal">Elite Gym Access</p>
+                                            <p className="text-[9px] text-gray-400 font-bold uppercase">{formatPrice(config.gymDailyFee || 0, config.currency)} / Day</p>
+                                        </div>
+                                    </div>
+                                    <div className={`w-10 h-6 rounded-full transition-all flex items-center p-1 ${newBooking.hasGymAccess ? 'bg-gold' : 'bg-gray-200'}`}>
+                                        <div className={`w-4 h-4 bg-white rounded-full shadow-sm transform transition-transform ${newBooking.hasGymAccess ? 'translate-x-4' : 'translate-x-0'}`} />
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Total Rate ({config.currency || 'GHS'})</label>
@@ -283,6 +306,15 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                                                 <span>{new Date(booking.date).toLocaleDateString()}</span>
                                                 <span className="w-1 h-1 bg-gray-200 rounded-full" />
                                                 <span>{booking.nights} Nights</span>
+                                                {booking.hasGymAccess && (
+                                                    <>
+                                                        <span className="w-1 h-1 bg-gray-200 rounded-full" />
+                                                        <span className="flex items-center gap-1 text-gold">
+                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                            GYM
+                                                        </span>
+                                                    </>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-8 py-8">
