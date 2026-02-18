@@ -6,7 +6,7 @@ import { CommandSearch } from './CommandSearch';
 import { useAuth } from '../context/AuthContext';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { config, addSubscriber } = useSite();
+  const { config, addSubscriber, isGalleryActive } = useSite();
   const { user, isAdmin, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -119,7 +119,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen font-sans">
       <header
-        className={`fixed top-0 z-50 w-full transition-all duration-300 px-6 md:px-10 lg:px-40 py-0 flex items-center justify-between border-b ${isScrolled || !isHome
+        className={`fixed top-0 z-50 w-full transition-all duration-300 px-6 md:px-10 lg:px-40 py-0 flex items-center justify-between border-b ${isGalleryActive ? 'opacity-0 pointer-events-none visibility-hidden' : ''} ${isScrolled || !isHome
           ? 'bg-white text-charcoal border-gray-100 shadow-sm'
           : 'bg-black/10 backdrop-blur-md text-white border-white/10'
           }`}
@@ -362,7 +362,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </div>
 
-      <div className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[70] flex flex-col items-end gap-4 ${isMobileMenuOpen ? 'hidden' : ''}`}>
+      <div className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[70] flex flex-col items-end gap-4 fixed-button-container ${isGalleryActive ? 'opacity-0 pointer-events-none visibility-hidden' : 'animate-fade-in'} ${isMobileMenuOpen ? 'hidden' : ''}`}>
         <Concierge
           isOpen={isConciergeOpen}
           onClose={() => setIsConciergeOpen(false)}

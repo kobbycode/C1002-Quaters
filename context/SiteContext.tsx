@@ -15,6 +15,8 @@ interface SiteContextType {
   bookings: Booking[];
   reviews: Review[];
   loading: boolean;
+  isGalleryActive: boolean;
+  setIsGalleryActive: (active: boolean) => void;
   updateRooms: (rooms: Room[]) => void;
   updateRoom: (id: string, data: Partial<Room>) => Promise<void>;
   deleteRoom: (id: string) => Promise<void>;
@@ -146,6 +148,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isGalleryActive, setIsGalleryActive] = useState(false);
 
   // Firestore Subscriptions
   useEffect(() => {
@@ -379,6 +382,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       bookings,
       reviews,
       loading,
+      isGalleryActive,
+      setIsGalleryActive,
       updateRooms,
       updateRoom,
       deleteRoom,

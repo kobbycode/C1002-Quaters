@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
@@ -261,7 +262,7 @@ const ReviewForm: React.FC<{ roomId: string, roomName: string }> = ({ roomId, ro
 };
 
 const RoomDetail: React.FC = () => {
-  const { rooms, config, bookings, reviews, loading, calculatePrice } = useSite();
+  const { rooms, config, bookings, reviews, loading, calculatePrice, isGalleryActive, setIsGalleryActive } = useSite();
   const { id } = useParams<{ id: string }>();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -339,6 +340,16 @@ const RoomDetail: React.FC = () => {
   }, [galleryImages.length]);
 
   useEffect(() => {
+    if (isGalleryOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.setAttribute('data-gallery-open', 'true');
+      setIsGalleryActive(true);
+    } else {
+      document.body.style.overflow = '';
+      document.body.removeAttribute('data-gallery-open');
+      setIsGalleryActive(false);
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isGalleryOpen) return;
       if (e.key === 'ArrowRight') { e.preventDefault(); handleNext(); }
@@ -346,8 +357,13 @@ const RoomDetail: React.FC = () => {
       if (e.key === 'Escape') { e.preventDefault(); setIsGalleryOpen(false); }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNext, handlePrev, isGalleryOpen]);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+      document.body.removeAttribute('data-gallery-open');
+      setIsGalleryActive(false);
+    };
+  }, [handleNext, handlePrev, isGalleryOpen, setIsGalleryActive]);
 
   const nights = useMemo(() => {
     if (!checkIn || !checkOut) return 0;
@@ -732,62 +748,157 @@ const RoomDetail: React.FC = () => {
         </div>
       </div>
 
-      {isGalleryOpen && (
-        <div className="fixed inset-0 z-[9999] backdrop-blur-3xl flex flex-col animate-fade-in" style={{ backgroundColor: 'rgba(255, 255, 255, 0.99)' }}>
-          <div className="h-40 md:h-28 w-full px-6 md:px-10 flex items-end md:items-center justify-between shrink-0 border-b border-gray-100 pb-8 md:pb-0">
+      {isGalleryOpen && createPortal(
+        <div className="fixed inset-0 z-[10000] backdrop-blur-3xl flex flex-col animate-fade-in" style={{ backgroundColor: 'rgba(255, 255, 255, 0.99)' }}>
+          {/* Compact Header for Mobile */}
+          <div className="h-20 md:h-28 w-full px-4 md:px-10 flex items-center justify-between shrink-0 border-b border-gray-100">
             <button
               onClick={() => setIsGalleryOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 text-charcoal hover:text-primary transition-all active:scale-95 group/back mb-1 md:mb-0"
-              aria-label="Go Back"
+              className="flex items-center gap-2 md:gap-3 text-charcoal/40 hover:text-primary transition-all group"
             >
-              <svg className="w-5 h-5 transition-transform group-hover/back:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
-              <span className="text-[11px] font-black uppercase tracking-[0.2em]">Back</span>
+              <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border border-charcoal/10 flex items-center justify-center group-hover:border-primary/30 group-hover:bg-primary/5">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+              </div>
+              <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em]">Back</span>
             </button>
 
-            <div className="flex items-center gap-6 absolute left-1/2 -translate-x-1/2 mb-2.5 md:mb-0">
-              <h2 className="text-sm font-serif italic hidden md:block text-charcoal">{room.name}</h2>
-              <div className="px-5 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-[0.3em] bg-charcoal/5 border-charcoal/10 text-charcoal shadow-sm">
-                {currentIndex + 1} / {galleryImages.length}
+            <div className="flex flex-col items-center">
+              <h2 className="text-sm md:text-lg font-serif italic text-charcoal truncate max-w-[150px] md:max-w-none">{room.name}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="h-px w-3 md:w-4 bg-gold/30" />
+                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-gold">{currentIndex + 1} / {galleryImages.length}</span>
+                <span className="h-px w-3 md:w-4 bg-gold/30" />
               </div>
             </div>
 
             <button
               onClick={() => setIsGalleryOpen(false)}
-              className="p-2 text-charcoal hover:text-primary transition-all active:scale-90"
-              aria-label="Close Gallery"
+              className="w-10 h-10 md:w-14 md:h-14 rounded-full border border-charcoal/10 flex items-center justify-center hover:bg-gray-50 transition-all text-charcoal/40 hover:text-charcoal"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg className="w-5 h-5 md:w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
-          <div className="flex-1 relative flex items-center justify-center px-4 md:px-24 overflow-hidden group">
+
+          <div className="flex-1 relative flex items-center justify-center overflow-hidden">
             <button
               onClick={handlePrev}
-              className="absolute left-4 md:left-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-2xl backdrop-blur-md bg-white/40 border-black/5 text-charcoal hover:bg-gold hover:text-white md:opacity-0 md:group-hover:opacity-100 touch-active"
+              className="absolute left-4 md:left-12 z-20 w-10 h-10 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-xl backdrop-blur-md bg-white/10 border-white/20 text-charcoal hover:bg-white hover:scale-110 active:scale-95"
               aria-label="Previous Image"
             >
-              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              <svg className="w-5 h-5 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
+
             <div className="relative w-full h-full flex items-center justify-center max-w-7xl mx-auto overflow-hidden">
               <img
                 src={galleryImages[currentIndex]}
                 alt={`${room.name} view`}
-                className="max-w-full max-h-[82vh] object-contain rounded-xl md:rounded-2xl shadow-3xl transition-transform duration-500 animate-fade-in"
+                className="max-w-full max-h-full md:max-h-[75vh] object-contain rounded-xl md:rounded-2xl shadow-3xl transition-all duration-700 animate-fade-in"
                 key={galleryImages[currentIndex]}
               />
             </div>
+
             <button
               onClick={handleNext}
-              className="absolute right-4 md:right-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-2xl backdrop-blur-md bg-white/40 border-black/5 text-charcoal hover:bg-gold hover:text-white md:opacity-0 md:group-hover:opacity-100 touch-active"
+              className="absolute right-4 md:right-12 z-20 w-10 h-10 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-xl backdrop-blur-md bg-white/10 border-white/20 text-charcoal hover:bg-white hover:scale-110 active:scale-95"
               aria-label="Next Image"
             >
-              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-5 h-5 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
+
+            {/* Desktop Only Overlay */}
+            <div className="hidden md:block absolute top-1/2 -translate-y-1/2 right-12 z-30 pointer-events-none">
+              <div className="bg-white/95 backdrop-blur-2xl p-8 rounded-[2rem] border border-gray-100 shadow-2xl md:max-w-md pointer-events-auto transform transition-all duration-700 animate-slide-up">
+                <div className="mb-3">
+                  <p className="text-gold text-[10px] font-black uppercase tracking-[0.3em] mb-1">{room.category}</p>
+                  <h3 className="text-4xl font-black font-serif text-charcoal leading-tight">{room.name}</h3>
+                </div>
+
+                <p className="text-gray-500 text-sm font-medium mb-6 leading-relaxed italic">
+                  {room.description}
+                </p>
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {room.amenities.slice(0, 4).map(a => (
+                    <span key={a} className="bg-background-light px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-charcoal/50 border border-gray-100">
+                      {a}
+                    </span>
+                  ))}
+                  {room.amenities.length > 4 && <span className="text-[10px] text-gray-300 font-bold self-center">+{room.amenities.length - 4}</span>}
+                </div>
+                <div className="flex items-center justify-between pt-6 border-t border-gray-50">
+                  <div>
+                    <p className="text-gold text-[9px] font-black uppercase tracking-widest mb-1">Reservation</p>
+                    <p className="text-2xl font-black font-serif text-charcoal">{formatPrice(room.price, config.currency)}</p>
+                  </div>
+                  <Link
+                    to={checkIn && nights > 0 ? `/checkout?room=${room.id}&checkIn=${checkIn.toISOString()}&nights=${nights}` : `/checkout?room=${room.id}`}
+                    className="bg-primary text-white px-8 py-4 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-[#6B006B] transition-all shadow-lg shadow-primary/20 active:scale-95"
+                  >
+                    Book Now
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          {/* Mobile Only Info Section - Below Image */}
+          <div className="md:hidden bg-white border-t border-gray-100 px-6 py-5 shrink-0">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-gold text-[8px] font-black uppercase tracking-[0.3em] mb-0.5">{room.category}</p>
+                <h3 className="text-xl font-black font-serif text-charcoal">{room.name}</h3>
+              </div>
+              <div className="text-right">
+                <p className="text-gold text-[8px] font-black uppercase tracking-widest mb-0.5">Rate</p>
+                <p className="text-lg font-black font-serif text-charcoal">{formatPrice(room.price, config.currency)}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 mb-5">
+              {room.amenities.slice(0, 3).map(a => (
+                <span key={a} className="bg-background-light px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider text-charcoal/50 border border-gray-100">
+                  {a}
+                </span>
+              ))}
+              {room.amenities.length > 3 && <span className="text-[10px] text-gray-300 font-bold self-center">+{room.amenities.length - 3}</span>}
+            </div>
+
+            <Link
+              to={checkIn && nights > 0 ? `/checkout?room=${room.id}&checkIn=${checkIn.toISOString()}&nights=${nights}` : `/checkout?room=${room.id}`}
+              className="block w-full bg-primary text-white text-center py-4 rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-[0.98] transition-transform shadow-lg shadow-primary/10"
+            >
+              Check Out Now
+            </Link>
+          </div>
+
+          {galleryImages.length > 1 && (
+            <div className="h-32 md:h-40 w-full border-t border-gray-100 flex items-center justify-start md:justify-center p-4 md:p-6 gap-3 md:gap-5 overflow-x-auto shrink-0 no-scrollbar bg-white/95 backdrop-blur-md">
+              {galleryImages.map((src, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentIndex(idx)}
+                  className={`relative shrink-0 h-16 md:h-20 lg:h-24 aspect-video rounded-xl overflow-hidden transition-all duration-500 border-2 ${currentIndex === idx
+                    ? 'border-primary scale-105 shadow-xl opacity-100'
+                    : 'border-transparent opacity-30 hover:opacity-60 grayscale hover:grayscale-0'
+                    }`}
+                  aria-label={`Go to image ${idx + 1}`}
+                >
+                  <img src={src} className="w-full h-full object-cover" alt="Preview" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>,
+        document.body
       )}
 
       {/* Premium Floating Booking Bar - Mobile Only */}
-      <div className="fixed bottom-0 left-0 right-0 z-[80] md:hidden p-4 pointer-events-none">
+      <div className="fixed bottom-0 left-0 right-0 z-[80] md:hidden p-4 pointer-events-none fixed-button-container">
         <div className="bg-charcoal/95 backdrop-blur-3xl rounded-3xl border border-white/10 shadow-[0_-15px_50px_rgba(0,0,0,0.5)] p-5 flex items-center justify-between pointer-events-auto animate-slide-up-fade">
           <div className="flex flex-col gap-0.5">
             <span className="text-gold font-black text-[9px] uppercase tracking-[0.3em] block opacity-80">Nightly Rate</span>

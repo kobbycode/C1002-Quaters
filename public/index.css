@@ -1,18 +1,37 @@
 /* Luxury Mobile Experience Support */
 
 @keyframes slide-up-fade {
-    0% { transform: translateY(30px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
+    0% {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes slide-in-right {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(0); }
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
 }
 
 @keyframes blur-in {
-    0% { backdrop-filter: blur(0px); background: rgba(16, 25, 34, 0); }
-    100% { backdrop-filter: blur(12px); background: rgba(16, 25, 34, 0.95); }
+    0% {
+        backdrop-filter: blur(0px);
+        background: rgba(16, 25, 34, 0);
+    }
+
+    100% {
+        backdrop-filter: blur(12px);
+        background: rgba(16, 25, 34, 0.95);
+    }
 }
 
 .animate-slide-up-fade {
@@ -24,12 +43,29 @@
     animation: slide-up-fade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.stagger-1 { animation-delay: 100ms; }
-.stagger-2 { animation-delay: 150ms; }
-.stagger-3 { animation-delay: 200ms; }
-.stagger-4 { animation-delay: 250ms; }
-.stagger-5 { animation-delay: 300ms; }
-.stagger-6 { animation-delay: 350ms; }
+.stagger-1 {
+    animation-delay: 100ms;
+}
+
+.stagger-2 {
+    animation-delay: 150ms;
+}
+
+.stagger-3 {
+    animation-delay: 200ms;
+}
+
+.stagger-4 {
+    animation-delay: 250ms;
+}
+
+.stagger-5 {
+    animation-delay: 300ms;
+}
+
+.stagger-6 {
+    animation-delay: 350ms;
+}
 
 .touch-active {
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -45,15 +81,39 @@
 }
 
 @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Hide scrollbar for clean mobile galleries */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
+
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Fix for fixed overlays inside main (e.g. Gallery) being hidden or trapped by site header */
+body[data-gallery-open="true"] main {
+    z-index: 9999 !important;
+    position: relative;
+    /* CRITICAL: Removing animation/transform disables the new stacking context 
+       that traps fixed children inside 'main' */
+    animation: none !important;
+    transform: none !important;
+}
+
+/* Ensure header and concierge don't interfere with the gallery experience */
+body[data-gallery-open="true"] header,
+body[data-gallery-open="true"] .fixed-button-container {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
 }
