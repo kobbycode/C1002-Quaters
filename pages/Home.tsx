@@ -150,7 +150,6 @@ const Home: React.FC = () => {
           </div>
         )}
 
-        {/* Scroll Indicator */}
 
       </section>
 
@@ -308,5 +307,4 @@ const Home: React.FC = () => {
     </div>
   );
 };
-
 export default Home;
