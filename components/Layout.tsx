@@ -20,7 +20,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const location = useLocation();
   const isHome = location.pathname === '/';
-  // const isAdminRoute = location.pathname.startsWith('/admin'); // Not used since we have isAdmin from useAuth
+  const isAdminRoute = location.pathname.startsWith('/admin');
   const isLogin = location.pathname === '/login' || location.pathname === '/signup';
 
   const handleNavClick = () => {
@@ -112,7 +112,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   };
 
-  if (isLogin) {
+  if (isLogin || isAdminRoute) {
     return <div className="flex flex-col min-h-screen font-sans bg-background-light">{children}</div>;
   }
 
