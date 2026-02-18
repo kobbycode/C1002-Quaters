@@ -305,17 +305,6 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Social proof marquee simplified for code brevity but styled well */}
-      <section className="py-20 border-y border-gray-100">
-        <div className="flex flex-wrap justify-center gap-x-24 gap-y-10 items-center opacity-40 grayscale px-10">
-          <span className="text-2xl font-serif font-bold tracking-tighter">Condé Nast</span>
-          <span className="text-2xl font-serif font-bold tracking-tighter">Forbes Travel</span>
-          <span className="text-2xl font-serif font-bold tracking-tighter">VOGUE</span>
-          <span className="text-2xl font-serif font-bold tracking-tighter">Ghana Web</span>
-          <span className="text-2xl font-serif font-bold tracking-tighter">Luxury Retreats</span>
-        </div>
-      </section>
     </div>
   );
 };
