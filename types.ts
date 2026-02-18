@@ -101,6 +101,7 @@ export interface SiteConfig {
   aiKnowledgeBase?: { question: string; answer: string; category?: string }[];
   aiLabInstructions?: string;
   pricingRules?: PricingRule[];
+  adminEmails?: string[];
 
   // bookings: Booking[]; // Deprecated, moved to root collection
 }

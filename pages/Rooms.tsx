@@ -7,7 +7,7 @@ import { Room } from '../types';
 
 const RoomSkeleton: React.FC = () => (
   <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm flex flex-col animate-pulse">
-    <div className="aspect-[16/10] bg-gray-200" />
+    <div className="aspect-[4/5] md:aspect-[16/10] bg-gray-200" />
     <div className="p-6 flex-1 flex flex-col">
       <div className="flex justify-between items-start mb-4">
         <div className="space-y-2 flex-1">
@@ -60,11 +60,11 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
         className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center transition-all hover:scale-110 group/wish"
       >
         <svg className={`w-5 h-5 transition-colors ${wishlist.includes(room.id) ? 'text-gold' : 'text-gray-300 group-hover/wish:text-gold'}`} fill={wishlist.includes(room.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
       </button>
 
-      <div className="aspect-[16/10] relative overflow-hidden group/image cursor-pointer" onClick={() => onOpenGallery(room, currentImageIndex)}>
+      <div className="aspect-[4/5] md:aspect-[16/10] relative overflow-hidden group/image cursor-pointer" onClick={() => onOpenGallery(room, currentImageIndex)}>
         <div className="flex h-full w-full transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
           {roomImages.map((src, idx) => (
             <div key={idx} className="w-full h-full shrink-0">
@@ -99,7 +99,7 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
               </button>
             </div>
             <div className="absolute bottom-2 right-2 bg-black/30 backdrop-blur-md px-2 py-1 rounded-full opacity-0 group-hover/image:opacity-100 transition-opacity">
-              <span className="text-white text-[9px] font-black uppercase tracking-wider">Click to expand</span>
+              <span className="text-white text-[10px] font-black uppercase tracking-wider">Click to expand</span>
             </div>
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 opacity-0 group-hover/image:opacity-100 transition-opacity">
               {roomImages.map((_, idx) => (
@@ -112,17 +112,17 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
               ))}
             </div>
             <div className="absolute top-2 left-2 bg-black/30 backdrop-blur-md px-2 py-1 rounded-full">
-              <span className="text-white text-[9px] font-black uppercase tracking-wider">{currentImageIndex + 1} / {roomImages.length}</span>
+              <span className="text-white text-[10px] font-black uppercase tracking-wider">{currentImageIndex + 1} / {roomImages.length}</span>
             </div>
           </>
         )}
 
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           {room.isBestSeller && (
-            <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider text-primary shadow-sm">Popular Choice</div>
+            <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider text-primary shadow-sm">Popular Choice</div>
           )}
           {room.isElite && (
-            <div className="bg-primary px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-sm">Top Pick</div>
+            <div className="bg-primary px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider text-white shadow-sm">Top Pick</div>
           )}
         </div>
       </div>
@@ -130,19 +130,19 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-2">
           <div>
-            <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">{room.category}</p>
+            <p className="text-[10px] md:text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-1">{room.category}</p>
             <Link to={`/rooms/${room.id}`} className="block group-Title">
-              <h3 className="text-xl md:text-2xl font-black font-serif group-hover:text-primary transition-colors">{room.name}</h3>
+              <h3 className="text-lg md:text-2xl font-black font-serif group-hover:text-primary transition-colors">{room.name}</h3>
             </Link>
           </div>
           <div className="flex flex-col items-end">
-            <div className="flex items-center text-gold text-sm font-black">
+            <div className="flex items-center text-gold text-xs md:text-sm font-black">
               ★ {room.rating}
             </div>
-            <p className="text-[10px] text-gray-400 font-bold">{room.reviewsCount} Reviews</p>
+            <p className="text-[10px] md:text-[11px] text-gray-400 font-bold">{room.reviewsCount} Reviews</p>
           </div>
         </div>
-        <p className="text-gray-500 text-sm mb-6 line-clamp-2 font-light leading-relaxed">
+        <p className="text-gray-400 md:text-gray-500 text-xs md:text-sm mb-6 line-clamp-2 font-light leading-relaxed">
           {formatLuxuryText(room.description)}
         </p>
 
@@ -159,11 +159,11 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
 
         <div className="mt-auto flex items-center justify-between pt-4">
           <div>
-            <p className="text-gray-400 text-[9px] uppercase font-black tracking-[0.2em]">Nightly rate</p>
-            <p className="text-2xl md:text-3xl font-black text-charcoal font-serif">{formatPrice(room.price, config.currency)}</p>
+            <p className="text-gray-400 text-[10px] md:text-[11px] uppercase font-black tracking-[0.2em]">Nightly rate</p>
+            <p className="text-xl md:text-3xl font-black text-charcoal font-serif">{formatPrice(room.price, config.currency)}</p>
           </div>
-          <Link to={`/checkout?room=${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.15em] text-xs">
-            Book Now
+          <Link to={`/checkout?room=${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.15em] text-[11px] md:text-xs">
+            Book Room
           </Link>
         </div>
       </div>
@@ -181,8 +181,9 @@ const Rooms: React.FC = () => {
   const [galleryIndex, setGalleryIndex] = useState(0);
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<number>(1500);
+  const [priceRange, setPriceRange] = useState<number>(3000);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const allAmenities = useMemo(() => {
     const set = new Set<string>();
@@ -227,11 +228,11 @@ const Rooms: React.FC = () => {
 
       let guestMatch = true;
       if (guestParam === 'Family') {
-        guestMatch = parseInt(room.guests) >= 3 || room.category === 'Villa' || room.category === 'Presidential';
+        guestMatch = room.guests >= 3 || room.category === 'Villa' || room.category === 'Presidential';
       } else if (guestParam === '1 Adult') {
         guestMatch = true;
       } else if (guestParam === '2 Adults') {
-        guestMatch = parseInt(room.guests) >= 2;
+        guestMatch = room.guests >= 2;
       }
 
       return categoryMatch && priceMatch && amenitiesMatch && guestMatch;
@@ -331,26 +332,56 @@ const Rooms: React.FC = () => {
 
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-2xl md:text-4xl font-black leading-tight tracking-tight font-serif mb-2 text-charcoal">Our Rooms</h1>
-            <p className="text-gray-500 text-sm md:text-base max-w-2xl">
-              Enjoy your stay in one of our {rooms.length} beautiful rooms and suites.
+            <h1 className="text-3xl md:text-5xl font-black leading-tight tracking-tight font-serif mb-3 text-charcoal">The Collection</h1>
+            <p className="text-gray-500 text-sm md:text-base max-w-2xl font-medium">
+              Explore our curated selection of {rooms.length} avant-garde suites and private estates.
             </p>
           </div>
-          {(selectedCategories.length > 0 || selectedAmenities.length > 0 || priceRange < 1500) && (
+          <div className="flex items-center gap-4">
+            {(selectedCategories.length > 0 || selectedAmenities.length > 0 || priceRange < 3000) && (
+              <button
+                onClick={clearFilters}
+                className="text-primary text-[11px] font-black uppercase tracking-[0.2em] hover:text-charcoal transition-colors border-b-2 border-primary/20 pb-0.5"
+              >
+                Reset All
+              </button>
+            )}
             <button
-              onClick={clearFilters}
-              className="text-primary text-sm font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4"
+              onClick={() => setIsFilterDrawerOpen(true)}
+              className="lg:hidden flex items-center gap-2 bg-charcoal text-white px-5 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
             >
-              Clear All Filters
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+              Refine Search
             </button>
-          )}
+          </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <aside className="w-full lg:w-72 flex-shrink-0">
-            <div className="sticky top-24 flex flex-col gap-8 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        {/* Active Filter Chips - Mobile/Desktop */}
+        {(selectedCategories.length > 0 || selectedAmenities.length > 0 || priceRange < 3000) && (
+          <div className="flex flex-wrap gap-2 mb-8 animate-fade-in">
+            {selectedCategories.map(cat => (
+              <button key={cat} onClick={() => toggleCategory(cat)} className="flex items-center gap-2 bg-primary/5 text-primary px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/10 hover:bg-primary/10 transition-all">
+                {cat} <span className="text-lg leading-none">×</span>
+              </button>
+            ))}
+            {selectedAmenities.map(amenity => (
+              <button key={amenity} onClick={() => toggleAmenity(amenity)} className="flex items-center gap-2 bg-gold/5 text-gold px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-gold/10 hover:bg-gold/10 transition-all">
+                {amenity} <span className="text-lg leading-none">×</span>
+              </button>
+            ))}
+            {priceRange < 3000 && (
+              <button onClick={() => setPriceRange(3000)} className="flex items-center gap-2 bg-charcoal/5 text-charcoal px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-charcoal/10 hover:bg-charcoal/10 transition-all">
+                Under {formatPrice(priceRange, config.currency)} <span className="text-lg leading-none">×</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          <aside className="hidden lg:block w-80 flex-shrink-0">
+            <div className="sticky top-28 flex flex-col gap-10 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40">
               <div>
-                <h3 className="text-charcoal text-[10px] font-black mb-4 uppercase tracking-[0.2em] text-gold">Room Categories</h3>
+                <h3 className="text-charcoal text-[11px] font-black mb-4 uppercase tracking-[0.2em] text-gold">Room Categories</h3>
                 <div className="flex flex-col gap-2">
                   {config.categories.map((cat) => (
                     <label
@@ -368,7 +399,7 @@ const Rooms: React.FC = () => {
                       />
                       <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedCategories.includes(cat) ? 'bg-primary border-primary' : 'border-gray-300'
                         }`}>
-                        {selectedCategories.includes(cat) && <span className="text-white text-[10px]">✓</span>}
+                        {selectedCategories.includes(cat) && <span className="text-white text-[11px]">✓</span>}
                       </div>
                       <span className="text-sm font-bold">{cat}</span>
                     </label>
@@ -378,7 +409,7 @@ const Rooms: React.FC = () => {
 
               <div className="border-t border-gray-100 pt-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-charcoal text-[10px] font-black uppercase tracking-[0.2em] text-gold">Max Price</h3>
+                  <h3 className="text-charcoal text-[11px] font-black uppercase tracking-[0.2em] text-gold">Max Price</h3>
                   <span className="text-primary font-black text-sm">{formatPrice(priceRange, config.currency)}</span>
                 </div>
                 <input
@@ -393,7 +424,7 @@ const Rooms: React.FC = () => {
               </div>
 
               <div className="border-t border-gray-100 pt-6">
-                <h3 className="text-charcoal text-[10px] font-black mb-4 uppercase tracking-[0.2em] text-gold">Amenities</h3>
+                <h3 className="text-charcoal text-[11px] font-black mb-4 uppercase tracking-[0.2em] text-gold">Amenities</h3>
                 <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                   {allAmenities.map((amenity) => (
                     <label
@@ -419,11 +450,11 @@ const Rooms: React.FC = () => {
 
           <div className="flex-1">
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {[1, 2, 3, 4].map(i => <RoomSkeleton key={i} />)}
               </div>
             ) : filteredRooms.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-12">
                 {filteredRooms.map((room) => (
                   <RoomCard
                     key={room.id}
@@ -435,18 +466,19 @@ const Rooms: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-3xl p-20 text-center border border-gray-100 shadow-sm animate-fade-in">
-                <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="bg-white rounded-[2.5rem] py-24 px-10 text-center border border-gray-100 shadow-2xl shadow-gray-200/40 animate-fade-in max-w-2xl mx-auto w-full">
+                <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-gray-100">
                   <svg className="w-12 h-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-black font-serif mb-4">No Rooms Match Your Criteria</h2>
+                <h2 className="text-2xl md:text-3xl font-black font-serif mb-4 text-charcoal tracking-tight">No Discoveries Found</h2>
+                <p className="text-gray-400 font-medium mb-10 max-w-sm mx-auto">Try refining your selection criteria to find the perfect suite for your experience.</p>
                 <button
                   onClick={clearFilters}
-                  className="bg-charcoal text-white font-black px-6 md:px-10 py-3 md:py-4 rounded-xl hover:bg-primary transition-all uppercase tracking-widest text-xs"
+                  className="bg-charcoal text-white font-black px-12 py-5 rounded-2xl hover:bg-primary transition-all uppercase tracking-[0.2em] text-[11px] shadow-xl hover:shadow-primary/30"
                 >
-                  Clear All Filters
+                  Reset all criteria
                 </button>
               </div>
             )}
@@ -454,35 +486,122 @@ const Rooms: React.FC = () => {
         </div>
       </div>
 
-      {/* Full-Screen Gallery Modal */}
-      {galleryOpen && selectedRoom && (
-        <div className="fixed inset-0 z-[500] backdrop-blur-xl flex flex-col animate-fade-in" style={{ backgroundColor: 'rgba(255, 255, 255, 0.98)' }}>
-          <div className="h-20 md:h-24 w-full px-4 md:px-10 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-4 md:gap-10">
-              <h2 className="text-lg md:text-xl font-serif italic" style={{ color: '#101922' }}>{selectedRoom.name}</h2>
-              <div className="px-4 md:px-5 py-1.5 md:py-2 rounded-full border text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: '#101922', borderColor: 'rgba(16, 25, 34, 0.1)', backgroundColor: 'rgba(16, 25, 34, 0.05)' }}>
-                {galleryIndex + 1} <span className="opacity-30 mx-1 md:mx-2">/</span> {galleryImages.length}
+      {/* Mobile Filter Drawer Overlay */}
+      {isFilterDrawerOpen && (
+        <div className="fixed inset-0 z-[100] lg:hidden animate-fade-in">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsFilterDrawerOpen(false)} />
+          <div className="absolute inset-x-0 bottom-0 max-h-[90vh] bg-white rounded-t-[2.5rem] shadow-2xl animate-slide-up flex flex-col p-8 overflow-hidden">
+            <div className="w-12 h-1.5 bg-gray-100 rounded-full mx-auto mb-8 shrink-0" />
+
+            <div className="flex justify-between items-center mb-8 shrink-0">
+              <h3 className="text-2xl font-black font-serif text-charcoal tracking-tight">Refine Selection</h3>
+              <button onClick={() => setIsFilterDrawerOpen(false)} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-charcoal hover:bg-gray-100 transition-all">×</button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-12 pb-10">
+              <div>
+                <h3 className="text-gold text-[10px] font-black mb-6 uppercase tracking-[0.4em]">Suite Categories</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {config.categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => toggleCategory(cat)}
+                      className={`px-4 py-3 rounded-xl font-bold text-xs transition-all border text-left ${selectedCategories.includes(cat)
+                        ? 'bg-primary/5 border-primary/20 text-primary shadow-sm'
+                        : 'bg-white border-gray-100 text-gray-500 hover:border-gold/20'
+                        }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-gold text-[10px] font-black uppercase tracking-[0.4em]">Max Investment</h3>
+                  <span className="text-primary font-black text-xs">{formatPrice(priceRange, config.currency)}</span>
+                </div>
+                <input
+                  type="range"
+                  min="400"
+                  max="3000"
+                  step="50"
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(parseInt(e.target.value))}
+                  className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+              </div>
+
+              <div>
+                <h3 className="text-gold text-[10px] font-black mb-6 uppercase tracking-[0.4em]">Premium Amenities</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {allAmenities.map((amenity) => (
+                    <button
+                      key={amenity}
+                      onClick={() => toggleAmenity(amenity)}
+                      className={`px-4 py-3 rounded-xl font-bold text-[10px] transition-all border text-left flex items-center gap-2 ${selectedAmenities.includes(amenity)
+                        ? 'bg-gold/5 border-gold/20 text-gold shadow-sm'
+                        : 'bg-white border-gray-100 text-gray-400'
+                        }`}
+                    >
+                      <div className={`w-2 h-2 rounded-full ${selectedAmenities.includes(amenity) ? 'bg-gold' : 'bg-gray-100'}`} />
+                      {amenity}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
+
+            <div className="pt-6 border-t border-gray-100 shrink-0">
+              <button
+                onClick={() => setIsFilterDrawerOpen(false)}
+                className="w-full bg-charcoal text-white font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all uppercase tracking-[0.2em] text-[11px]"
+              >
+                Apply Discoveries
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full-Screen Gallery Modal */}
+      {galleryOpen && selectedRoom && (
+        <div className="fixed inset-0 z-[9999] backdrop-blur-3xl flex flex-col animate-fade-in" style={{ backgroundColor: 'rgba(255, 255, 255, 0.99)' }}>
+          <div className="h-40 md:h-28 w-full px-6 md:px-10 flex items-end md:items-center justify-between shrink-0 border-b border-gray-100 pb-8 md:pb-0">
             <button
               onClick={handleCloseGallery}
-              className="group flex items-center gap-3 md:gap-4 hover:text-[#8B008B] transition-all font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px]"
-              style={{ color: '#101922' }}
+              className="flex items-center gap-3 text-charcoal/40 hover:text-primary transition-all group"
             >
-              Close Gallery
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#101922]/10 group-hover:border-[#8B008B]/50 flex items-center justify-center transition-all bg-[#101922]/5 group-hover:bg-[#8B008B]/10">
-                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+              <div className="w-8 h-8 rounded-full border border-charcoal/10 flex items-center justify-center group-hover:border-primary/30 group-hover:bg-primary/5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </div>
+              <span className="text-[11px] font-black uppercase tracking-[0.2em]">Back</span>
+            </button>
+
+            <div className="hidden md:flex flex-col items-center">
+              <h2 className="text-lg font-serif italic text-charcoal">{selectedRoom.name}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="h-px w-4 bg-gold/30" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gold">{galleryIndex + 1} / {galleryImages.length}</span>
+                <span className="h-px w-4 bg-gold/30" />
+              </div>
+            </div>
+
+            <button
+              onClick={handleCloseGallery}
+              className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-charcoal/10 flex items-center justify-center hover:bg-gray-50 transition-all text-charcoal/40 hover:text-charcoal"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
 
           <div className="flex-1 relative flex items-center justify-center px-4 md:px-12 lg:px-24 overflow-hidden">
             <button
               onClick={handleGalleryPrev}
-              className="absolute left-4 md:left-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-2xl backdrop-blur-md"
-              style={{ backgroundColor: 'rgba(16, 25, 34, 0.05)', color: '#101922', borderColor: 'rgba(16, 25, 34, 0.1)' }}
+              className="absolute left-4 md:left-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-2xl backdrop-blur-md bg-white/10 border-white/20 text-charcoal hover:bg-white hover:scale-110 active:scale-95"
               aria-label="Previous Image"
             >
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -497,12 +616,14 @@ const Rooms: React.FC = () => {
               >
                 {galleryImages.map((src, idx) => (
                   <div key={idx} className="h-full w-full shrink-0 flex items-center justify-center p-4">
-                    <img
-                      src={src}
-                      alt={`${selectedRoom.name} full view ${idx + 1}`}
-                      className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl"
-                      loading="lazy"
-                    />
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <img
+                        src={src}
+                        alt={`${selectedRoom.name} full view ${idx + 1}`}
+                        className="max-w-full max-h-[65vh] md:max-h-[75vh] object-contain rounded-2xl shadow-2xl"
+                        loading="lazy"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -510,8 +631,7 @@ const Rooms: React.FC = () => {
 
             <button
               onClick={handleGalleryNext}
-              className="absolute right-4 md:right-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-2xl backdrop-blur-md"
-              style={{ backgroundColor: 'rgba(16, 25, 34, 0.05)', color: '#101922', borderColor: 'rgba(16, 25, 34, 0.1)' }}
+              className="absolute right-4 md:right-12 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center border transition-all shadow-2xl backdrop-blur-md bg-white/10 border-white/20 text-charcoal hover:bg-white hover:scale-110 active:scale-95"
               aria-label="Next Image"
             >
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -521,13 +641,13 @@ const Rooms: React.FC = () => {
           </div>
 
           {galleryImages.length > 1 && (
-            <div className="h-32 md:h-40 w-full border-t flex items-center justify-center p-4 md:p-6 gap-3 md:gap-5 overflow-x-auto shrink-0 no-scrollbar" style={{ backgroundColor: 'rgba(255, 255, 255, 0.98)', borderColor: 'rgba(16, 25, 34, 0.1)' }}>
+            <div className="h-32 md:h-40 w-full border-t border-gray-100 flex items-center justify-center p-4 md:p-6 gap-3 md:gap-5 overflow-x-auto shrink-0 no-scrollbar bg-white/95 backdrop-blur-md">
               {galleryImages.map((src, idx) => (
                 <button
                   key={idx}
                   onClick={() => setGalleryIndex(idx)}
                   className={`relative shrink-0 h-16 md:h-20 lg:h-24 aspect-video rounded-xl overflow-hidden transition-all duration-500 border-2 ${galleryIndex === idx
-                    ? 'border-[#8B008B] scale-110 shadow-2xl opacity-100'
+                    ? 'border-primary scale-105 shadow-xl opacity-100'
                     : 'border-transparent opacity-30 hover:opacity-60 grayscale hover:grayscale-0'
                     }`}
                   aria-label={`Go to image ${idx + 1}`}
@@ -538,7 +658,8 @@ const Rooms: React.FC = () => {
             </div>
           )}
         </div>
-      )}
+      )
+      }
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }

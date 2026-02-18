@@ -1,27 +1,13 @@
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-import React, { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../utils/firebase';
-import { useNavigate } from 'react-router-dom';
-
-export const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [loading, setLoading] = useState(true);
-    const [authenticated, setAuthenticated] = useState(false);
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setAuthenticated(true);
-            } else {
-                setAuthenticated(false);
-                navigate('/login');
-            }
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, [navigate]);
+export const AuthGuard: React.FC<{ children: React.ReactNode; requireAdmin?: boolean }> = ({
+    children,
+    requireAdmin = false
+}) => {
+    const { user, loading, isAdmin } = useAuth();
+    const location = useLocation();
 
     if (loading) {
         return (
@@ -31,5 +17,14 @@ export const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children })
         );
     }
 
-    return authenticated ? <>{children}</> : null;
+    if (!user) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    if (requireAdmin && !isAdmin) {
+        // Logged in but not an admin, send to profile
+        return <Navigate to="/profile" replace />;
+    }
+
+    return <>{children}</>;
 };

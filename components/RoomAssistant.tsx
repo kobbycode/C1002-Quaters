@@ -25,7 +25,7 @@ const RoomAssistant: React.FC<RoomAssistantProps> = ({ roomId, roomName }) => {
                         </div>
                         <div>
                             <h4 className="text-sm font-black text-charcoal uppercase tracking-widest">Ask about {roomName}</h4>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">AI Concierge Assistant • Instant Answers</p>
+                            <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">AI Concierge Assistant • Instant Answers</p>
                         </div>
                     </div>
                     <button className={`w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`}>
@@ -51,7 +51,7 @@ const RoomAssistant: React.FC<RoomAssistantProps> = ({ roomId, roomName }) => {
                                         // This would ideally trigger the global concierge with this input
                                         window.dispatchEvent(new CustomEvent('open-concierge', { detail: { text: q, roomId } }));
                                     }}
-                                    className="px-4 py-2 rounded-full border border-gray-100 text-[10px] font-bold text-gray-400 hover:border-primary hover:text-primary transition-all bg-white shadow-sm"
+                                    className="px-4 py-2 rounded-full border border-gray-100 text-[11px] font-bold text-gray-400 hover:border-primary hover:text-primary transition-all bg-white shadow-sm"
                                 >
                                     {q}
                                 </button>
@@ -59,7 +59,7 @@ const RoomAssistant: React.FC<RoomAssistantProps> = ({ roomId, roomName }) => {
                         </div>
                         <button
                             onClick={() => window.dispatchEvent(new CustomEvent('open-concierge', { detail: { roomId } }))}
-                            className="w-full bg-charcoal text-white font-black py-4 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-primary transition-all shadow-lg"
+                            className="w-full bg-charcoal text-white font-black py-4 rounded-2xl uppercase tracking-[0.2em] text-[11px] hover:bg-primary transition-all shadow-lg"
                         >
                             Open Live Chat
                         </button>

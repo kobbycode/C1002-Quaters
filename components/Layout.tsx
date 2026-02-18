@@ -3,9 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import Concierge from './Concierge';
 import { CommandSearch } from './CommandSearch';
+import { useAuth } from '../context/AuthContext';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { config, addSubscriber } = useSite();
+  const { user, isAdmin, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,14 +16,21 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const isAdmin = location.pathname.startsWith('/admin');
-  const isLogin = location.pathname === '/login';
+  // const isAdminRoute = location.pathname.startsWith('/admin'); // Not used since we have isAdmin from useAuth
+  const isLogin = location.pathname === '/login' || location.pathname === '/signup';
 
   const handleNavClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsProfileMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setIsProfileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -65,8 +74,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     const handleOpenConcierge = (e: any) => {
       setIsConciergeOpen(true);
-      // In a real scenario, we might want to pass the message to the Concierge state
-      // But since they share the same SiteContext/Location, the roomId will be picked up.
     };
     window.addEventListener('open-concierge', handleOpenConcierge);
 
@@ -105,8 +112,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   };
 
-  if (isAdmin || isLogin) {
-    return <div className="flex flex-col min-h-screen font-sans">{children}</div>;
+  if (isLogin) {
+    return <div className="flex flex-col min-h-screen font-sans bg-background-light">{children}</div>;
   }
 
   return (
@@ -163,6 +170,65 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 </span>
               )}
             </Link>
+
+            {/* Auth Link */}
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className={`p-2 flex items-center gap-2 rounded-full border transition-all ${isScrolled || !isHome ? 'border-gray-100 bg-gray-50' : 'border-white/10 bg-white/5'}`}
+                >
+                  <div className="w-6 h-6 rounded-full bg-gold text-white flex items-center justify-center text-[10px] font-black">
+                    {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                </button>
+
+                {isProfileMenuOpen && (
+                  <div className="absolute top-full right-0 mt-4 w-56 bg-white rounded-3xl shadow-2xl border border-gray-100 py-3 animate-fade-in text-charcoal overflow-hidden group/menu">
+                    <div className="px-5 py-3 border-b border-gray-50 flex flex-col gap-0.5 mb-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gold">Welcome</p>
+                      <p className="text-sm font-bold truncate">{user.displayName || 'Patron'}</p>
+                    </div>
+                    <Link
+                      to="/profile"
+                      onClick={handleNavClick}
+                      className="px-5 py-3 flex items-center gap-3 text-xs font-bold hover:bg-gold/5 hover:text-gold transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                      My Profile
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={handleNavClick}
+                        className="px-5 py-3 flex items-center gap-3 text-xs font-bold hover:bg-gold/5 hover:text-gold transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-5 py-3 flex items-center gap-3 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className={`p-2 transition-colors ${isScrolled || !isHome ? 'text-gray-400' : 'text-white/70'} hover:text-gold`}
+                aria-label="Login"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </Link>
+            )}
+
             <Link
               to="/rooms"
               className="hidden sm:flex min-w-[100px] sm:min-w-[120px] items-center justify-center rounded-lg h-9 sm:h-10 px-4 sm:px-6 bg-primary text-white text-xs sm:text-sm font-bold tracking-wide hover:bg-primary/90 transition-all shadow-md shadow-primary/20"
@@ -181,56 +247,120 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </div>
 
-        <div className={`fixed top-0 left-0 w-screen h-screen z-[100] bg-charcoal transition-transform duration-500 md:hidden overscroll-contain ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-          <div ref={mobileMenuRef} className="flex flex-col h-full pt-20 px-10 pb-10 overflow-y-auto overscroll-contain">
+      </header>
+
+      <main className="flex-1 page-fade-in" key={location.pathname}>{children}</main>
+
+      <CommandSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
+      {/* Premium Mobile Menu Overlay */}
+      <div className={`fixed inset-0 z-[100] md:hidden transition-all duration-500 ${isMobileMenuOpen ? 'visible' : 'invisible pointer-events-none'}`}>
+        {/* Blurred Backdrop */}
+        <div
+          className={`absolute inset-0 transition-all duration-700 bg-charcoal/40 backdrop-blur-xl ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+
+        {/* Sliding Content Container */}
+        <div className={`absolute inset-y-0 right-0 w-full max-w-sm bg-charcoal shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div ref={mobileMenuRef} className="flex flex-col h-full pt-24 px-10 pb-10 overflow-y-auto no-scrollbar relative">
+            {/* Close Button Inside Drawer */}
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="absolute top-6 right-6 p-2 text-white hover:text-primary transition-colors z-[101]"
+              className="absolute top-8 right-8 p-3 text-white/50 hover:text-gold transition-colors touch-active"
               aria-label="Close Mobile Menu"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+
+            <div className="flex flex-col gap-1 mb-10">
+              <span className="text-gold font-black uppercase tracking-[0.4em] text-[8px]">Navigation</span>
+              <h2 className="text-2xl font-serif text-white italic">The Collection</h2>
+            </div>
+
             <nav className="flex flex-col gap-6">
-              {config.navLinks.map((link) => {
+              {config.navLinks.map((link, i) => {
                 const isActive = location.pathname === link.path;
                 return (
                   <Link
                     key={link.id}
                     to={link.path}
                     onClick={handleNavClick}
-                    className={`text-2xl font-serif transition-colors ${isActive
-                      ? 'text-primary'
-                      : 'text-white hover:text-primary'
+                    className={`text-2xl font-serif transition-all stagger-item stagger-${i + 1} ${isActive
+                      ? 'text-gold translate-x-2'
+                      : 'text-white/80 hover:text-gold hover:translate-x-2'
                       }`}
                   >
                     {link.label}
                   </Link>
                 );
               })}
+
+              <div className="h-px w-10 bg-white/10 my-1" />
+
               <Link
                 to="/wishlist"
                 onClick={handleNavClick}
-                className={`text-2xl font-serif transition-colors ${location.pathname === '/wishlist'
-                  ? 'text-primary'
-                  : 'text-white hover:text-primary'
+                className={`text-xl font-serif transition-all stagger-item stagger-5 ${location.pathname === '/wishlist'
+                  ? 'text-gold translate-x-2'
+                  : 'text-white/60 hover:text-gold hover:translate-x-2'
                   }`}
               >
-                Wishlist
+                My Selection
               </Link>
+
+              {user ? (
+                <>
+                  <Link
+                    to="/profile"
+                    onClick={handleNavClick}
+                    className={`text-xl font-serif transition-all stagger-item stagger-6 ${location.pathname === '/profile'
+                      ? 'text-gold translate-x-2'
+                      : 'text-white/60 hover:text-gold hover:translate-x-2'
+                      }`}
+                  >
+                    Guest Profile
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={handleNavClick}
+                      className="text-xl font-serif text-primary/80 hover:text-primary transition-all stagger-item stagger-6"
+                    >
+                      Management
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="text-xl font-serif text-red-400/60 hover:text-red-400 transition-all text-left stagger-item stagger-6"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={handleNavClick}
+                  className={`text-2xl font-serif transition-all stagger-item stagger-6 ${location.pathname === '/login'
+                    ? 'text-gold translate-x-2'
+                    : 'text-white/60 hover:text-gold hover:translate-x-2'
+                    }`}
+                >
+                  Guest Entrance
+                </Link>
+              )}
             </nav>
-            <div className="mt-12 pt-10 border-t border-white/10">
-              <p className="text-gold font-black uppercase tracking-[0.2em] text-[10px] mb-4">Concierge 24/7</p>
-              <a href={`tel:${config.footer.phone.replace(/\s/g, '')}`} className="text-2xl font-bold text-white">{config.footer.phone}</a>
+
+            <div className="mt-auto pt-10 border-t border-white/5 animate-fade-in">
+              <p className="text-gold font-black uppercase tracking-[0.2em] text-[10px] mb-4">Support 24/7</p>
+              <a href={`tel:${config.footer.phone.replace(/\s/g, '')}`} className="text-xl font-bold text-white/90 hover:text-white transition-colors block mb-2">{config.footer.phone}</a>
+              <p className="text-[11px] text-white/30 font-medium tracking-wider">Global Support Readiness</p>
             </div>
           </div>
         </div>
-      </header>
-
-      <main className="flex-1">{children}</main>
-
-      <CommandSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      </div>
 
       <div className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[70] flex flex-col items-end gap-4 ${isMobileMenuOpen ? 'hidden' : ''}`}>
         <Concierge
@@ -302,9 +432,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <div className="bg-charcoal text-white p-6 rounded-2xl border border-gold/30 animate-fade-in relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-20 h-20 bg-gold/10 rounded-bl-full"></div>
                   <div className="relative z-10">
-                    <p className="text-gold font-black uppercase tracking-[0.3em] text-[8px] mb-2">Welcome to</p>
+                    <p className="text-gold font-black uppercase tracking-[0.3em] text-[10px] mb-2">Welcome to</p>
                     <h5 className="font-serif text-xl mb-2 italic">The Inner Circle</h5>
-                    <p className="text-xs text-white/60 leading-relaxed font-light">
+                    <p className="text-[13px] text-white/60 leading-relaxed font-light">
                       You are now part of Accra's most exclusive stay network. Expect curated gifts shortly.
                     </p>
                   </div>

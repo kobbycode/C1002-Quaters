@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
+import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
 import { formatLuxuryText, formatPrice } from '../utils/formatters';
 
@@ -9,6 +10,7 @@ import { PaystackButton } from 'react-paystack';
 
 const Checkout: React.FC = () => {
   const { rooms, config, addBooking, sendEmail, isRoomAvailable, calculatePrice } = useSite();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get('room') || rooms[0]?.id;
   const room = rooms.find(r => r.id === roomId) || rooms[0];
@@ -18,10 +20,11 @@ const Checkout: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDateError, setIsDateError] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'paystack'>('paystack');
+
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
+    firstName: user?.displayName?.split(' ')[0] || '',
+    lastName: user?.displayName?.split(' ').slice(1).join(' ') || '',
+    email: user?.email || '',
     phone: ''
   });
 
@@ -163,7 +166,7 @@ const Checkout: React.FC = () => {
               <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
             </div>
 
-            <span className="text-gold font-black uppercase tracking-[0.5em] text-[10px] mb-6 block">Akwaaba</span>
+            <span className="text-gold font-black uppercase tracking-[0.5em] text-[11px] mb-6 block">Akwaaba</span>
             <h1 className="text-4xl md:text-6xl font-black font-serif mb-6 text-charcoal leading-tight">Your Stay is *Confirmed*</h1>
             <p className="text-gray-500 text-sm md:text-lg max-w-2xl mx-auto mb-12 font-light leading-relaxed italic border-l-2 border-gold/30 pl-8">
               "We have sent your formal invitation and receipt to <strong>{formData.email}</strong>. Your luxury experience in Accra begins now."
@@ -171,15 +174,15 @@ const Checkout: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-16 py-10 border-y border-gray-100/50">
               <div className="text-center">
-                <p className="text-[10px] font-black uppercase text-gold tracking-widest mb-2">Suite</p>
+                <p className="text-[11px] font-black uppercase text-gold tracking-widest mb-2">Suite</p>
                 <p className="text-lg font-black text-charcoal font-serif">{room.name}</p>
               </div>
               <div className="text-center md:border-x border-gray-100/50 px-4">
-                <p className="text-[10px] font-black uppercase text-gold tracking-widest mb-2">Dates</p>
+                <p className="text-[11px] font-black uppercase text-gold tracking-widest mb-2">Dates</p>
                 <p className="text-lg font-black text-charcoal font-serif">{dates?.formattedCheckIn || 'Flexible'}</p>
               </div>
               <div className="text-center">
-                <p className="text-[10px] font-black uppercase text-gold tracking-widest mb-2">Total</p>
+                <p className="text-[11px] font-black uppercase text-gold tracking-widest mb-2">Total</p>
                 <p className="text-lg font-black text-charcoal font-serif">{formatPrice(totalAmount, config.currency)}</p>
               </div>
             </div>
@@ -189,18 +192,18 @@ const Checkout: React.FC = () => {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 bg-charcoal text-white font-black py-5 px-10 rounded-2xl uppercase tracking-[0.2em] text-[10px] shadow-2xl shadow-charcoal/30 hover:bg-gold transition-all flex items-center justify-center gap-3"
+                className="flex-1 bg-charcoal text-white font-black py-5 px-10 rounded-2xl uppercase tracking-[0.2em] text-[11px] shadow-2xl shadow-charcoal/30 hover:bg-gold transition-all flex items-center justify-center gap-3"
               >
                 Direct Concierge
               </a>
-              <Link to="/" className="flex-1 bg-white text-charcoal border border-gray-100 font-black py-5 px-10 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gray-50 transition-all flex items-center justify-center">
+              <Link to="/" className="flex-1 bg-white text-charcoal border border-gray-100 font-black py-5 px-10 rounded-2xl uppercase tracking-[0.2em] text-[11px] hover:bg-gray-50 transition-all flex items-center justify-center">
                 Return Home
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 text-gray-400 text-[10px] font-black uppercase tracking-widest animate-pulse">
+        <div className="mt-12 text-gray-400 text-[11px] font-black uppercase tracking-widest animate-pulse">
           Scroll to explore more
         </div>
       </div>
@@ -212,7 +215,7 @@ const Checkout: React.FC = () => {
       <SEO title="Secure Reservation" description="Finalize your luxury stay at C1002 Quarters." />
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
         <div className="mb-10 max-w-[960px] mx-auto text-center">
-          <span className="text-gold text-[10px] font-black uppercase tracking-[0.4em] mb-4 block">Secure Reservation</span>
+          <span className="text-gold text-[11px] font-black uppercase tracking-[0.4em] mb-4 block">Secure Reservation</span>
           <h1 className="text-2xl md:text-4xl font-black font-serif mb-4 text-charcoal">Confirm Your Stay</h1>
           <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4 max-w-xs mx-auto">
             <div className={`bg-gold h-full transition-all duration-500`} style={{ width: paymentMethod === 'paystack' ? '100%' : '85%' }} />
@@ -225,19 +228,19 @@ const Checkout: React.FC = () => {
               <h2 className="text-xl md:text-2xl font-black font-serif mb-6 md:mb-10 text-charcoal">Guest Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">First Name</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-gold mb-3 block">First Name</label>
                   <input required type="text" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} className="w-full rounded-2xl border-gray-100 bg-gray-50/50 py-5 px-6 focus:ring-primary focus:border-primary text-sm font-medium outline-none" placeholder="John" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Last Name</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-gold mb-3 block">Last Name</label>
                   <input required type="text" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} className="w-full rounded-2xl border-gray-100 bg-gray-50/50 py-5 px-6 focus:ring-primary focus:border-primary text-sm font-medium outline-none" placeholder="Doe" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Email Address</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-gold mb-3 block">Email Address</label>
                   <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full rounded-2xl border-gray-100 bg-gray-50/50 py-5 px-6 focus:ring-primary focus:border-primary text-sm font-medium outline-none" placeholder="john.doe@example.com" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Phone Number</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-gold mb-3 block">Phone Number</label>
                   <input required type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full rounded-2xl border-gray-100 bg-gray-50/50 py-5 px-6 focus:ring-primary focus:border-primary text-sm font-medium outline-none" placeholder="+233..." />
                 </div>
               </div>
@@ -298,7 +301,7 @@ const Checkout: React.FC = () => {
                   </button>
                 )}
 
-                <p className="mt-6 text-center text-[10px] uppercase font-black tracking-widest text-gray-400">
+                <p className="mt-6 text-center text-[11px] uppercase font-black tracking-widest text-gray-400">
                   By clicking, you agree to our booking policy and terms of service.
                 </p>
               </div>
@@ -312,18 +315,18 @@ const Checkout: React.FC = () => {
                 <img src={room.image} className="w-full h-full object-cover" alt={room.name} />
                 <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent" />
                 <div className="absolute bottom-6 left-6">
-                  <p className="text-gold text-[9px] font-black uppercase tracking-[0.2em] mb-1">Your Selection</p>
+                  <p className="text-gold text-[11px] font-black uppercase tracking-[0.2em] mb-1">Your Selection</p>
                   <h3 className="text-white text-xl font-black font-serif">{room.name}</h3>
                 </div>
               </div>
               <div className="p-10">
                 <div className="grid grid-cols-2 gap-8 py-8 border-b border-gray-50 mb-8">
                   <div>
-                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2">Check in</p>
+                    <p className="text-gray-400 text-[11px] font-black uppercase tracking-widest mb-2">Check in</p>
                     <p className="font-bold text-charcoal">{dates?.formattedCheckIn || 'Flexible'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2">Duration</p>
+                    <p className="text-gray-400 text-[11px] font-black uppercase tracking-widest mb-2">Duration</p>
                     <p className="font-bold text-charcoal">{nights} Night{nights > 1 ? 's' : ''}</p>
                   </div>
                 </div>

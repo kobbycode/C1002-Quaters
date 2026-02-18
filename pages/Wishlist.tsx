@@ -47,7 +47,7 @@ const Wishlist: React.FC = () => {
       <div className="max-w-[1280px] mx-auto px-6 md:px-10">
         <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-12">
           <div className="animate-fade-in">
-            <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Your Saved Rooms</span>
+            <span className="text-gold font-black uppercase tracking-[0.4em] text-[11px] mb-4 block">Your Saved Rooms</span>
             <h1 className="text-3xl md:text-5xl font-black font-serif text-charcoal mb-2">My Wishlist</h1>
             <p className="text-gray-400 text-sm font-medium tracking-wide">
               {wishlistRooms.length === 0
@@ -83,7 +83,7 @@ const Wishlist: React.FC = () => {
                     </svg>
                   </button>
                   <div className="absolute top-4 left-4">
-                    <span className="bg-charcoal/80 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider text-white border border-white/10">
+                    <span className="bg-charcoal/80 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-white border border-white/10">
                       {room.category}
                     </span>
                   </div>
@@ -99,7 +99,7 @@ const Wishlist: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-6 mb-8 text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] border-y border-gray-50 py-4">
+                  <div className="flex items-center gap-6 mb-8 text-[11px] text-gray-400 font-bold uppercase tracking-[0.2em] border-y border-gray-50 py-4">
                     <span className="flex items-center gap-2">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                       {room.size}
@@ -112,11 +112,11 @@ const Wishlist: React.FC = () => {
 
                   <div className="mt-auto flex items-center justify-between">
                     <div>
-                      <p className="text-gray-400 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Nightly</p>
+                      <p className="text-gray-400 text-[11px] uppercase font-black tracking-[0.2em] mb-1">Nightly</p>
                       <p className="text-xl md:text-2xl font-black text-charcoal font-serif">{formatPrice(room.price, config.currency)}</p>
                     </div>
-                    <Link to={`/rooms/${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.2em] text-xs">
-                      View Details
+                    <Link to={`/rooms/${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-3 md:py-4 px-6 md:px-8 rounded-xl transition-all shadow-lg hover:shadow-primary/30 uppercase tracking-[0.2em] text-[11px]">
+                      View Room
                     </Link>
                   </div>
                 </div>
@@ -136,9 +136,9 @@ const Wishlist: React.FC = () => {
             </p>
             <Link
               to="/rooms"
-              className="inline-flex items-center justify-center bg-charcoal text-white font-black px-6 md:px-12 py-3 md:py-5 rounded-2xl hover:bg-primary transition-all shadow-2xl uppercase tracking-[0.2em] text-xs"
+              className="inline-flex items-center justify-center bg-charcoal text-white font-black px-6 md:px-12 py-3 md:py-5 rounded-2xl hover:bg-primary transition-all shadow-2xl uppercase tracking-[0.2em] text-[11px]"
             >
-              Discover Our Rooms
+              Browse Rooms
             </Link>
           </div>
         )}

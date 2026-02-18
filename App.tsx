@@ -14,37 +14,52 @@ import Wishlist from './pages/Wishlist';
 import Amenities from './pages/Amenities';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import Profile from './pages/Profile';
 import { AuthGuard } from './components/AuthGuard';
+import { AuthProvider } from './context/AuthContext';
 
 const App: React.FC = () => {
   return (
     <ToastProvider>
-      <SiteProvider>
-        <Router>
-          <Toast />
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/rooms" element={<Rooms />} />
-              <Route path="/rooms/:id" element={<RoomDetail />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/amenities" element={<Amenities />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/admin"
-                element={
+      <AuthProvider>
+        <SiteProvider>
+          <Router>
+            <Toast />
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/rooms" element={<Rooms />} />
+                <Route path="/rooms/:id" element={<RoomDetail />} />
+                <Route path="/checkout" element={
                   <AuthGuard>
-                    <Admin />
+                    <Checkout />
                   </AuthGuard>
-                }
-              />
-            </Routes>
-          </Layout>
-        </Router>
-      </SiteProvider>
+                } />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/amenities" element={<Amenities />} />
+                <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/profile" element={
+                  <AuthGuard>
+                    <Profile />
+                  </AuthGuard>
+                } />
+                <Route
+                  path="/admin"
+                  element={
+                    <AuthGuard requireAdmin>
+                      <Admin />
+                    </AuthGuard>
+                  }
+                />
+              </Routes>
+            </Layout>
+          </Router>
+        </SiteProvider>
+      </AuthProvider>
     </ToastProvider>
   );
 };

@@ -1,30 +1,46 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../utils/firebase';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { isUserAdmin } from '../utils/auth-utils';
 import { useSite } from '../context/SiteContext';
 
-const Login = () => {
+const SignUp = () => {
     const { config } = useSite();
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Get the return path from location state, default to specific role dashboards
+    // Get the return path from location state
     const from = (location.state as any)?.from?.pathname;
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        if (password !== confirmPassword) {
+            setError("Passwords don't match.");
+            return;
+        }
+
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters.");
+            return;
+        }
+
         setLoading(true);
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, {
+                displayName: name
+            });
 
             // Use centralized admin check
             const isAdmin = isUserAdmin(email, config);
@@ -36,9 +52,14 @@ const Login = () => {
             } else {
                 navigate('/profile');
             }
+
         } catch (err: any) {
             console.error(err);
-            setError('Invalid email or password.');
+            if (err.code === 'auth/email-already-in-use') {
+                setError('Email is already registered.');
+            } else {
+                setError('Failed to create account. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -46,10 +67,10 @@ const Login = () => {
 
     return (
         <div className="min-h-screen bg-background-light flex items-center justify-center p-6 pt-24">
-            <div className="w-full max-w-md bg-white rounded-[2rem] p-10 shadow-2xl animate-fade-in">
+            <div className="w-full max-w-md bg-white rounded-[2rem] p-8 md:p-10 shadow-2xl animate-fade-in">
                 <div className="text-center mb-10">
-                    <h1 className="text-3xl font-serif italic text-charcoal mb-2">Welcome Back</h1>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gold">Member Access</p>
+                    <h1 className="text-3xl font-serif italic text-charcoal mb-2">Join C1002 Quarters</h1>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gold">Create Your Account</p>
                 </div>
 
                 {error && (
@@ -58,7 +79,19 @@ const Login = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleLogin} className="space-y-6">
+                <form onSubmit={handleSignUp} className="space-y-5">
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Full Name</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-charcoal font-medium outline-none focus:border-gold transition-colors"
+                            placeholder="John Doe"
+                            required
+                        />
+                    </div>
+
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Email</label>
                         <input
@@ -83,20 +116,32 @@ const Login = () => {
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Confirm Password</label>
+                        <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-charcoal font-medium outline-none focus:border-gold transition-colors"
+                            placeholder="••••••••"
+                            required
+                        />
+                    </div>
+
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gold text-white py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gold-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                        className="w-full bg-charcoal text-white py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                     >
-                        {loading ? 'Authenticating...' : 'Sign In'}
+                        {loading ? 'Creating Account...' : 'Sign Up'}
                     </button>
                 </form>
 
                 <div className="mt-8 text-center">
                     <p className="text-xs text-gray-400 font-medium">
-                        New to C1002 Quarters?{' '}
-                        <Link to="/signup" state={{ from: (location.state as any)?.from }} className="text-gold font-bold hover:underline">
-                            Create an Account
+                        Already have an account?{' '}
+                        <Link to="/login" state={{ from: (location.state as any)?.from }} className="text-gold font-bold hover:underline">
+                            Log In
                         </Link>
                     </p>
                 </div>
@@ -105,4 +150,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default SignUp;

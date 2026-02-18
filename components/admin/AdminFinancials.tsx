@@ -3,8 +3,17 @@ import { useSite } from '../../context/SiteContext';
 import { formatPrice } from '../../utils/formatters';
 import { ExportService } from '../../utils/export-service';
 
+import { useAnalytics } from '../../hooks/useAnalytics';
+
 export const AdminFinancials: React.FC = () => {
-    const { rooms, bookings, config } = useSite();
+    const { rooms, bookings, reviews, config } = useSite();
+
+    const { financialData } = useAnalytics({
+        rooms,
+        bookings,
+        reviews,
+        config
+    });
 
     const roiData = useMemo(() => {
         return rooms.map(room => {
@@ -19,15 +28,18 @@ export const AdminFinancials: React.FC = () => {
             const netProfit = grossRevenue - operationalCosts - (maintenance * 6); // Look at 6 months as default window
             const margin = grossRevenue > 0 ? (netProfit / grossRevenue) * 100 : 0;
 
+            // Find current occupancy from centralized data if available, or fallback
+            const perf = financialData.roomPerformance.find(p => p.id === room.id);
+
             return {
                 ...room,
                 grossRevenue,
                 netProfit,
                 margin: Math.round(margin),
-                occupancy: Math.round((roomBookings.length / 30) * 100) // Simple monthly estimate
+                occupancy: perf ? perf.occupancy : Math.round((roomBookings.length / 30) * 100)
             };
         }).sort((a, b) => b.netProfit - a.netProfit);
-    }, [rooms, bookings]);
+    }, [rooms, bookings, financialData.roomPerformance]);
 
     const portfolioMetrics = useMemo(() => {
         const totalGross = roiData.reduce((acc, r) => acc + r.grossRevenue, 0);
@@ -46,10 +58,8 @@ export const AdminFinancials: React.FC = () => {
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ROI & Net Yield Analysis</p>
                 </div>
                 <button
-                    onClick={() => ExportService.exportFinancialsToPDF({ ...portfolioMetrics, roomPerformance: roiData, occupancyRate: 0, revPAR: '0', avgStayDuration: 0, forecastedRevenue: 0, strategicInsight: 'See full report for details.' }, bookings, config)}
-                    // Note: Passing placeholder stats for now as full stats calculation is inside AdminOverview. 
-                    // Ideally, stats calculation should be moved to a context or hook for shared access.
-                    // For this MVP, we will let it generate with available data.
+                    onClick={() => ExportService.exportFinancialsToPDF(financialData, bookings, config)}
+                    // Passing real financialData now!
                     className="bg-charcoal text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-charcoal/20 flex items-center gap-2"
                 >
                     <span className="text-lg">📄</span> Download Report
