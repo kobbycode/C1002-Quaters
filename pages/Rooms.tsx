@@ -190,9 +190,14 @@ const Rooms: React.FC = () => {
 
   const allAmenities = useMemo(() => {
     const set = new Set<string>();
-    rooms.forEach(room => room.amenities.forEach(a => set.add(a)));
+    rooms.forEach(room => room.amenities.forEach(a => {
+      // Only add if it exists in the registry
+      if (config.amenityDetails[a]) {
+        set.add(a);
+      }
+    }));
     return Array.from(set).sort();
-  }, [rooms]);
+  }, [rooms, config.amenityDetails]);
 
   useEffect(() => {
     const category = searchParams.get('category');
@@ -658,12 +663,14 @@ const Rooms: React.FC = () => {
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-8">
-                  {selectedRoom.amenities.slice(0, 4).map(a => (
-                    <span key={a} className="bg-background-light px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-charcoal/50 border border-gray-100">
-                      {a}
-                    </span>
-                  ))}
-                  {selectedRoom.amenities.length > 4 && <span className="text-[10px] text-gray-300 font-bold self-center">+{selectedRoom.amenities.length - 4}</span>}
+                  {selectedRoom.amenities
+                    .filter(a => config.amenityDetails[a]) // Filter valid amenities
+                    .slice(0, 4).map(a => (
+                      <span key={a} className="bg-background-light px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-charcoal/50 border border-gray-100">
+                        {a}
+                      </span>
+                    ))}
+                  {selectedRoom.amenities.filter(a => config.amenityDetails[a]).length > 4 && <span className="text-[10px] text-gray-300 font-bold self-center">+{selectedRoom.amenities.filter(a => config.amenityDetails[a]).length - 4}</span>}
                 </div>
 
                 <div className="flex items-center justify-between pt-6 border-t border-gray-50">
@@ -696,12 +703,14 @@ const Rooms: React.FC = () => {
             </div>
 
             <div className="flex flex-wrap gap-1.5 mb-5">
-              {selectedRoom.amenities.slice(0, 3).map(a => (
-                <span key={a} className="bg-background-light px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider text-charcoal/50 border border-gray-100">
-                  {a}
-                </span>
-              ))}
-              {selectedRoom.amenities.length > 3 && <span className="text-[10px] text-gray-300 font-bold self-center">+{selectedRoom.amenities.length - 3}</span>}
+              {selectedRoom.amenities
+                .filter(a => config.amenityDetails[a])
+                .slice(0, 3).map(a => (
+                  <span key={a} className="bg-background-light px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider text-charcoal/50 border border-gray-100">
+                    {a}
+                  </span>
+                ))}
+              {selectedRoom.amenities.filter(a => config.amenityDetails[a]).length > 3 && <span className="text-[10px] text-gray-300 font-bold self-center">+{selectedRoom.amenities.filter(a => config.amenityDetails[a]).length - 3}</span>}
             </div>
 
             <Link

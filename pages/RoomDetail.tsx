@@ -388,12 +388,15 @@ const RoomDetail: React.FC = () => {
   const categorizedAmenities: Record<string, string[]> = useMemo(() => {
     if (!room) return {};
     const groups: Record<string, string[]> = {};
-    room.amenities.forEach((item) => {
-      const detail = config.amenityDetails[item];
-      const category = detail?.category || 'General';
-      if (!groups[category]) groups[category] = [];
-      groups[category].push(item);
-    });
+    room.amenities
+      .filter(item => config.amenityDetails[item]) // Only show amenities that exist in registry
+      .forEach((item) => {
+        const detail = config.amenityDetails[item];
+        const category = detail?.category || 'General';
+        if (!groups[category]) groups[category] = [];
+        groups[category].push(item);
+      });
+    return groups;
     return groups;
   }, [room, config.amenityDetails]);
 
