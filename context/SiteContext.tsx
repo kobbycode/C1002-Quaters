@@ -70,13 +70,13 @@ const DEFAULT_CONFIG: SiteConfig = {
   },
   categories: ['Deluxe', 'Executive', 'Presidential', 'Villa'],
   amenityDetails: {
-    '65" Smart TV': { icon: 'tv', description: '4K resolution with pre-installed streaming services.', category: 'Entertainment & Tech' },
-    'WiFi': { icon: 'wifi', description: 'High-speed fiber connectivity throughout the suite.', category: 'Entertainment & Tech' },
-    'Office Desk': { icon: 'desk', description: 'Ergonomic workspace with integrated power outlets.', category: 'Entertainment & Tech' },
-    'Nespresso Machine': { icon: 'coffee', description: 'Complimentary premium capsules replenished daily.', category: 'Comfort & Refreshment' },
-    'Rain Shower': { icon: 'shower', description: 'Oversized rainfall fixture with adjustable pressure.', category: 'Bath & Refreshment' },
-    'Butler Service': { icon: 'user', description: 'Personal attendant available 24/7 for all needs.', category: 'Service & Elite' },
-    'Private Garden': { icon: 'leaf', description: 'Personal botanic space for meditation.', category: 'Comfort & Refreshment' }
+    '65" Smart TV': { icon: 'tv', description: '4K resolution with pre-installed streaming services.', category: 'Entertainment & Tech', image: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&q=80&w=1200' },
+    'WiFi': { icon: 'wifi', description: 'High-speed fiber connectivity throughout the suite.', category: 'Entertainment & Tech', image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=1200' },
+    'Office Desk': { icon: 'desk', description: 'Ergonomic workspace with integrated power outlets.', category: 'Entertainment & Tech', image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=1200' },
+    'Nespresso Machine': { icon: 'coffee', description: 'Complimentary premium capsules replenished daily.', category: 'Comfort & Refreshment', image: 'https://images.unsplash.com/photo-1517701604599-bb23b335c0a6?auto=format&fit=crop&q=80&w=1200' },
+    'Rain Shower': { icon: 'shower', description: 'Oversized rainfall fixture with adjustable pressure.', category: 'Bath & Refreshment', image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200' },
+    'Butler Service': { icon: 'user', description: 'Personal attendant available 24/7 for all needs.', category: 'Service & Elite', image: 'https://images.unsplash.com/photo-1582213706822-22c608051253?auto=format&fit=crop&q=80&w=1200' },
+    'Private Garden': { icon: 'leaf', description: 'Personal botanic space for meditation.', category: 'Comfort & Refreshment', image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=1200' }
   },
   newsletterSubscribers: [],
   heroSlides: [

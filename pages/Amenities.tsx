@@ -69,18 +69,41 @@ const Amenities: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {items.map((amenity, idx) => (
-                  <div key={idx} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:shadow-gold/10 transition-all duration-500 hover:-translate-y-2 group/card">
-                    <div className="w-16 h-16 rounded-2xl bg-cream border border-gold/10 flex items-center justify-center text-gold mb-6 group-hover/card:bg-gold group-hover/card:text-white transition-colors duration-500">
-                      {DEFAULT_AMENITY_ICONS[amenity.name] || (
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
+                  <div key={idx} className="group/card relative bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:shadow-gold/10 transition-all duration-700 hover:-translate-y-2 flex flex-col h-full">
+                    {/* Image Header */}
+                    <div className="relative aspect-[16/10] overflow-hidden shrink-0">
+                      <img
+                        src={amenity.image || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=800'}
+                        alt={amenity.name}
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
+
+                      {/* Floating Icon Overlay */}
+                      <div className="absolute top-6 left-6 w-12 h-12 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/20 flex items-center justify-center text-gold shadow-lg group-hover/card:bg-gold group-hover/card:text-white transition-all duration-500 transform group-hover/card:scale-110">
+                        {DEFAULT_AMENITY_ICONS[amenity.name] ? (
+                          React.cloneElement(DEFAULT_AMENITY_ICONS[amenity.name] as React.ReactElement, { className: 'w-6 h-6' })
+                        ) : (
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
                     </div>
-                    <h3 className="text-lg font-black text-charcoal mb-3 group-hover/card:text-primary transition-colors">{amenity.name}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed font-medium">
-                      {formatLuxuryText(amenity.description)}
-                    </p>
+
+                    {/* Content Section */}
+                    <div className="p-8 flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="w-1.5 h-1.5 rounded-full bg-gold" />
+                        <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em]">{category}</p>
+                      </div>
+                      <h3 className="text-xl font-black text-charcoal mb-4 group-hover/card:text-primary transition-colors leading-tight">
+                        {amenity.name}
+                      </h3>
+                      <p className="text-gray-400 text-sm leading-relaxed font-light italic">
+                        "{formatLuxuryText(amenity.description)}"
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>

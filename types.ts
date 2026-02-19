@@ -39,6 +39,7 @@ export interface AmenityDetail {
   icon: string;
   description: string;
   category: string;
+  image?: string;
 }
 
 export interface HeroSlide {
