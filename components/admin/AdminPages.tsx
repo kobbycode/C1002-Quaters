@@ -5,15 +5,11 @@ import { useToast } from '../../context/ToastContext';
 interface AdminPagesProps {
     config: SiteConfig;
     updateConfig: (config: SiteConfig) => void;
-    handleAiWriter: (field: 'description' | 'hero' | 'tagline' | 'about' | 'contact', context: string) => Promise<string | null | void>;
-    isAiGenerating: boolean;
 }
 
 export const AdminPages: React.FC<AdminPagesProps> = ({
     config,
-    updateConfig,
-    handleAiWriter,
-    isAiGenerating
+    updateConfig
 }) => {
     const { showToast } = useToast();
     const [editingAboutPage, setEditingAboutPage] = useState(false);
@@ -130,16 +126,6 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                             <div>
                                 <div className="flex justify-between items-end mb-3">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Heritage Narrative - Phase I</label>
-                                    <button
-                                        onClick={async () => {
-                                            const result = await handleAiWriter('about', 'heritage background phase 1');
-                                            if (result) updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription1: result } });
-                                        }}
-                                        disabled={isAiGenerating}
-                                        className="text-[9px] font-black uppercase text-primary flex items-center gap-1 hover:underline disabled:opacity-50"
-                                    >
-                                        <span>{isAiGenerating ? 'Generating...' : '✨ AI Draft'}</span>
-                                    </button>
                                 </div>
                                 <textarea
                                     rows={4}
@@ -152,16 +138,6 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                             <div>
                                 <div className="flex justify-between items-end mb-3">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Heritage Narrative - Phase II</label>
-                                    <button
-                                        onClick={async () => {
-                                            const result = await handleAiWriter('about', 'heritage background phase 2');
-                                            if (result) updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription2: result } });
-                                        }}
-                                        disabled={isAiGenerating}
-                                        className="text-[9px] font-black uppercase text-primary flex items-center gap-1 hover:underline disabled:opacity-50"
-                                    >
-                                        <span>{isAiGenerating ? 'Generating...' : '✨ AI Draft'}</span>
-                                    </button>
                                 </div>
                                 <textarea
                                     rows={4}
@@ -264,25 +240,13 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                         <div className="space-y-8">
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Hero Narrative Lead</label>
-                                <div className="relative">
-                                    <textarea
-                                        rows={3}
-                                        value={config.contactPage?.heroDescription || ''}
-                                        onChange={e => updateConfig({ ...config, contactPage: { ...(config.contactPage || {}), heroDescription: e.target.value } })}
-                                        className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium outline-none focus:ring-2 ring-gold/20 pr-24"
-                                        placeholder="Inviting guests to connect..."
-                                    />
-                                    <button
-                                        onClick={async () => {
-                                            const result = await handleAiWriter('contact', 'contact page greeting');
-                                            if (result) updateConfig({ ...config, contactPage: { ...(config.contactPage || {}), heroDescription: result } });
-                                        }}
-                                        disabled={isAiGenerating}
-                                        className="absolute bottom-6 right-6 text-[9px] font-black uppercase text-primary bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100 disabled:opacity-50"
-                                    >
-                                        <span>{isAiGenerating ? 'Generating...' : '✨ AI Write'}</span>
-                                    </button>
-                                </div>
+                                <textarea
+                                    rows={3}
+                                    value={config.contactPage?.heroDescription || ''}
+                                    onChange={e => updateConfig({ ...config, contactPage: { ...(config.contactPage || {}), heroDescription: e.target.value } })}
+                                    className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium outline-none focus:ring-2 ring-gold/20"
+                                    placeholder="Inviting guests to connect..."
+                                />
                             </div>
 
                             <div>

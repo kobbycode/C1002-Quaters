@@ -13,6 +13,7 @@ export interface Room {
   view: string;
   amenities: string[];
   category: string;
+  tags?: string[]; // Array of tags like 'Best Seller', 'Popular'
   isBestSeller?: boolean;
   isElite?: boolean;
   maintenanceCost?: number; // Monthly maintenance cost
@@ -63,6 +64,7 @@ export interface SiteConfig {
   navLinks: NavLink[];
   footer: FooterConfig;
   categories: string[];
+  roomTags: string[]; // Global registry of available tags
   amenityDetails: Record<string, AmenityDetail>;
   newsletterSubscribers: string[];
   heroSlides: HeroSlide[];

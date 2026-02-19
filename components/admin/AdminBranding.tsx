@@ -5,15 +5,11 @@ import { formatLuxuryText } from '../../utils/formatters';
 interface AdminBrandingProps {
     config: SiteConfig;
     updateConfig: (config: SiteConfig) => void;
-    handleAiWriter: (field: 'description' | 'hero' | 'tagline', context: string) => Promise<void>;
-    isAiGenerating: boolean;
 }
 
 export const AdminBranding: React.FC<AdminBrandingProps> = ({
     config,
-    updateConfig,
-    handleAiWriter,
-    isAiGenerating
+    updateConfig
 }) => {
     return (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 animate-fade-in">
@@ -47,19 +43,6 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                     className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5 text-sm font-medium focus:border-gold outline-none transition-all"
                                 />
                             </div>
-                            <button
-                                onClick={async () => {
-                                    const result = await handleAiWriter('tagline', config.brand?.name || '');
-                                    if (result) updateConfig({ ...config, brand: { ...(config.brand || {}), tagline: result } });
-                                }}
-                                disabled={isAiGenerating}
-                                className="h-[58px] px-6 bg-charcoal text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gold transition-all disabled:opacity-50 hover-lift flex items-center gap-2"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                                {isAiGenerating ? 'Generating...' : 'AI Rewrite'}
-                            </button>
                         </div>
 
                         <div>

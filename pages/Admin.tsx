@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import { useToast } from '../context/ToastContext';
 import { Room, NavLink, HeroSlide, AmenityDetail, Booking } from '../types';
-import { useAiWriter } from '../hooks/useAiWriter';
 import { formatLuxuryText } from '../utils/formatters';
 import { db, auth } from '../utils/firebase';
 import { signOut } from 'firebase/auth';
@@ -100,30 +99,6 @@ const Admin: React.FC = () => {
 
 
 
-  const { generateContent, isAiGenerating } = useAiWriter({
-    apiKey: process.env.API_KEY || '',
-    brandVoice: config.brand.voice
-  });
-
-  const handleAiWriter = async (field: 'description' | 'hero' | 'tagline' | 'about' | 'contact', context: string) => {
-    try {
-      const textResult = await generateContent(field, context);
-      if (!textResult) return;
-
-      if (field === 'description' && editingRoom) {
-        setEditingRoom({ ...editingRoom, description: textResult });
-      } else if (field === 'tagline') {
-        updateConfig({ ...config, brand: { ...config.brand, tagline: textResult } });
-      } else if (field === 'about') {
-        // This is handled via callbacks in the future if needed, 
-        // but for now we'll allow components to use it directly
-        return textResult;
-      }
-      return textResult;
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const handleSaveRoom = () => {
     if (!editingRoom || !editingRoom.id) return;
@@ -279,8 +254,6 @@ const Admin: React.FC = () => {
             <AdminBranding
               config={config}
               updateConfig={updateConfig}
-              handleAiWriter={handleAiWriter}
-              isAiGenerating={isAiGenerating}
             />
           )}
 
@@ -340,8 +313,6 @@ const Admin: React.FC = () => {
             <AdminPages
               config={config}
               updateConfig={updateConfig}
-              handleAiWriter={handleAiWriter}
-              isAiGenerating={isAiGenerating}
             />
           )}
 
@@ -350,8 +321,6 @@ const Admin: React.FC = () => {
             <AdminGym
               config={config}
               updateConfig={updateConfig}
-              handleAiWriter={handleAiWriter}
-              isAiGenerating={isAiGenerating}
             />
           )}
 
@@ -429,8 +398,6 @@ const Admin: React.FC = () => {
         editingRoom={editingRoom}
         setEditingRoom={setEditingRoom}
         onSave={handleSaveRoom}
-        handleAiWriter={handleAiWriter}
-        isAiGenerating={isAiGenerating}
       />
 
       <AdminHeroModal

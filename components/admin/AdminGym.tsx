@@ -5,15 +5,11 @@ import { useToast } from '../../context/ToastContext';
 interface AdminGymProps {
     config: SiteConfig;
     updateConfig: (config: SiteConfig) => void;
-    handleAiWriter?: (field: 'description' | 'hero' | 'tagline' | 'about' | 'contact', context: string) => Promise<string | null | void>;
-    isAiGenerating?: boolean;
 }
 
 export const AdminGym: React.FC<AdminGymProps> = ({
     config,
-    updateConfig,
-    handleAiWriter,
-    isAiGenerating
+    updateConfig
 }) => {
     const { showToast } = useToast();
 

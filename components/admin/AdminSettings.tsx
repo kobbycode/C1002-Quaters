@@ -13,6 +13,8 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
     const { showToast } = useToast();
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editValue, setEditValue] = useState('');
+    const [editingTagIndex, setEditingTagIndex] = useState<number | null>(null);
+    const [editTagValue, setEditTagValue] = useState('');
 
     const handleExportConfig = () => {
         const dataStr = JSON.stringify(config, null, 2);
@@ -57,6 +59,42 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
         }
 
         setEditingIndex(null);
+    };
+
+    const handleSaveTagEdit = (idx: number) => {
+        const oldValue = (config.roomTags || [])[idx];
+        const newValue = editTagValue.trim();
+
+        if (!newValue || newValue === oldValue) {
+            setEditingTagIndex(null);
+            return;
+        }
+
+        if ((config.roomTags || []).includes(newValue)) {
+            showToast('Tag already exists', 'error');
+            return;
+        }
+
+        // Update config
+        const newTags = [...(config.roomTags || [])];
+        newTags[idx] = newValue;
+        updateConfig({ ...config, roomTags: newTags });
+
+        // Update rooms
+        const roomsToUpdate = rooms.filter(r => r.tags?.includes(oldValue));
+        if (roomsToUpdate.length > 0) {
+            const updatedRooms = rooms.map(r =>
+                r.tags?.includes(oldValue)
+                    ? { ...r, tags: r.tags.map(t => t === oldValue ? newValue : t) }
+                    : r
+            );
+            updateRooms(updatedRooms);
+            showToast(`Tag renamed and ${roomsToUpdate.length} rooms updated`, 'success');
+        } else {
+            showToast('Tag renamed', 'success');
+        }
+
+        setEditingTagIndex(null);
     };
 
     const handleImportConfig = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,6 +274,112 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                             <button
                                 type="submit"
                                 className="bg-charcoal text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg"
+                            >
+                                Add
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {/* Tag Management Card */}
+            <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-bl-full pointer-events-none" />
+                <div className="relative z-10">
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="w-1.5 h-6 bg-gold rounded-full" />
+                        <h2 className="text-2xl font-black font-serif text-charcoal">Room Tags</h2>
+                    </div>
+
+                    <div className="space-y-4 mb-8">
+                        {(config.roomTags || []).map((tag, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 group hover:border-gold/30 transition-all">
+                                {editingTagIndex === idx ? (
+                                    <div className="flex-1 flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={editTagValue}
+                                            onChange={(e) => setEditTagValue(e.target.value)}
+                                            className="flex-1 bg-white border border-gold/30 rounded-lg px-3 py-1 text-sm font-bold outline-none"
+                                            autoFocus
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleSaveTagEdit(idx);
+                                                if (e.key === 'Escape') setEditingTagIndex(null);
+                                            }}
+                                        />
+                                        <button onClick={() => handleSaveTagEdit(idx)} className="text-green-500 hover:text-green-600 font-bold text-[10px] uppercase">Save</button>
+                                        <button onClick={() => setEditingTagIndex(null)} className="text-gray-400 hover:text-gray-600 font-bold text-[10px] uppercase">Cancel</button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span className="text-sm font-bold text-charcoal">{tag}</span>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    setEditingTagIndex(idx);
+                                                    setEditTagValue(tag);
+                                                }}
+                                                className="text-gray-400 hover:text-gold p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                title="Edit Tag"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm(`Are you sure you want to delete the tag "${tag}"? This will remove it from all rooms.`)) {
+                                                        const newTags = config.roomTags.filter(t => t !== tag);
+                                                        const updatedRooms = rooms.map(r => ({
+                                                            ...r,
+                                                            tags: r.tags?.filter(t => t !== tag) || []
+                                                        }));
+                                                        updateConfig({ ...config, roomTags: newTags });
+                                                        updateRooms(updatedRooms);
+                                                        showToast(`Tag "${tag}" removed from registry and rooms`);
+                                                    }
+                                                }}
+                                                className="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                title="Delete Tag"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        ))}
+                        {(!config.roomTags || config.roomTags.length === 0) && (
+                            <p className="text-xs text-gray-400 italic text-center py-4">No tags defined. Add tags like "Best Seller" or "Popular".</p>
+                        )}
+                    </div>
+
+                    <div className="pt-6 border-t border-gray-100">
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const form = e.currentTarget;
+                                const input = form.elements.namedItem('newTag') as HTMLInputElement;
+                                const val = input.value.trim();
+                                if (val && !(config.roomTags || []).includes(val)) {
+                                    updateConfig({ ...config, roomTags: [...(config.roomTags || []), val] });
+                                    showToast(`Tag "${val}" added`);
+                                    input.value = '';
+                                } else if ((config.roomTags || []).includes(val)) {
+                                    showToast('Tag already exists', 'error');
+                                }
+                            }}
+                            className="flex gap-2"
+                        >
+                            <input
+                                name="newTag"
+                                type="text"
+                                placeholder="Add new tag..."
+                                className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold focus:border-gold outline-none transition-all"
+                            />
+                            <button
+                                type="submit"
+                                className="bg-charcoal text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold transition-all shadow-lg"
                             >
                                 Add
                             </button>

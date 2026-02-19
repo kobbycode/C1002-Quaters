@@ -8,16 +8,12 @@ interface AdminRoomModalProps {
     editingRoom: Partial<Room> | null;
     setEditingRoom: (room: Partial<Room> | null) => void;
     onSave: () => void;
-    handleAiWriter: (field: 'description', context: string) => Promise<string | null | void>;
-    isAiGenerating: boolean;
 }
 
 export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
     editingRoom,
     setEditingRoom,
-    onSave,
-    handleAiWriter,
-    isAiGenerating
+    onSave
 }) => {
     const { showToast } = useToast();
     const { config } = useSite();
@@ -80,6 +76,34 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                         </select>
                     </div>
 
+                    <div className="col-span-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Room Spec Tags</label>
+                        <div className="flex flex-wrap gap-2">
+                            {(config.roomTags || []).map(tag => (
+                                <button
+                                    key={tag}
+                                    type="button"
+                                    onClick={() => {
+                                        const currentTags = editingRoom.tags || [];
+                                        const newTags = currentTags.includes(tag)
+                                            ? currentTags.filter(t => t !== tag)
+                                            : [...currentTags, tag];
+                                        setEditingRoom({ ...editingRoom, tags: newTags });
+                                    }}
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${(editingRoom.tags || []).includes(tag)
+                                            ? 'bg-gold text-white shadow-lg shadow-gold/20'
+                                            : 'bg-gray-50 text-gray-400 border border-gray-100 hover:border-gold/30'
+                                        }`}
+                                >
+                                    {tag}
+                                </button>
+                            ))}
+                            {(!config.roomTags || config.roomTags.length === 0) && (
+                                <p className="text-[9px] text-gray-400 italic">No tags defined in Settings.</p>
+                            )}
+                        </div>
+                    </div>
+
                     <div className="col-span-2 md:col-span-1">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Price ({config.currency || 'GHS'})</label>
                         <input
@@ -137,16 +161,6 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                     <div className="col-span-2">
                         <div className="flex justify-between items-center mb-3">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Narrative Description</label>
-                            <button
-                                onClick={async () => {
-                                    const result = await handleAiWriter('description', editingRoom.name || '');
-                                    if (result) setEditingRoom({ ...editingRoom, description: result });
-                                }}
-                                disabled={isAiGenerating || !editingRoom.name}
-                                className="text-[9px] font-black uppercase text-primary hover:underline disabled:opacity-50"
-                            >
-                                {isAiGenerating ? 'AI Scripting...' : '✨ AI Rewrite'}
-                            </button>
                         </div>
                         <textarea
                             value={editingRoom.description || ''}
