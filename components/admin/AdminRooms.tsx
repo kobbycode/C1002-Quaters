@@ -161,13 +161,44 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                         <div className="aspect-[16/10] relative overflow-hidden">
                             <img src={room.image} alt={room.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60" />
-                            <div className="absolute top-6 left-6 flex flex-col gap-2">
-                                {room.isBestSeller && (
-                                    <span className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-primary shadow-lg border border-white/20">Popular Choice</span>
-                                )}
-                                {room.isElite && (
-                                    <span className="bg-primary px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-lg border border-primary/20">Top Pick</span>
-                                )}
+                            <div className="absolute top-6 right-6 flex flex-col items-end gap-2">
+                                {(() => {
+                                    const todayStr = new Date().toISOString().split('T')[0];
+                                    const activeBooking = bookings.find(b =>
+                                        b.roomId === room.id &&
+                                        b.isoCheckIn <= todayStr &&
+                                        b.isoCheckOut > todayStr &&
+                                        b.status !== 'cancelled'
+                                    );
+
+                                    if (activeBooking) {
+                                        return (
+                                            <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl border border-red-100 shadow-xl flex flex-col items-end animate-pulse">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-red-500">Occupied</span>
+                                                </div>
+                                                <span className="text-[8px] font-bold text-gray-400 uppercase mt-0.5">Until {activeBooking.isoCheckOut}</span>
+                                            </div>
+                                        );
+                                    }
+
+                                    const nextBooking = bookings
+                                        .filter(b => b.roomId === room.id && b.isoCheckIn > todayStr && b.status !== 'cancelled')
+                                        .sort((a, b) => a.isoCheckIn.localeCompare(b.isoCheckIn))[0];
+
+                                    return (
+                                        <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl border border-emerald-100 shadow-xl flex flex-col items-end">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Available</span>
+                                            </div>
+                                            <span className="text-[8px] font-bold text-gray-400 uppercase mt-0.5">
+                                                {nextBooking ? `Next: ${nextBooking.isoCheckIn}` : 'No upcoming stays'}
+                                            </span>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                             <div className="absolute bottom-6 left-6 right-6">
                                 <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">{room.category}</p>

@@ -165,6 +165,20 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         revenueDateFilter
     });
 
+    const liveSnapshot = useMemo(() => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const occupied = rooms.filter(r =>
+            bookings.some(b =>
+                b.roomId === r.id &&
+                b.isoCheckIn <= todayStr &&
+                b.isoCheckOut > todayStr &&
+                b.status !== 'cancelled'
+            )
+        );
+        const available = rooms.filter(r => !occupied.find(o => o.id === r.id));
+        return { occupied, available };
+    }, [rooms, bookings]);
+
     // Automated Email Scheduler
     React.useEffect(() => {
         const runScheduler = async () => {
@@ -233,6 +247,50 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                             </div>
                         </div>
                         <RevenueChart data={chartData.historical} projected={chartData.projected} />
+                    </div>
+
+                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                        <div className="flex items-center justify-between mb-10">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full" />
+                                <h3 className="text-2xl font-black font-serif text-charcoal">Live Occupancy Snapshot</h3>
+                            </div>
+                            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Right Now</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center px-4">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Available ({liveSnapshot.available.length})</span>
+                                </div>
+                                <div className="space-y-2">
+                                    {liveSnapshot.available.length > 0 ? liveSnapshot.available.slice(0, 4).map(r => (
+                                        <div key={r.id} className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100 flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                            <span className="text-[11px] font-black text-charcoal truncate">{r.name}</span>
+                                        </div>
+                                    )) : (
+                                        <div className="py-4 text-center text-gray-300 text-[10px] font-bold uppercase">All occupied</div>
+                                    )}
+                                    {liveSnapshot.available.length > 4 && <p className="text-[9px] text-gray-400 font-bold text-center">+{liveSnapshot.available.length - 4} more</p>}
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center px-4">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-red-500">Occupied ({liveSnapshot.occupied.length})</span>
+                                </div>
+                                <div className="space-y-2">
+                                    {liveSnapshot.occupied.length > 0 ? liveSnapshot.occupied.slice(0, 4).map(r => (
+                                        <div key={r.id} className="bg-red-50/50 p-3 rounded-xl border border-red-100 flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-red-500" />
+                                            <span className="text-[11px] font-black text-charcoal truncate">{r.name}</span>
+                                        </div>
+                                    )) : (
+                                        <div className="py-4 text-center text-gray-300 text-[10px] font-bold uppercase">None currently</div>
+                                    )}
+                                    {liveSnapshot.occupied.length > 4 && <p className="text-[9px] text-gray-400 font-bold text-center">+{liveSnapshot.occupied.length - 4} more</p>}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">

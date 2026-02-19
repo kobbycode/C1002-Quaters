@@ -33,7 +33,14 @@ const RoomSkeleton: React.FC = () => (
   </div>
 );
 
-const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id: string, e: React.MouseEvent) => void; onOpenGallery: (room: Room, index: number) => void }> = ({ room, wishlist, onToggleWishlist, onOpenGallery }) => {
+const RoomCard: React.FC<{
+  room: Room;
+  wishlist: string[];
+  onToggleWishlist: (id: string, e: React.MouseEvent) => void;
+  onOpenGallery: (room: Room, index: number) => void;
+  isAvailable?: boolean;
+  selectedDates?: { checkIn: string; nights: number };
+}> = ({ room, wishlist, onToggleWishlist, onOpenGallery, isAvailable = true, selectedDates }) => {
   const { config } = useSite();
   const [searchParams] = useSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -135,6 +142,11 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
               <span className="text-xs">🏆</span> Elite Pick
             </div>
           )}
+          {!isAvailable && (
+            <div className="bg-red-500 text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-xl shadow-red-500/20 flex items-center gap-1.5 animate-pulse">
+              <span className="text-xs">📅</span> Reserved
+            </div>
+          )}
         </div>
       </div>
 
@@ -191,11 +203,15 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
             </div>
           </div>
           <Link
-            to={`/checkout?room=${room.id}${searchParams.toString() ? `&${searchParams.toString()}` : ''}`}
-            className="group/btn relative h-14 sm:h-auto sm:px-10 py-4 rounded-xl bg-charcoal text-white font-black uppercase tracking-[0.2em] text-[10px] transition-all hover:bg-gold hover:shadow-2xl active:scale-95 shadow-xl shadow-charcoal/20 overflow-hidden flex items-center justify-center border border-white/5"
+            to={isAvailable ? `/checkout?room=${room.id}&checkIn=${selectedDates?.checkIn}&nights=${selectedDates?.nights}${searchParams.toString().replace(/checkIn=[^&]*&?/, '').replace(/nights=[^&]*&?/, '') ? `&${searchParams.toString().replace(/checkIn=[^&]*&?/, '').replace(/nights=[^&]*&?/, '')}` : ''}` : '#'}
+            onClick={(e) => !isAvailable && e.preventDefault()}
+            className={`group/btn relative h-14 sm:h-auto sm:px-10 py-4 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] transition-all shadow-xl overflow-hidden flex items-center justify-center border border-white/5 ${isAvailable
+              ? 'bg-charcoal text-white hover:bg-gold hover:shadow-gold/20 active:scale-95 shadow-charcoal/20'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed grayscale'
+              }`}
           >
-            <span className="relative z-10">Secure Suite</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+            <span className="relative z-10">{isAvailable ? 'Secure Suite' : 'Currently Reserved'}</span>
+            {isAvailable && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />}
           </Link>
         </div>
       </div>
@@ -204,8 +220,8 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
 };
 
 const Rooms: React.FC = () => {
-  const { rooms, config, isGalleryActive, setIsGalleryActive } = useSite();
-  const [searchParams] = useSearchParams();
+  const { rooms, config, isGalleryActive, setIsGalleryActive, isRoomAvailable } = useSite();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -216,6 +232,31 @@ const Rooms: React.FC = () => {
   const [priceRange, setPriceRange] = useState<number>(3000);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  const [checkIn, setCheckIn] = useState<string>(() => {
+    const param = searchParams.get('checkIn');
+    if (param) return param.split('T')[0];
+    return new Date().toISOString().split('T')[0];
+  });
+
+  const [nights, setNights] = useState<number>(() => {
+    const param = searchParams.get('nights');
+    return param ? parseInt(param) : 1;
+  });
+
+  const isoCheckOut = useMemo(() => {
+    const date = new Date(checkIn);
+    date.setDate(date.getDate() + nights);
+    return date.toISOString().split('T')[0];
+  }, [checkIn, nights]);
+
+  // Sync state with URL
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('checkIn', checkIn);
+    newParams.set('nights', nights.toString());
+    setSearchParams(newParams, { replace: true });
+  }, [checkIn, nights]);
 
   const allAmenities = useMemo(() => {
     const set = new Set<string>();
@@ -294,8 +335,10 @@ const Rooms: React.FC = () => {
 
   const clearFilters = () => {
     setSelectedCategories([]);
-    setPriceRange(1500);
+    setPriceRange(3000);
     setSelectedAmenities([]);
+    setCheckIn(new Date().toISOString().split('T')[0]);
+    setNights(1);
   };
 
   const handleOpenGallery = (room: Room, index: number) => {
@@ -428,7 +471,44 @@ const Rooms: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <aside className="hidden lg:block w-80 flex-shrink-0">
             <div className="sticky top-28 flex flex-col gap-10 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40">
+              {/* Stay Dates Picker */}
               <div>
+                <h3 className="text-charcoal text-[11px] font-black mb-4 uppercase tracking-[0.2em] text-gold">Stay Schedule</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-2 block">Arrival Date</label>
+                    <input
+                      type="date"
+                      value={checkIn}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                      className="w-full h-11 px-4 rounded-xl bg-gray-50 border-none outline-none text-xs font-bold text-charcoal focus:ring-1 focus:ring-gold/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-2 block">Duration</label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setNights(Math.max(1, nights - 1))}
+                        className="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center text-charcoal hover:bg-gold hover:text-white transition-all"
+                      >
+                        -
+                      </button>
+                      <div className="flex-1 h-11 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-xs font-black">
+                        {nights} {nights === 1 ? 'Night' : 'Nights'}
+                      </div>
+                      <button
+                        onClick={() => setNights(nights + 1)}
+                        className="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center text-charcoal hover:bg-gold hover:text-white transition-all"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-100 pt-6">
                 <h3 className="text-charcoal text-[11px] font-black mb-4 uppercase tracking-[0.2em] text-gold">Room Categories</h3>
                 <div className="flex flex-col gap-2">
                   {config.categories.map((cat) => (
@@ -510,6 +590,8 @@ const Rooms: React.FC = () => {
                     wishlist={wishlist}
                     onToggleWishlist={toggleWishlist}
                     onOpenGallery={handleOpenGallery}
+                    isAvailable={isRoomAvailable(room.id, checkIn, isoCheckOut)}
+                    selectedDates={{ checkIn, nights }}
                   />
                 ))}
               </div>
@@ -548,7 +630,42 @@ const Rooms: React.FC = () => {
 
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-12 pb-10">
               <div>
-                <h3 className="text-gold text-[10px] font-black mb-6 uppercase tracking-[0.4em]">Suite Categories</h3>
+                <h3 className="text-gold text-[10px] font-black mb-6 uppercase tracking-[0.4em]">Stay Schedule</h3>
+                <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-2 block">Arrival</label>
+                    <input
+                      type="date"
+                      value={checkIn}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                      className="w-full h-14 px-5 rounded-2xl bg-gray-50 border-none outline-none text-sm font-bold text-charcoal"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-2 block">Duration</label>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNights(Math.max(1, nights - 1))}
+                        className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-charcoal text-xl"
+                      >
+                        -
+                      </button>
+                      <div className="flex-1 h-14 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-sm font-black">
+                        {nights} {nights === 1 ? 'Night' : 'Nights'}
+                      </div>
+                      <button
+                        onClick={() => setNights(nights + 1)}
+                        className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-charcoal text-xl"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
                 <div className="grid grid-cols-2 gap-3">
                   {config.categories.map((cat) => (
                     <button
