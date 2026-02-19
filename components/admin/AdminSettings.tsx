@@ -1,14 +1,18 @@
-import React from 'react';
-import { SiteConfig } from '../../types';
+import React, { useState } from 'react';
+import { SiteConfig, Room } from '../../types';
 import { useToast } from '../../context/ToastContext';
 
 interface AdminSettingsProps {
     config: SiteConfig;
     updateConfig: (config: SiteConfig) => void;
+    rooms: Room[];
+    updateRooms: (rooms: Room[]) => void;
 }
 
-export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConfig }) => {
+export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConfig, rooms, updateRooms }) => {
     const { showToast } = useToast();
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editValue, setEditValue] = useState('');
 
     const handleExportConfig = () => {
         const dataStr = JSON.stringify(config, null, 2);
@@ -19,6 +23,40 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
         a.download = `quarters_config_backup_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         showToast('Configuration backup exported');
+    };
+
+    const handleSaveEdit = (idx: number) => {
+        const oldValue = config.categories[idx];
+        const newValue = editValue.trim();
+
+        if (!newValue || newValue === oldValue) {
+            setEditingIndex(null);
+            return;
+        }
+
+        if (config.categories.includes(newValue)) {
+            showToast('Category already exists', 'error');
+            return;
+        }
+
+        // Update config
+        const newCategories = [...config.categories];
+        newCategories[idx] = newValue;
+        updateConfig({ ...config, categories: newCategories });
+
+        // Update rooms
+        const roomsToUpdate = rooms.filter(r => r.category === oldValue);
+        if (roomsToUpdate.length > 0) {
+            const updatedRooms = rooms.map(r =>
+                r.category === oldValue ? { ...r, category: newValue } : r
+            );
+            updateRooms(updatedRooms);
+            showToast(`Category renamed and ${roomsToUpdate.length} rooms updated`, 'success');
+        } else {
+            showToast('Category renamed', 'success');
+        }
+
+        setEditingIndex(null);
     };
 
     const handleImportConfig = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,20 +158,54 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                     <div className="space-y-4 mb-8">
                         {config.categories.map((cat, idx) => (
                             <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 group hover:border-primary/30 transition-all">
-                                <span className="text-sm font-bold text-charcoal">{cat}</span>
-                                <button
-                                    onClick={() => {
-                                        if (window.confirm(`Are you sure you want to delete the category "${cat}"?`)) {
-                                            const newCategories = config.categories.filter(c => c !== cat);
-                                            updateConfig({ ...config, categories: newCategories });
-                                            showToast(`Category "${cat}" removed`);
-                                        }
-                                    }}
-                                    className="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    title="Delete Category"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                </button>
+                                {editingIndex === idx ? (
+                                    <div className="flex-1 flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={editValue}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            className="flex-1 bg-white border border-primary/30 rounded-lg px-3 py-1 text-sm font-bold outline-none"
+                                            autoFocus
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleSaveEdit(idx);
+                                                if (e.key === 'Escape') setEditingIndex(null);
+                                            }}
+                                        />
+                                        <button onClick={() => handleSaveEdit(idx)} className="text-green-500 hover:text-green-600 font-bold text-[10px] uppercase">Save</button>
+                                        <button onClick={() => setEditingIndex(null)} className="text-gray-400 hover:text-gray-600 font-bold text-[10px] uppercase">Cancel</button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span className="text-sm font-bold text-charcoal">{cat}</span>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    setEditingIndex(idx);
+                                                    setEditValue(cat);
+                                                }}
+                                                className="text-gray-400 hover:text-primary p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                title="Edit Category"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    if (window.confirm(`Are you sure you want to delete the category "${cat}"?`)) {
+                                                        const newCategories = config.categories.filter(c => c !== cat);
+                                                        updateConfig({ ...config, categories: newCategories });
+                                                        showToast(`Category "${cat}" removed`);
+                                                    }
+                                                }}
+                                                className="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                title="Delete Category"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         ))}
                     </div>

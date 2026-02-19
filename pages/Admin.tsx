@@ -379,6 +379,8 @@ const Admin: React.FC = () => {
             <AdminSettings
               config={config}
               updateConfig={updateConfig}
+              rooms={rooms}
+              updateRooms={updateRooms}
             />
           )}
 
