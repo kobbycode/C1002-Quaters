@@ -116,7 +116,7 @@ const Checkout: React.FC = () => {
       nights: nights,
       paymentStatus: status,
       paymentMethod: method,
-      paymentReference: reference,
+      paymentReference: reference || '',
       checkInDate: dates?.formattedCheckIn || 'Flexible',
       checkOutDate: dates?.formattedCheckOut || 'Flexible',
       isoCheckIn: dates?.isoCheckIn || '',
