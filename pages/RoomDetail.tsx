@@ -536,7 +536,7 @@ const RoomDetail: React.FC = () => {
                     <span className="text-gold font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] border border-gold/30 px-3 py-1 rounded-full">{room.category}</span>
                     {room.isElite && <span className="bg-primary/10 text-primary font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] px-3 py-1 rounded-full">Elite Class</span>}
                   </div>
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-serif text-charcoal mb-6 tracking-tighter leading-tight">{room.name}</h1>
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-black font-serif text-charcoal mb-6 tracking-tighter leading-tight">{room.name}</h1>
                   <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-gray-400 text-[11px] font-bold uppercase tracking-[0.2em]">
                     <span className="flex items-center gap-2.5"><svg className="w-4 h-4 text-gold/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>{room.size}</span>
                     <span className="flex items-center gap-2.5"><svg className="w-4 h-4 text-gold/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>{room.guests} Guests</span>
@@ -766,7 +766,7 @@ const RoomDetail: React.FC = () => {
             </button>
 
             <div className="flex flex-col items-center">
-              <h2 className="text-sm md:text-lg font-serif italic text-charcoal truncate max-w-[150px] md:max-w-none">{room.name}</h2>
+              <h2 className="text-xs md:text-base font-serif italic text-charcoal truncate max-w-[150px] md:max-w-none">{room.name}</h2>
               <div className="flex items-center gap-2 mt-1">
                 <span className="h-px w-3 md:w-4 bg-gold/30" />
                 <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-gold">{currentIndex + 1} / {galleryImages.length}</span>
@@ -819,7 +819,7 @@ const RoomDetail: React.FC = () => {
               <div className="bg-white/95 backdrop-blur-2xl p-8 rounded-[2rem] border border-gray-100 shadow-2xl md:max-w-md pointer-events-auto transform transition-all duration-700 animate-slide-up">
                 <div className="mb-3">
                   <p className="text-gold text-[10px] font-black uppercase tracking-[0.3em] mb-1">{room.category}</p>
-                  <h3 className="text-4xl font-black font-serif text-charcoal leading-tight">{room.name}</h3>
+                  <h3 className="text-3xl font-black font-serif text-charcoal leading-tight">{room.name}</h3>
                 </div>
 
                 <p className="text-gray-500 text-sm font-medium mb-6 leading-relaxed italic">
@@ -854,7 +854,7 @@ const RoomDetail: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="text-gold text-[8px] font-black uppercase tracking-[0.3em] mb-0.5">{room.category}</p>
-                <h3 className="text-xl font-black font-serif text-charcoal">{room.name}</h3>
+                <h3 className="text-lg font-black font-serif text-charcoal">{room.name}</h3>
               </div>
               <div className="text-right">
                 <p className="text-gold text-[8px] font-black uppercase tracking-widest mb-0.5">Rate</p>

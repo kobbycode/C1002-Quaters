@@ -224,7 +224,7 @@ const Home: React.FC = () => {
                 <div className="px-2">
                   <div className="flex justify-between items-start mb-3">
                     <Link to={`/rooms/${room.id}`} className="block group/title">
-                      <h3 className="text-xl md:text-2xl font-black font-serif text-charcoal group-hover/title:text-gold transition-colors">{room.name}</h3>
+                      <h3 className="text-lg md:text-xl font-black font-serif text-charcoal group-hover/title:text-gold transition-colors">{room.name}</h3>
                     </Link>
                     <p className="text-lg md:text-xl font-bold text-gold font-serif">{formatPrice(room.price, config.currency)}</p>
                   </div>

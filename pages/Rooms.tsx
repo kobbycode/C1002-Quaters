@@ -146,7 +146,7 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
               <p className="text-[10px] md:text-[11px] font-black text-gold uppercase tracking-[0.3em]">{room.category}</p>
             </div>
             <Link to={`/rooms/${room.id}`} className="block group/title">
-              <h3 className="text-xl md:text-2xl font-black font-serif text-charcoal leading-tight group-hover/title:text-gold transition-colors truncate">
+              <h3 className="text-lg md:text-xl font-black font-serif text-charcoal leading-tight group-hover/title:text-gold transition-colors truncate">
                 {room.name}
               </h3>
             </Link>
