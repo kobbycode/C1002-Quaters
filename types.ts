@@ -94,18 +94,6 @@ export interface SiteConfig {
     facilityImage: string;
     amenities: { title: string; desc: string; icon: string }[];
   };
-  homeExperience: {
-    title: string;
-    description: string;
-    icon: string;
-  }[];
-  homePulse: {
-    title: string;
-    subtitle: string;
-    description: string;
-    image: string;
-    pillars: { title: string; description: string }[];
-  };
   foundingYear: string;
   conciergePrompt: string;
   currency?: string;

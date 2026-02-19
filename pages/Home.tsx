@@ -234,76 +234,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* The Experience Section */}
-      <section className="py-20 md:py-32 px-6 md:px-10 lg:px-40 bg-charcoal text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
-          <svg className="w-full h-full" viewBox="0 0 100 100" fill="none"><circle cx="100" cy="0" r="100" stroke="white" strokeWidth="0.5" /></svg>
-        </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16 md:mb-24 max-w-3xl mx-auto">
-            <span className="text-gold font-black uppercase tracking-[0.5em] text-[10px] mb-4 md:mb-6 block">Our Welcome</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif mb-6 md:mb-8">{formatLuxuryText("The *Akwaaba* Style")}</h2>
-            <p className="text-white/60 text-sm md:text-lg font-light leading-relaxed">
-              We make sure your stay in Accra is perfect, with great service and a warm Ghanaian welcome.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-            {config.homeExperience?.map((exp, i) => (
-              <div key={i} className="group p-8 md:p-10 rounded-3xl md:rounded-[3rem] border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-500 hover:-translate-y-4">
-                <div className="text-5xl mb-8 md:mb-10 transform group-hover:scale-110 transition-transform duration-500 inline-block">{exp.icon}</div>
-                <h4 className="text-xl font-black font-serif mb-4 md:mb-6 text-gold">{exp.title}</h4>
-                <p className="text-white/40 text-sm leading-relaxed font-medium">{exp.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Local Pulse Section */}
-      <section className="py-20 md:py-32 px-6 md:px-10 lg:px-40 bg-cream">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
-            <div className="relative group">
-              <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl relative">
-                <img src={config.homePulse?.image || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400"} className="w-full h-full object-cover transition-scale duration-[2000ms] group-hover:scale-105" alt={`${config.brand.name} Exterior`} />
-                <div className="absolute inset-0 bg-charcoal/20 group-hover:bg-transparent transition-colors duration-700" />
-              </div>
-              <div className="absolute -bottom-6 -right-6 md:-bottom-12 md:-right-12 w-48 h-48 md:w-64 md:h-64 bg-gold rounded-3xl md:rounded-[2rem] p-6 md:p-10 flex flex-col justify-center items-center text-center shadow-2xl animate-pulse delay-1000">
-                <p className="text-charcoal font-black text-2xl md:text-3xl font-serif mb-1 md:mb-2 italic">{config.foundingYear}</p>
-                <p className="text-charcoal/60 text-[10px] font-black uppercase tracking-widest">Year of Vision</p>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-8 md:gap-10">
-              <div className="space-y-4 md:space-y-6">
-                <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px]">{config.homePulse?.subtitle}</span>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-charcoal leading-tight">{formatLuxuryText(config.homePulse?.title)}</h2>
-                <p className="text-gray-500 text-sm md:text-lg leading-relaxed font-light italic border-l-2 border-gold/30 pl-6 md:pl-8 py-2">
-                  "{config.homePulse?.description}"
-                </p>
-              </div>
-
-              <div className="space-y-6 md:space-y-8">
-                {config.homePulse?.pillars?.map((pillar, i) => (
-                  <div key={i} className="flex gap-6 items-start">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gold mt-2 shrink-0" />
-                    <div>
-                      <h5 className="font-bold text-charcoal mb-1 md:mb-2 text-sm md:text-base">{pillar.title}</h5>
-                      <p className="text-gray-400 text-xs md:text-sm leading-relaxed">{pillar.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Link to="/about" className="w-fit bg-charcoal text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-primary transition-all active:scale-95">
-                The Legacy Story
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

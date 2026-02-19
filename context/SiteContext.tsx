@@ -138,33 +138,7 @@ const DEFAULT_CONFIG: SiteConfig = {
       { title: "Garden View", desc: "Floor-to-ceiling glass walls overlooking our lush botanic spaces.", icon: "🌿" }
     ]
   },
-  homeExperience: [
-    {
-      title: "Butler Service",
-      description: "Your own personal helper to make sure you have everything you need.",
-      icon: "👔"
-    },
-    {
-      title: "Great Food",
-      description: "Enjoy traditional Ghanaian food made with fresh local ingredients.",
-      icon: "🥘"
-    },
-    {
-      title: "Quiet Spot",
-      description: "Private gardens where you can relax and get away from the busy city.",
-      icon: "🌿"
-    }
-  ],
-  homePulse: {
-    title: "The Accra *Style*",
-    subtitle: "The Neighbourhood",
-    description: "Perfectly placed in the nice area of Spintex, C1002 Quarters is your home in Ghana's busy capital.",
-    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400",
-    pillars: [
-      { title: "Artisanal Shopping", description: "Moments from the finest textile and craft markets of Spintex." },
-      { title: "Coastal Proximity", description: "A short, luxury chauffeur drive to the golden sands of Labadi Beach." }
-    ]
-  },
+
   foundingYear: "1957",
   conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Akwaaba'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
   adminEmails: ['admin@c1002quarters.com', 'reservations@c1002quarters.com.gh']
