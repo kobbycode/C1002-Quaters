@@ -386,23 +386,56 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateBooking = async (id: string, data: Partial<Booking>) => {
     try {
+      const oldBooking = bookings.find(b => b.id === id);
       await updateDoc(doc(db, 'bookings', id), data);
 
-      // Check if payment was just completed and send receipt
-      const booking = bookings.find(b => b.id === id);
-      if (booking && booking.paymentStatus !== 'paid' && data.paymentStatus === 'paid') {
-        try {
-          const updatedBooking = { ...booking, ...data };
-          await EmailService.sendPaymentReceipt(updatedBooking, config);
+      if (oldBooking) {
+        const updatedBooking = { ...oldBooking, ...data };
 
+        // 1. Notification for Status Change
+        if (data.status && data.status !== oldBooking.status) {
+          if (oldBooking.guestId) {
+            await addNotification({
+              userId: oldBooking.guestId,
+              title: `Booking Status: ${data.status.replace('-', ' ')}`,
+              message: `Your reservation at ${oldBooking.roomName} has been updated to ${data.status.replace('-', ' ')}.`,
+              type: 'booking',
+              link: '/profile'
+            });
+          }
           await logActivity({
-            type: 'payment',
-            action: 'Payment Confirmed',
-            details: `Payment of ${updatedBooking.totalPrice} for ${updatedBooking.roomName} confirmed.`,
-            metadata: { bookingId: id, reference: updatedBooking.paymentReference }
+            type: 'booking',
+            action: 'Status Updated',
+            details: `${oldBooking.guestName}'s status for ${oldBooking.roomName} is now ${data.status}`,
+            metadata: { bookingId: id, status: data.status }
           });
-        } catch (emailErr) {
-          console.error("Failed to send payment receipt:", emailErr);
+        }
+
+        // 2. Notification for Payment Status Change
+        if (data.paymentStatus && data.paymentStatus !== oldBooking.paymentStatus) {
+          if (oldBooking.guestId) {
+            await addNotification({
+              userId: oldBooking.guestId,
+              title: `Payment ${data.paymentStatus.toUpperCase()}`,
+              message: `The payment for your booking at ${oldBooking.roomName} is now ${data.paymentStatus}.`,
+              type: 'payment',
+              link: '/profile'
+            });
+          }
+
+          if (data.paymentStatus === 'paid') {
+            try {
+              await EmailService.sendPaymentReceipt(updatedBooking, config);
+              await logActivity({
+                type: 'payment',
+                action: 'Payment Confirmed',
+                details: `Payment of ${updatedBooking.totalPrice} for ${updatedBooking.roomName} confirmed.`,
+                metadata: { bookingId: id, reference: updatedBooking.paymentReference }
+              });
+            } catch (emailErr) {
+              console.error("Failed to send payment receipt/log payment:", emailErr);
+            }
+          }
         }
       }
     } catch (err) {

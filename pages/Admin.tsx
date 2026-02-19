@@ -40,7 +40,7 @@ type Tab = 'overview' | 'bookings' | 'reviews' | 'emails' | 'pricing' | 'brandin
 
 
 const Admin: React.FC = () => {
-  const { rooms, config, updateConfig, updateRooms, loading } = useSite();
+  const { rooms, config, bookings, reviews, updateConfig, updateRooms, loading } = useSite();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [editingRoom, setEditingRoom] = useState<Partial<Room> | null>(null);
   const [editingNav, setEditingNav] = useState<NavLink | null>(null);
@@ -174,16 +174,34 @@ const Admin: React.FC = () => {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mt-1">HQ Command Node</p>
         </div>
         <nav className="flex flex-col gap-1 overflow-y-auto no-scrollbar">
-          {(['overview', 'bookings', 'reviews', 'emails', 'pricing', 'branding', 'home', 'pages', 'gym', 'navigation', 'rooms', 'amenities', 'concierge', 'ailab', 'patrons', 'financials', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => (
-            <button
-              key={tab}
-              onClick={() => handleTabChange(tab)}
-              className={`text-left px-5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-between group ${activeTab === tab ? 'bg-gold text-white shadow-lg shadow-gold/20' : 'hover:bg-white/5 text-gray-400'
-                }`}
-            >
-              <span className="capitalize">{tab}</span>
-            </button>
-          ))}
+          {(['overview', 'bookings', 'reviews', 'emails', 'pricing', 'branding', 'home', 'pages', 'gym', 'navigation', 'rooms', 'amenities', 'concierge', 'ailab', 'patrons', 'financials', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => {
+            const getBadgeCount = () => {
+              if (tab === 'bookings') return bookings.filter(b => b.status === 'pending').length;
+              if (tab === 'reviews') return (reviews || []).filter(r => r.status === 'pending').length;
+              if (tab === 'overview') {
+                const today = new Date().toISOString().split('T')[0];
+                return bookings.filter(b => b.date.startsWith(today)).length;
+              }
+              return 0;
+            };
+            const badgeCount = getBadgeCount();
+
+            return (
+              <button
+                key={tab}
+                onClick={() => handleTabChange(tab)}
+                className={`text-left px-5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-between group ${activeTab === tab ? 'bg-gold text-white shadow-lg shadow-gold/20' : 'hover:bg-white/5 text-gray-400'
+                  }`}
+              >
+                <span className="capitalize">{tab}</span>
+                {badgeCount > 0 && (
+                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-black ${activeTab === tab ? 'bg-white text-gold' : 'bg-gold text-white'}`}>
+                    {badgeCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
 
           <div className="mt-8 border-t border-white/10 pt-8">
             <button

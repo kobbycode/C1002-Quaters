@@ -6,7 +6,7 @@ import { CommandSearch } from './CommandSearch';
 import { useAuth } from '../context/AuthContext';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { config, addSubscriber, isGalleryActive } = useSite();
+  const { config, addSubscriber, isGalleryActive, notifications } = useSite();
   const { user, isAdmin, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -184,8 +184,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className={`p-2 flex items-center gap-2 rounded-full border transition-all ${isScrolled || !isHome ? 'border-gray-100 bg-gray-50' : 'border-white/10 bg-white/5'}`}
                 >
-                  <div className="w-6 h-6 rounded-full bg-gold text-white flex items-center justify-center text-[10px] font-black">
+                  <div className="w-6 h-6 rounded-full bg-gold text-white flex items-center justify-center text-[10px] font-black relative">
                     {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase() || 'U'}
+                    {notifications.some(n => n.userId === user.uid && !n.isRead) && (
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+                    )}
                   </div>
                 </button>
 
@@ -322,12 +325,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   <Link
                     to="/profile"
                     onClick={handleNavClick}
-                    className={`text-xl font-serif transition-all stagger-item stagger-6 ${location.pathname === '/profile'
+                    className={`text-xl font-serif transition-all stagger-item stagger-6 flex items-center gap-2 ${location.pathname === '/profile'
                       ? 'text-gold translate-x-2'
                       : 'text-white/60 hover:text-gold hover:translate-x-2'
                       }`}
                   >
                     Guest Profile
+                    {notifications.some(n => n.userId === user.uid && !n.isRead) && (
+                      <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    )}
                   </Link>
                   {isAdmin && (
                     <Link
