@@ -730,7 +730,7 @@ const RoomDetail: React.FC = () => {
               <div className="flex flex-col gap-3">
                 <Link
                   to={`/checkout?room=${room.id}&checkIn=${checkIn?.toISOString() || new Date().toISOString()}&nights=${nights}`}
-                  className={`w-full flex items-center justify-center bg-primary hover:bg-[#6B006B] text-white font-black py-6 rounded-2xl shadow-xl shadow-primary/30 transition-all uppercase tracking-[0.3em] text-[10px] ${(!checkIn || nights === 0) ? 'opacity-50 pointer-events-none' : ''}`}
+                  className={`w-full flex items-center justify-center bg-charcoal hover:bg-gold text-white font-black py-6 rounded-2xl shadow-xl shadow-charcoal/20 transition-all uppercase tracking-[0.3em] text-[10px] border border-white/5 ${(!checkIn || nights === 0) ? 'opacity-50 pointer-events-none' : ''}`}
                 >
                   Book Room
                 </Link>
