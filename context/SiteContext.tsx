@@ -141,6 +141,7 @@ const DEFAULT_CONFIG: SiteConfig = {
 
   foundingYear: "1957",
   conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Akwaaba'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
+  roomTags: ['Best Seller', 'Popular', 'Elite'],
   adminEmails: ['admin@c1002quarters.com', 'reservations@c1002quarters.com.gh']
 };
 
