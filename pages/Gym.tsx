@@ -62,7 +62,7 @@ const Gym: React.FC = () => {
 
                 <div className="relative z-10 text-center px-6 max-w-4xl animate-fade-in">
                     <span className="text-gold font-black uppercase tracking-[0.5em] text-xs mb-6 block">{gymPage.heroSubtitle}</span>
-                    <h1 className="text-white text-5xl md:text-8xl font-serif mb-8 leading-tight">
+                    <h1 className="text-white text-4xl md:text-6xl font-serif mb-8 leading-tight">
                         {formatLuxuryText(gymPage.heroTitle)}
                     </h1>
                     <div className="flex items-center justify-center gap-4">
@@ -89,7 +89,7 @@ const Gym: React.FC = () => {
                     <div className="flex flex-col gap-10 order-1 lg:order-2">
                         <div className="space-y-4">
                             <span className="text-gold font-bold uppercase tracking-[0.4em] text-xs">{gymPage.facilitySubtitle}</span>
-                            <h2 className="text-4xl md:text-6xl font-serif leading-tight text-charcoal">
+                            <h2 className="text-3xl md:text-5xl font-serif leading-tight text-charcoal">
                                 {formatLuxuryText(gymPage.facilityTitle)}
                             </h2>
                         </div>
@@ -120,7 +120,7 @@ const Gym: React.FC = () => {
                 <div className="max-w-7xl mx-auto space-y-20">
                     <div className="text-center space-y-4">
                         <span className="text-gold font-bold uppercase tracking-[0.4em] text-xs">Curated Amenities</span>
-                        <h2 className="text-4xl md:text-5xl font-serif text-charcoal">Everything You *Need*</h2>
+                        <h2 className="text-3xl md:text-4xl font-serif text-charcoal">Everything You *Need*</h2>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">

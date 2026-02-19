@@ -41,7 +41,7 @@ const About: React.FC = () => {
         />
         <div className="relative z-10 text-center px-6 max-w-4xl animate-fade-in">
           <span className="text-gold font-black uppercase tracking-[0.4em] text-xs mb-6 block">{aboutPage.heroSubtitle}</span>
-          <h1 className="text-white text-5xl md:text-7xl font-serif mb-8 leading-tight">
+          <h1 className="text-white text-4xl md:text-6xl font-serif mb-8 leading-tight">
             {formatLuxuryText(aboutPage.heroTitle)}
           </h1>
           <div className="w-24 h-px bg-gold/50 mx-auto"></div>
@@ -55,7 +55,7 @@ const About: React.FC = () => {
           </div>
           <div className="flex flex-col gap-8 order-1 lg:order-2">
             <span className="text-gold font-bold uppercase tracking-[0.4em] text-xs">Our Story</span>
-            <h2 className="text-5xl md:text-6xl font-serif leading-tight text-charcoal">
+            <h2 className="text-3xl md:text-5xl font-serif leading-tight text-charcoal">
               {formatLuxuryText(aboutPage.heritageTitle)}
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed font-light">
@@ -81,7 +81,7 @@ const About: React.FC = () => {
       <section className="py-24 px-6 md:px-10 lg:px-40 bg-cream">
         <div className="max-w-7xl mx-auto text-center mb-20">
           <span className="text-gold font-bold uppercase tracking-[0.4em] text-xs mb-4 block">Our Values</span>
-          <h2 className="text-4xl md:text-5xl font-serif text-charcoal">
+          <h2 className="text-3xl md:text-4xl font-serif text-charcoal">
             {formatLuxuryText(`The Pillars of *${config.brand.name}*`)}
           </h2>
         </div>

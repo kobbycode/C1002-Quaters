@@ -84,7 +84,7 @@ const SignUp = () => {
         <div className="min-h-screen bg-background-light flex items-center justify-center p-6 pt-24">
             <div className="w-full max-w-md bg-white rounded-[2rem] p-8 md:p-10 shadow-2xl animate-fade-in">
                 <div className="text-center mb-10">
-                    <h1 className="text-3xl font-serif italic text-charcoal mb-2">Join {config.brand.name}</h1>
+                    <h1 className="text-2xl font-serif italic text-charcoal mb-2">Join {config.brand.name}</h1>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gold">Create Your Account</p>
                 </div>
 

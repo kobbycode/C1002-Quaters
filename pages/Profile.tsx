@@ -105,7 +105,7 @@ const Profile = () => {
             <div className="max-w-5xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                     <div>
-                        <h1 className="text-4xl font-serif text-charcoal italic mb-2">Hello, {user.displayName?.split(' ')[0] || 'Guest'}</h1>
+                        <h1 className="text-3xl font-serif text-charcoal italic mb-2">Hello, {user.displayName?.split(' ')[0] || 'Guest'}</h1>
                         <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Manage your stays and preferences</p>
                     </div>
                     <button

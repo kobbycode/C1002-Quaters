@@ -160,9 +160,6 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
           </div>
         </div>
 
-        <p className="text-gray-500 text-[13px] md:text-sm mb-8 line-clamp-2 md:line-clamp-3 font-medium leading-relaxed italic">
-          "{formatLuxuryText(room.description)}"
-        </p>
 
         <div className="grid grid-cols-2 gap-4 mb-10 border-y border-gray-50 py-5">
           <div className="bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50 flex items-center gap-3">

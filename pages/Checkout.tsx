@@ -168,7 +168,7 @@ const Checkout: React.FC = () => {
 
             <div className="space-y-4 mb-10">
               <span className="text-gold font-black uppercase tracking-[0.6em] text-[10px] block">Reservation Secured</span>
-              <h1 className="text-5xl md:text-7xl font-black font-serif text-charcoal leading-tight">
+              <h1 className="text-4xl md:text-6xl font-black font-serif text-charcoal leading-tight">
                 Akwaaba, <span className="italic font-normal underline decoration-gold/30 underline-offset-8">{formData.firstName}</span>.
               </h1>
             </div>
@@ -243,7 +243,7 @@ const Checkout: React.FC = () => {
             <span className="text-gold text-[10px] font-black uppercase tracking-[0.3em]">Secure Verification</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-black font-serif text-charcoal leading-tight animate-slide-up">
+          <h1 className="text-3xl md:text-5xl font-black font-serif text-charcoal leading-tight animate-slide-up">
             Confirm Your <span className="italic font-normal">Quarters</span>
           </h1>
 

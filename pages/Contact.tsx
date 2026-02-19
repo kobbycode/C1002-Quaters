@@ -62,7 +62,7 @@ const Contact: React.FC = () => {
           <div>
             <div className="mb-10">
               <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Visit Us</span>
-              <h1 className="text-3xl md:text-5xl font-black font-serif mb-4 md:mb-6 leading-tight text-charcoal">
+              <h1 className="text-2xl md:text-4xl font-black font-serif mb-4 md:mb-6 leading-tight text-charcoal">
                 {formatLuxuryText(contactPage.heroTitle)}
               </h1>
               <p className="text-gray-600 text-sm md:text-lg mb-6 md:mb-10 font-light leading-relaxed">
@@ -160,7 +160,7 @@ const Contact: React.FC = () => {
                 <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-8">
                   <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                 </div>
-                <h2 className="text-4xl font-black font-serif mb-4 text-charcoal">Akwaaba!</h2>
+                <h2 className="text-3xl font-black font-serif mb-4 text-charcoal">Akwaaba!</h2>
                 <p className="text-gray-400 text-sm mb-12 max-w-xs mx-auto leading-relaxed">
                   Your message has been received with warmth. Our team will contact you shortly to ensure your requirements are met.
                 </p>
