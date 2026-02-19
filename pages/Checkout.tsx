@@ -31,36 +31,36 @@ const Checkout: React.FC = () => {
     phone: ''
   });
 
-  const nights = useMemo(() => {
-    const n = searchParams.get('nights');
-    return n ? parseInt(n) : 1;
-  }, [searchParams]);
+  // Initial state from URL with fallbacks
+  const [checkIn, setCheckIn] = useState<string>(() => {
+    const param = searchParams.get('checkIn');
+    if (param) return param.split('T')[0];
+    return new Date().toISOString().split('T')[0];
+  });
+
+  const [nights, setNights] = useState<number>(() => {
+    const param = searchParams.get('nights');
+    return param ? parseInt(param) : 1;
+  });
 
   const dates = useMemo(() => {
-    const checkInParam = searchParams.get('checkIn');
-    if (!checkInParam) return null;
-
-    const checkIn = new Date(checkInParam);
-    const checkOut = new Date(checkIn);
-    checkOut.setDate(checkOut.getDate() + nights);
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkInDate);
+    checkOutDate.setDate(checkOutDate.getDate() + nights);
 
     return {
-      checkIn,
-      checkOut,
-      isoCheckIn: checkIn.toISOString().split('T')[0],
-      isoCheckOut: checkOut.toISOString().split('T')[0],
-      formattedCheckIn: checkIn.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
-      formattedCheckOut: checkOut.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      checkIn: checkInDate,
+      checkOut: checkOutDate,
+      isoCheckIn: checkInDate.toISOString().split('T')[0],
+      isoCheckOut: checkOutDate.toISOString().split('T')[0],
+      formattedCheckIn: checkInDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+      formattedCheckOut: checkOutDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     };
-  }, [searchParams, nights]);
+  }, [checkIn, nights]);
 
 
 
   const pricing = useMemo(() => {
-    if (!dates) return {
-      total: room.price * nights,
-      breakdown: { basePrice: room.price, totalNights: nights, subtotal: room.price * nights, adjustments: [], finalTotal: room.price * nights, averageNightlyRate: room.price }
-    };
     const calculation = calculatePrice(room.id, dates.checkIn, dates.checkOut);
 
     // Add Gym Fee if selected
@@ -86,7 +86,6 @@ const Checkout: React.FC = () => {
 
   const handleCashBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!dates) return;
 
     setIsProcessing(true);
     setError(null);
@@ -282,7 +281,71 @@ const Checkout: React.FC = () => {
 
         <div className="flex flex-col lg:flex-row gap-12 items-start">
           <div className="flex-[2] w-full space-y-10 animate-fade-in-slow">
-            {/* Guest Details with Premium Fields */}
+            {/* Stay Details Section */}
+            <section className="bg-white p-6 md:p-14 rounded-[3rem] border border-gray-100 shadow-2xl shadow-gray-200/40">
+              <div className="flex items-center gap-4 mb-10 md:mb-14">
+                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-charcoal/30">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black font-serif text-charcoal">Stay Details</h2>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Arrival & Duration</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gold ml-2">Preferred Arrival</label>
+                  <div className="relative group">
+                    <input
+                      type="date"
+                      value={checkIn}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                      className="w-full h-16 md:h-18 px-6 rounded-2xl bg-gray-50/50 border-2 border-transparent focus:border-primary focus:bg-white outline-none transition-all font-bold text-charcoal"
+                    />
+                    <div className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none group-focus-within:text-primary transition-colors">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gold ml-2">Duration of Stay</label>
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setNights(Math.max(1, nights - 1))}
+                      className="w-16 h-16 md:h-18 rounded-2xl bg-gray-50/50 border-2 border-transparent hover:border-gray-200 flex items-center justify-center text-charcoal transition-all active:scale-90"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 12H4" /></svg>
+                    </button>
+                    <div className="flex-1 h-16 md:h-18 rounded-2xl bg-white border-2 border-gray-100 flex items-center justify-center">
+                      <span className="text-xl font-black font-serif text-charcoal mr-2">{nights}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-1">{nights === 1 ? 'Night' : 'Nights'}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setNights(nights + 1)}
+                      className="w-16 h-16 md:h-18 rounded-2xl bg-gray-50/50 border-2 border-transparent hover:border-gray-200 flex items-center justify-center text-charcoal transition-all active:scale-90"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-10 p-6 bg-emerald-50/30 rounded-2xl border border-emerald-100 flex items-center gap-4 animate-fade-in">
+                <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-200">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <p className="text-emerald-700 text-xs font-medium leading-relaxed italic">
+                  Departure scheduled for <strong className="font-black underline decoration-emerald-200 underline-offset-4">{dates.formattedCheckOut}</strong>. Pricing has been updated automatically for your {nights} night stay.
+                </p>
+              </div>
+            </section>
+
+            {/* Guest Details Section */}
             <section className="bg-white p-6 md:p-14 rounded-[3rem] border border-gray-100 shadow-2xl shadow-gray-200/40 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 

@@ -35,6 +35,7 @@ const RoomSkeleton: React.FC = () => (
 
 const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id: string, e: React.MouseEvent) => void; onOpenGallery: (room: Room, index: number) => void }> = ({ room, wishlist, onToggleWishlist, onOpenGallery }) => {
   const { config } = useSite();
+  const [searchParams] = useSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const roomImages = useMemo(() => {
@@ -165,7 +166,10 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
               <p className="text-xl md:text-3xl font-black text-charcoal font-serif tracking-tight">{formatPrice(room.price, config.currency)}</p>
             </div>
           </div>
-          <Link to={`/checkout?room=${room.id}`} className="bg-primary hover:bg-[#6B006B] text-white font-black py-4 md:py-5 px-8 md:px-10 rounded-2xl transition-all shadow-xl hover:shadow-primary/30 uppercase tracking-[0.2em] text-[10px] md:text-[11px] active:scale-95 shadow-primary/20">
+          <Link
+            to={`/checkout?room=${room.id}${searchParams.toString() ? `&${searchParams.toString()}` : ''}`}
+            className="bg-primary hover:bg-[#6B006B] text-white font-black py-4 md:py-5 px-8 md:px-10 rounded-2xl transition-all shadow-xl hover:shadow-primary/30 uppercase tracking-[0.2em] text-[10px] md:text-[11px] active:scale-95 shadow-primary/20"
+          >
             Secure Suite
           </Link>
         </div>
@@ -679,7 +683,7 @@ const Rooms: React.FC = () => {
                     <p className="text-2xl font-black font-serif text-charcoal">{formatPrice(selectedRoom.price, config.currency)}</p>
                   </div>
                   <Link
-                    to={`/checkout?room=${selectedRoom.id}`}
+                    to={`/checkout?room=${selectedRoom.id}${searchParams.toString() ? `&${searchParams.toString()}` : ''}`}
                     className="bg-primary text-white px-8 py-4 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-[#6B006B] transition-all shadow-lg shadow-primary/20 active:scale-95"
                   >
                     Book Now
@@ -714,7 +718,7 @@ const Rooms: React.FC = () => {
             </div>
 
             <Link
-              to={`/checkout?room=${selectedRoom.id}`}
+              to={`/checkout?room=${selectedRoom.id}${searchParams.toString() ? `&${searchParams.toString()}` : ''}`}
               className="block w-full bg-primary text-white text-center py-4 rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-[0.98] transition-transform shadow-lg shadow-primary/10"
             >
               Check Out Now
