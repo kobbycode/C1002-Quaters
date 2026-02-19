@@ -66,14 +66,14 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
         </svg>
       </button>
 
-      <div className="aspect-[4/5] md:aspect-[16/10] relative overflow-hidden group/image cursor-pointer" onClick={() => onOpenGallery(room, currentImageIndex)}>
-        <div className="flex h-full w-full transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
+      <div className="aspect-[3/4] md:aspect-[16/10] relative overflow-hidden group/image cursor-pointer" onClick={() => onOpenGallery(room, currentImageIndex)}>
+        <div className="flex h-full w-full transition-transform duration-700 cubic-bezier(0.4, 0, 0.2, 1)" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
           {roomImages.map((src, idx) => (
             <div key={idx} className="w-full h-full shrink-0">
               <img
                 src={src}
                 alt={`${room.name} view ${idx + 1}`}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
               />
             </div>
           ))}
@@ -81,96 +81,122 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
 
         {roomImages.length > 1 && (
           <>
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-y-0 left-0 flex items-center pl-2 opacity-0 group-hover/image:opacity-100 transition-opacity">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 md:opacity-0 md:group-hover/image:opacity-100 transition-opacity">
               <button
                 onClick={(e) => { e.stopPropagation(); handlePrev(e); }}
-                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all shadow-lg"
+                className="w-10 h-10 md:w-8 md:h-8 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all shadow-2xl"
                 aria-label="Previous Image"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </button>
             </div>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 opacity-0 group-hover/image:opacity-100 transition-opacity">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 md:opacity-0 md:group-hover/image:opacity-100 transition-opacity">
               <button
                 onClick={(e) => { e.stopPropagation(); handleNext(e); }}
-                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all shadow-lg"
+                className="w-10 h-10 md:w-8 md:h-8 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-charcoal transition-all shadow-2xl"
                 aria-label="Next Image"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
-            <div className="absolute bottom-2 right-2 bg-black/30 backdrop-blur-md px-2 py-1 rounded-full opacity-0 group-hover/image:opacity-100 transition-opacity">
-              <span className="text-white text-[10px] font-black uppercase tracking-wider">Click to expand</span>
+            <div className="absolute bottom-4 right-4 bg-charcoal/40 backdrop-blur-md px-3 py-1.5 rounded-full md:opacity-0 md:group-hover/image:opacity-100 transition-opacity">
+              <span className="text-white text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                Gallery
+              </span>
             </div>
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 opacity-0 group-hover/image:opacity-100 transition-opacity">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
               {roomImages.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(idx); }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${currentImageIndex === idx ? 'bg-white w-6' : 'bg-white/50'}`}
+                  className={`h-1 rounded-full transition-all duration-500 ${currentImageIndex === idx ? 'bg-white w-8 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'bg-white/30 w-2 hover:bg-white/50'}`}
                   aria-label={`Go to image ${idx + 1}`}
                 />
               ))}
             </div>
-            <div className="absolute top-2 left-2 bg-black/30 backdrop-blur-md px-2 py-1 rounded-full">
-              <span className="text-white text-[10px] font-black uppercase tracking-wider">{currentImageIndex + 1} / {roomImages.length}</span>
+            <div className="absolute top-4 left-4 flex gap-2">
+              <div className="bg-charcoal/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                <span className="text-white text-[10px] font-black tracking-widest">{currentImageIndex + 1} / {roomImages.length}</span>
+              </div>
             </div>
           </>
         )}
 
-        <div className="absolute top-4 left-4 flex flex-col gap-2">
+        <div className="absolute top-4 right-4 flex flex-col gap-2 pointer-events-none">
           {room.isBestSeller && (
-            <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider text-primary shadow-sm">Popular Choice</div>
+            <div className="bg-gold text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-xl shadow-gold/20 flex items-center gap-1.5 animate-bounce">
+              <span className="text-xs">✨</span> Best Seller
+            </div>
           )}
           {room.isElite && (
-            <div className="bg-primary px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider text-white shadow-sm">Top Pick</div>
+            <div className="bg-primary text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-xl shadow-primary/20 flex items-center gap-1.5">
+              <span className="text-xs">🏆</span> Elite Pick
+            </div>
           )}
         </div>
       </div>
 
-      <div className="p-6 flex-1 flex flex-col">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <p className="text-[10px] md:text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-1">{room.category}</p>
-            <Link to={`/rooms/${room.id}`} className="block group-Title">
-              <h3 className="text-lg md:text-2xl font-black font-serif group-hover:text-primary transition-colors">{room.name}</h3>
-            </Link>
-          </div>
-          <div className="flex flex-col items-end">
-            <div className="flex items-center text-gold text-xs md:text-sm font-black">
-              ★ {room.rating}
+      <div className="p-7 md:p-8 flex-1 flex flex-col">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-gold" />
+              <p className="text-[10px] md:text-[11px] font-black text-gold uppercase tracking-[0.3em]">{room.category}</p>
             </div>
-            <p className="text-[10px] md:text-[11px] text-gray-400 font-bold">{room.reviewsCount} Reviews</p>
+            <h3 className="text-2xl md:text-3xl font-black font-serif text-charcoal leading-tight group-hover:text-primary transition-colors truncate">
+              {room.name}
+            </h3>
+          </div>
+          <div className="flex flex-col items-end shrink-0 ml-4">
+            <div className="flex items-center gap-1 bg-gold/5 px-3 py-1.5 rounded-xl border border-gold/10">
+              <span className="text-gold text-sm font-black">★</span>
+              <span className="text-charcoal text-sm font-black">{room.rating}</span>
+            </div>
+            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1.5">{room.reviewsCount} Reviews</p>
           </div>
         </div>
-        <p className="text-gray-400 md:text-gray-500 text-xs md:text-sm mb-6 line-clamp-2 font-light leading-relaxed">
-          {formatLuxuryText(room.description)}
+
+        <p className="text-gray-500 text-[13px] md:text-sm mb-8 line-clamp-2 md:line-clamp-3 font-medium leading-relaxed italic">
+          "{formatLuxuryText(room.description)}"
         </p>
 
-        <div className="flex items-center gap-6 mb-8 text-[11px] text-gray-400 font-black uppercase tracking-widest border-y border-gray-50 py-3">
-          <span className="flex items-center gap-2">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-            {room.size}
-          </span>
-          <span className="flex items-center gap-2">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-            {room.guests}
-          </span>
+        <div className="grid grid-cols-2 gap-4 mb-10 border-y border-gray-50 py-5">
+          <div className="bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-gold">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+            </div>
+            <div>
+              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Dimension</p>
+              <p className="text-[11px] font-black text-charcoal">{room.size}</p>
+            </div>
+          </div>
+          <div className="bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-gold">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            </div>
+            <div>
+              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Capacity</p>
+              <p className="text-[11px] font-black text-charcoal truncate">{room.guests}</p>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-50/50">
-          <div>
-            <p className="text-gray-400 text-[10px] md:text-[11px] uppercase font-black tracking-[0.25em] mb-1">Nightly rate</p>
-            <div className="bg-white/40 backdrop-blur-md px-4 py-2 rounded-xl border border-white/50 shadow-sm inline-block">
-              <p className="text-xl md:text-3xl font-black text-charcoal font-serif tracking-tight">{formatPrice(room.price, config.currency)}</p>
+        <div className="mt-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6 pt-2">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Standard Rate</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl md:text-4xl font-black text-charcoal font-serif">{formatPrice(room.price, config.currency)}</span>
+              <span className="text-[10px] font-black text-gray-400 uppercase">/ night</span>
             </div>
           </div>
           <Link
             to={`/checkout?room=${room.id}${searchParams.toString() ? `&${searchParams.toString()}` : ''}`}
-            className="bg-primary hover:bg-[#6B006B] text-white font-black py-4 md:py-5 px-8 md:px-10 rounded-2xl transition-all shadow-xl hover:shadow-primary/30 uppercase tracking-[0.2em] text-[10px] md:text-[11px] active:scale-95 shadow-primary/20"
+            className="group/btn relative h-16 sm:h-auto sm:px-10 py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-[0.2em] text-[11px] transition-all hover:bg-charcoal hover:shadow-2xl active:scale-95 shadow-xl shadow-primary/20 overflow-hidden flex items-center justify-center"
           >
-            Secure Suite
+            <span className="relative z-10">Secure Suite</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
           </Link>
         </div>
       </div>
@@ -347,28 +373,34 @@ const Rooms: React.FC = () => {
           <span className="text-charcoal text-sm font-medium">Our Rooms</span>
         </div>
 
-        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight font-serif mb-4 text-charcoal">The Collection</h1>
-            <p className="text-gray-500 text-sm md:text-lg max-w-2xl font-medium leading-relaxed italic border-l-2 border-gold/20 pl-6">
-              Explore our curated selection of {rooms.length} avant-garde suites and private estates, where modern architecture meets timeless hospitality.
+        <div className="mb-12 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-4 md:mb-6">
+              <div className="h-0.5 w-12 bg-gold" />
+              <span className="text-gold font-black uppercase tracking-[0.6em] text-[10px] md:text-xs">The Collection</span>
+            </div>
+            <h1 className="text-5xl md:text-8xl font-black leading-[0.9] tracking-tighter font-serif mb-6 text-charcoal">
+              {formatLuxuryText("Suites of *Distinction*")}
+            </h1>
+            <p className="text-gray-500 text-sm md:text-lg max-w-2xl font-medium leading-relaxed italic border-l-2 border-gold/20 pl-6 md:pl-10">
+              Explore our curated selection of avant-garde suites, where modern architecture meets timeless hospitality.
             </p>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 self-start md:self-end">
             {(selectedCategories.length > 0 || selectedAmenities.length > 0 || priceRange < 3000) && (
               <button
                 onClick={clearFilters}
-                className="text-primary text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] hover:text-charcoal transition-all border-b-2 border-primary/20 hover:border-charcoal/20 pb-0.5"
+                className="text-primary text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] hover:text-charcoal transition-all border-b border-primary/20 hover:border-charcoal/20 pb-0.5"
               >
-                Clear Selection
+                Clear Filters
               </button>
             )}
             <button
               onClick={() => setIsFilterDrawerOpen(true)}
-              className="lg:hidden flex items-center gap-2 bg-charcoal text-white px-5 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
+              className="lg:hidden h-14 px-8 rounded-2xl bg-charcoal text-white text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all flex items-center gap-3"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-              Refine Search
+              <svg className="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+              Filter
             </button>
           </div>
         </div>
@@ -471,7 +503,7 @@ const Rooms: React.FC = () => {
                 {[1, 2, 3, 4].map(i => <RoomSkeleton key={i} />)}
               </div>
             ) : filteredRooms.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-14">
                 {filteredRooms.map((room) => (
                   <RoomCard
                     key={room.id}
