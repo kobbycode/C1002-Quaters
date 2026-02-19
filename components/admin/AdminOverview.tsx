@@ -10,6 +10,7 @@ interface AdminOverviewProps {
     setActiveTab: (tab: any) => void;
     setEditingRoom: (room: Room) => void;
     setViewingBooking: (booking: Booking) => void;
+    lastViewedOverview: string;
 }
 
 const Sparkline: React.FC<{ data: number[], color: string }> = ({ data, color }) => {
@@ -150,7 +151,8 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
     config,
     setActiveTab,
     setEditingRoom,
-    setViewingBooking
+    setViewingBooking,
+    lastViewedOverview
 }) => {
     const { bookings, reviews, activities } = useSite();
     const [revenueDateFilter, setRevenueDateFilter] = useState<'7d' | '30d' | '90d'>('7d');
@@ -377,30 +379,34 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                         </button>
                     </div>
                     <div className="space-y-4">
-                        {activities.slice(0, 6).map(activity => (
-                            <div key={activity.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 group hover:border-gold/30 transition-all">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-lg shadow-sm">
-                                        {activity.type === 'booking' ? '📅' :
-                                            activity.type === 'registration' ? '👤' :
-                                                activity.type === 'payment' ? '💳' :
-                                                    activity.type === 'review' ? '⭐' : '⚙️'}
+                        {activities.slice(0, 6).map(activity => {
+                            const isNew = activity.timestamp > lastViewedOverview;
+                            return (
+                                <div key={activity.id} className={`flex items-center justify-between p-4 bg-gray-50 rounded-xl border transition-all group ${isNew ? 'border-gold shadow-md shadow-gold/10' : 'border-gray-100 hover:border-gold/30'}`}>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-lg shadow-sm relative">
+                                            {activity.type === 'booking' ? '📅' :
+                                                activity.type === 'registration' ? '👤' :
+                                                    activity.type === 'payment' ? '💳' :
+                                                        activity.type === 'review' ? '⭐' : '⚙️'}
+                                            {isNew && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-gold rounded-full border-2 border-white animate-pulse" />}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black text-charcoal">{activity.action}</p>
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{activity.details}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-black text-charcoal">{activity.action}</p>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{activity.details}</p>
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-black text-charcoal uppercase tracking-widest">
+                                            {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                                            {new Date(activity.timestamp).toLocaleDateString()}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-[10px] font-black text-charcoal uppercase tracking-widest">
-                                        {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
-                                        {new Date(activity.timestamp).toLocaleDateString()}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>
