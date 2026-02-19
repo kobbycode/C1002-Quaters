@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, setDoc, updateDoc, arrayUnion, writeBatch, addDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../utils/firebase';
-import { Room, SiteConfig, Booking, Review, PricingRule } from '../types';
+import { Room, SiteConfig, Booking, Review, PricingRule, Notification, Activity } from '../types';
 import { EmailService } from '../utils/email-service';
 import { PricingEngine } from '../utils/pricing-engine';
 import { ROOMS as INITIAL_ROOMS } from '../constants';
@@ -14,6 +14,8 @@ interface SiteContextType {
   config: SiteConfig;
   bookings: Booking[];
   reviews: Review[];
+  notifications: Notification[];
+  activities: Activity[];
   loading: boolean;
   isGalleryActive: boolean;
   setIsGalleryActive: (active: boolean) => void;
@@ -29,6 +31,11 @@ interface SiteContextType {
   addReview: (review: Omit<Review, 'id' | 'date' | 'status'>) => Promise<void>;
   updateReview: (id: string, data: Partial<Review>) => Promise<void>;
   deleteReview: (id: string) => Promise<void>;
+
+  // New helpers
+  logActivity: (activity: Omit<Activity, 'id' | 'timestamp'>) => Promise<void>;
+  markNotificationRead: (id: string) => Promise<void>;
+  addNotification: (notification: Omit<Notification, 'id' | 'createdAt' | 'isRead'>) => Promise<void>;
 
   sendEmail: (to: string[], subject: string, html: string) => Promise<void>;
   calculatePrice: (roomId: string, checkIn: Date, checkOut: Date) => ReturnType<typeof PricingEngine.calculatePrice>;
@@ -171,6 +178,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [config, setConfig] = useState<SiteConfig>(DEFAULT_CONFIG);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [isGalleryActive, setIsGalleryActive] = useState(false);
 
@@ -180,6 +189,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let configLoaded = false;
     let bookingsLoaded = false;
     let reviewsLoaded = false;
+    let notificationsLoaded = false;
+    let activitiesLoaded = false;
 
     // 1. Subscribe to Rooms
     const unsubscribeRooms = onSnapshot(collection(db, 'rooms'), (snapshot) => {
@@ -238,14 +249,33 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const reviewData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Review));
       setReviews(reviewData);
       reviewsLoaded = true;
-      if (roomsLoaded && configLoaded && bookingsLoaded) setLoading(false);
+      if (roomsLoaded && configLoaded && bookingsLoaded && notificationsLoaded && activitiesLoaded) setLoading(false);
     }, (error) => console.error("Error listening to reviews:", error));
+
+    // 5. Subscribe to Notifications
+    const unsubscribeNotifications = onSnapshot(collection(db, 'notifications'), (snapshot) => {
+      const notifData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
+      setNotifications(notifData);
+      notificationsLoaded = true;
+      if (roomsLoaded && configLoaded && bookingsLoaded && reviewsLoaded && activitiesLoaded) setLoading(false);
+    }, (error) => console.error("Error listening to notifications:", error));
+
+    // 6. Subscribe to Activities (Limit to recent ones)
+    const unsubscribeActivities = onSnapshot(collection(db, 'activities'), (snapshot) => {
+      const actData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity))
+        .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+      setActivities(actData);
+      activitiesLoaded = true;
+      if (roomsLoaded && configLoaded && bookingsLoaded && reviewsLoaded && notificationsLoaded) setLoading(false);
+    }, (error) => console.error("Error listening to activities:", error));
 
     return () => {
       unsubscribeRooms();
       unsubscribeConfig();
       unsubscribeBookings();
       unsubscribeReviews();
+      unsubscribeNotifications();
+      unsubscribeActivities();
     };
   }, []);
 
@@ -264,6 +294,12 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateRoom = async (id: string, data: Partial<Room>) => {
     try {
       await updateDoc(doc(db, 'rooms', id), data);
+      await logActivity({
+        type: 'admin',
+        action: 'Room Updated',
+        details: `Updated room: ${data.name || id}`,
+        metadata: { roomId: id, updates: data }
+      });
     } catch (err) { console.error("Failed to update room:", err); }
   };
 
@@ -277,6 +313,11 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setConfig(newConfig);
     try {
       await setDoc(doc(db, 'settings', 'config'), newConfig);
+      await logActivity({
+        type: 'admin',
+        action: 'Site Settings Updated',
+        details: `Global configuration updated by admin`,
+      });
     } catch (err) { console.error("Failed to sync config:", err); }
   };
 
@@ -294,6 +335,24 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...bookingData,
         date: new Date().toISOString()
       });
+
+      // Log activity and send notification
+      await logActivity({
+        type: 'booking',
+        action: 'New Room Reservation',
+        details: `${bookingData.guestName} booked ${bookingData.roomName}`,
+        metadata: { roomId: bookingData.roomId, totalPrice: bookingData.totalPrice }
+      });
+
+      if (bookingData.guestId) {
+        await addNotification({
+          userId: bookingData.guestId,
+          title: 'Booking Confirmed!',
+          message: `Akwaaba, ${bookingData.guestName.split(' ')[0]}! Your reservation for ${bookingData.roomName} is confirmed for ${bookingData.checkInDate}.`,
+          type: 'booking',
+          link: '/profile'
+        });
+      }
 
       // Send confirmation email
       try {
@@ -335,6 +394,13 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const updatedBooking = { ...booking, ...data };
           await EmailService.sendPaymentReceipt(updatedBooking, config);
+
+          await logActivity({
+            type: 'payment',
+            action: 'Payment Confirmed',
+            details: `Payment of ${updatedBooking.totalPrice} for ${updatedBooking.roomName} confirmed.`,
+            metadata: { bookingId: id, reference: updatedBooking.paymentReference }
+          });
         } catch (emailErr) {
           console.error("Failed to send payment receipt:", emailErr);
         }
@@ -395,8 +461,12 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // In reality, most emails are triggered via addBooking/updateBooking using EmailService directly
     await addDoc(collection(db, 'mail'), {
       to,
-      message: { subject, html },
-      createdAt: new Date()
+      message: {
+        subject,
+        html,
+        text: html.replace(/<[^>]*>?/gm, '') // Basic text fallback
+      },
+      createdAt: Timestamp.now()
     });
   };
 
@@ -417,12 +487,45 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateConfig({ ...config, pricingRules: currentRules.filter(r => r.id !== id) });
   };
 
+  const logActivity = async (activityData: Omit<Activity, 'id' | 'timestamp'>) => {
+    try {
+      await addDoc(collection(db, 'activities'), {
+        ...activityData,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Failed to log activity:", err);
+    }
+  };
+
+  const addNotification = async (notifData: Omit<Notification, 'id' | 'createdAt' | 'isRead'>) => {
+    try {
+      await addDoc(collection(db, 'notifications'), {
+        ...notifData,
+        isRead: false,
+        createdAt: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Failed to add notification:", err);
+    }
+  };
+
+  const markNotificationRead = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'notifications', id), { isRead: true });
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+    }
+  };
+
   return (
     <SiteContext.Provider value={{
       rooms,
       config,
       bookings,
       reviews,
+      notifications,
+      activities,
       loading,
       isGalleryActive,
       setIsGalleryActive,
@@ -441,7 +544,10 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sendEmail,
       calculatePrice,
       addPricingRule,
-      deletePricingRule
+      deletePricingRule,
+      logActivity,
+      markNotificationRead,
+      addNotification
     }}>
       {loading ? <GlobalLoader /> : children}
     </SiteContext.Provider>

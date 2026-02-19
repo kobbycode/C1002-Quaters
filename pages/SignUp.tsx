@@ -6,7 +6,7 @@ import { isUserAdmin } from '../utils/auth-utils';
 import { useSite } from '../context/SiteContext';
 
 const SignUp = () => {
-    const { config } = useSite();
+    const { config, logActivity, addNotification } = useSite();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -42,7 +42,22 @@ const SignUp = () => {
                 displayName: name
             });
 
-            // Use centralized admin check
+            // Log activity and send welcome notification
+            await logActivity({
+                type: 'registration',
+                action: 'New Guest Registration',
+                details: `${name} (${email}) joined the platform`,
+                userId: userCredential.user.uid,
+                userName: name
+            });
+
+            await addNotification({
+                userId: userCredential.user.uid,
+                title: `Welcome to ${config.brand.name}`,
+                message: `Akwaaba, ${name.split(' ')[0]}! We're delighted to have you with us. Explore our suites to find your perfect stay.`,
+                type: 'system',
+                link: '/rooms'
+            });
             const isAdmin = isUserAdmin(email, config);
 
             if (from) {

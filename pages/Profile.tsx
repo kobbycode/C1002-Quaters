@@ -57,7 +57,7 @@ const BookingCard: React.FC<{ booking: Booking; roomName: string; roomImage: str
 
 const Profile = () => {
     const { user, logout } = useAuth();
-    const { bookings, rooms, config, loading: siteLoading } = useSite();
+    const { bookings, rooms, config, notifications, markNotificationRead, loading: siteLoading } = useSite();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'bookings' | 'notifications'>('bookings');
 
@@ -80,10 +80,23 @@ const Profile = () => {
         return { upcoming, past };
     }, [bookings, user]);
 
-    const notifications = [
-        { id: 1, title: `Welcome to ${config.brand.name}`, message: 'We are delighted to have you with us.', date: 'Just now', read: false },
-        { id: 2, title: 'Profile Created', message: 'Your account has been successfully set up.', date: 'Just now', read: true },
-    ];
+    const myNotifications = useMemo(() => {
+        if (!user?.uid || !notifications) return [];
+        return notifications
+            .filter(n => n.userId === user.uid)
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    }, [notifications, user]);
+
+    const unreadCount = myNotifications.filter(n => !n.isRead).length;
+
+    const handleNotificationClick = async (notif: any) => {
+        if (!notif.isRead) {
+            await markNotificationRead(notif.id);
+        }
+        if (notif.link) {
+            navigate(notif.link);
+        }
+    };
 
     if (!user) return null;
 
@@ -115,7 +128,7 @@ const Profile = () => {
                         className={`pb-4 text-xs font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap ${activeTab === 'notifications' ? 'text-gold border-b-2 border-gold' : 'text-gray-400 hover:text-charcoal'}`}
                     >
                         Notifications
-                        <span className="ml-2 bg-gold text-white text-[9px] px-1.5 py-0.5 rounded-full">2</span>
+                        {unreadCount > 0 && <span className="ml-2 bg-gold text-white text-[9px] px-1.5 py-0.5 rounded-full">{unreadCount}</span>}
                     </button>
                 </div>
 
@@ -179,18 +192,28 @@ const Profile = () => {
 
                 {activeTab === 'notifications' && (
                     <div className="space-y-4 animate-fade-in max-w-2xl">
-                        {notifications.map(notif => (
-                            <div key={notif.id} className={`bg-white p-6 rounded-2xl border ${notif.read ? 'border-gray-50' : 'border-gold/20 bg-gold/5 flex gap-4'}`}>
-                                <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${notif.read ? 'bg-gray-200' : 'bg-gold'}`} />
-                                <div>
+                        {myNotifications.length > 0 ? myNotifications.map(notif => (
+                            <div
+                                key={notif.id}
+                                onClick={() => handleNotificationClick(notif)}
+                                className={`bg-white p-6 rounded-2xl border transition-all cursor-pointer ${notif.isRead ? 'border-gray-50 opacity-75' : 'border-gold/20 bg-gold/5 flex gap-4 hover:border-gold/40'}`}
+                            >
+                                {!notif.isRead && <div className="w-2 h-2 rounded-full mt-2 shrink-0 bg-gold" />}
+                                <div className="flex-1">
                                     <div className="flex justify-between items-start mb-1">
                                         <h3 className="font-bold text-charcoal text-sm">{notif.title}</h3>
-                                        <span className="text-[9px] text-gray-400 uppercase tracking-widest">{notif.date}</span>
+                                        <span className="text-[9px] text-gray-400 uppercase tracking-widest">
+                                            {new Date(notif.createdAt).toLocaleDateString()} {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
                                     </div>
                                     <p className="text-xs text-gray-500 leading-relaxed max-w-lg">{notif.message}</p>
                                 </div>
                             </div>
-                        ))}
+                        )) : (
+                            <div className="bg-white rounded-3xl p-10 text-center border border-dashed border-gray-200">
+                                <p className="text-xs font-bold uppercase tracking-widest text-gray-400">No notifications yet</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

@@ -124,6 +124,7 @@ export interface Booking {
   roomName: string;
   guestName: string;
   guestEmail: string;
+  guestId?: string;
   guestPhone?: string;
   totalPrice: number;
   nights: number;
@@ -195,5 +196,27 @@ export interface ScheduledEmail {
   scheduledFor: string; // ISO date
   sent: boolean;
   sentAt?: string;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: 'booking' | 'payment' | 'system' | 'review';
+  isRead: boolean;
+  createdAt: string;
+  link?: string;
+}
+
+export interface Activity {
+  id: string;
+  type: 'booking' | 'registration' | 'payment' | 'admin' | 'review';
+  action: string;
+  details: string;
+  timestamp: string;
+  userId?: string;
+  userName?: string;
+  metadata?: any;
 }
 

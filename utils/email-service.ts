@@ -18,11 +18,11 @@ export const EmailService = {
 
             // Add to 'mail' collection for Firebase Trigger Email extension
             const docRef = await addDoc(collection(db, 'mail'), {
-                to: [booking.guestEmail],
+                to: [booking.guestEmail, config.footer.email],
                 message: {
                     subject,
                     html,
-                    text
+                    text: text || html.replace(/<[^>]*>?/gm, '') // Fallback text
                 },
                 metadata: {
                     bookingId: booking.id,

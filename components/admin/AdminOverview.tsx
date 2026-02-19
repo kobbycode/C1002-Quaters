@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Room, SiteConfig, Booking } from '../../types';
+import { Room, SiteConfig, Booking, Activity } from '../../types';
 import { useSite } from '../../context/SiteContext';
 import { formatPrice } from '../../utils/formatters';
 import { EmailScheduler } from '../../utils/email-scheduler';
@@ -152,7 +152,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
     setEditingRoom,
     setViewingBooking
 }) => {
-    const { bookings, reviews } = useSite();
+    const { bookings, reviews, activities } = useSite();
     const [revenueDateFilter, setRevenueDateFilter] = useState<'7d' | '30d' | '90d'>('7d');
 
     const { chartData, financialData, stats } = useAnalytics({
@@ -377,19 +377,26 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                         </button>
                     </div>
                     <div className="space-y-4">
-                        {bookings.slice(0, 5).map(booking => (
-                            <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 group hover:border-gold/30 transition-all cursor-pointer" onClick={() => setViewingBooking(booking)}>
+                        {activities.slice(0, 6).map(activity => (
+                            <div key={activity.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 group hover:border-gold/30 transition-all">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-lg shadow-sm">👤</div>
+                                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-lg shadow-sm">
+                                        {activity.type === 'booking' ? '📅' :
+                                            activity.type === 'registration' ? '👤' :
+                                                activity.type === 'payment' ? '💳' :
+                                                    activity.type === 'review' ? '⭐' : '⚙️'}
+                                    </div>
                                     <div>
-                                        <p className="text-sm font-black text-charcoal">{booking.guestName}</p>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{booking.roomName}</p>
+                                        <p className="text-sm font-black text-charcoal">{activity.action}</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{activity.details}</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-sm font-black text-charcoal">{formatPrice(booking.totalPrice, config.currency || 'GHS')}</p>
-                                    <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${booking.paymentStatus === 'paid' ? 'text-green-500' : 'text-yellow-500'}`}>
-                                        {booking.paymentStatus}
+                                    <p className="text-[10px] font-black text-charcoal uppercase tracking-widest">
+                                        {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </p>
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                                        {new Date(activity.timestamp).toLocaleDateString()}
                                     </p>
                                 </div>
                             </div>

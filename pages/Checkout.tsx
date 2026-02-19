@@ -111,6 +111,7 @@ const Checkout: React.FC = () => {
       roomName: room.name,
       guestName: `${formData.firstName} ${formData.lastName}`,
       guestEmail: formData.email,
+      guestId: user?.uid,
       guestPhone: formData.phone,
       totalPrice: totalAmount,
       nights: nights,
@@ -125,26 +126,6 @@ const Checkout: React.FC = () => {
     };
 
     await addBooking(bookingData);
-
-    // Send Email Notification
-    await sendEmail(
-      [formData.email, config.footer.email], // Use dynamic config email
-      `Booking Confirmed - ${room.name}`,
-      `<div>
-        <h1>Booking Confirmation</h1>
-        <p>Dear ${formData.firstName},</p>
-        <p>Thank you for choosing {config.brand.name}. Your reservation for <strong>${room.name}</strong> is confirmed.</p>
-        <ul>
-          <li><strong>Check-in:</strong> ${dates?.formattedCheckIn || 'Flexible'}</li>
-          <li><strong>Duration:</strong> ${nights} Night(s)</li>
-          <li><strong>Addons:</strong> ${hasGymAccess ? 'Elite Gym Access Included' : 'None'}</li>
-          <li><strong>Total:</strong> ${formatPrice(totalAmount, config.currency)}</li>
-          <li><strong>Payment Status:</strong> ${status.toUpperCase()} (${method})</li>
-        </ul>
-        <p>Our concierge will contact you shortly via WhatsApp/Phone to finalize details.</p>
-        <p>Akwaaba,<br/>{config.brand.name} Team</p>
-      </div>`
-    );
 
     setIsSuccess(true);
     setIsProcessing(false);
