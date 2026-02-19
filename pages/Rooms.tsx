@@ -145,9 +145,11 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
               <span className="w-1.5 h-1.5 rounded-full bg-gold" />
               <p className="text-[10px] md:text-[11px] font-black text-gold uppercase tracking-[0.3em]">{room.category}</p>
             </div>
-            <h3 className="text-2xl md:text-3xl font-black font-serif text-charcoal leading-tight group-hover:text-primary transition-colors truncate">
-              {room.name}
-            </h3>
+            <Link to={`/rooms/${room.id}`} className="block group/title">
+              <h3 className="text-xl md:text-2xl font-black font-serif text-charcoal leading-tight group-hover/title:text-gold transition-colors truncate">
+                {room.name}
+              </h3>
+            </Link>
           </div>
           <div className="flex flex-col items-end shrink-0 ml-4">
             <div className="flex items-center gap-1 bg-gold/5 px-3 py-1.5 rounded-xl border border-gold/10">
@@ -193,10 +195,10 @@ const RoomCard: React.FC<{ room: Room; wishlist: string[]; onToggleWishlist: (id
           </div>
           <Link
             to={`/checkout?room=${room.id}${searchParams.toString() ? `&${searchParams.toString()}` : ''}`}
-            className="group/btn relative h-16 sm:h-auto sm:px-10 py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-[0.2em] text-[11px] transition-all hover:bg-charcoal hover:shadow-2xl active:scale-95 shadow-xl shadow-primary/20 overflow-hidden flex items-center justify-center"
+            className="group/btn relative h-14 sm:h-auto sm:px-10 py-4 rounded-xl bg-charcoal text-white font-black uppercase tracking-[0.2em] text-[10px] transition-all hover:bg-gold hover:shadow-2xl active:scale-95 shadow-xl shadow-charcoal/20 overflow-hidden flex items-center justify-center border border-white/5"
           >
             <span className="relative z-10">Secure Suite</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
           </Link>
         </div>
       </div>
@@ -379,7 +381,7 @@ const Rooms: React.FC = () => {
               <div className="h-0.5 w-12 bg-gold" />
               <span className="text-gold font-black uppercase tracking-[0.6em] text-[10px] md:text-xs">The Collection</span>
             </div>
-            <h1 className="text-5xl md:text-8xl font-black leading-[0.9] tracking-tighter font-serif mb-6 text-charcoal">
+            <h1 className="text-4xl md:text-6xl font-black leading-[1] tracking-tighter font-serif mb-6 text-charcoal">
               {formatLuxuryText("Suites of *Distinction*")}
             </h1>
             <p className="text-gray-500 text-sm md:text-lg max-w-2xl font-medium leading-relaxed italic border-l-2 border-gold/20 pl-6 md:pl-10">

@@ -183,7 +183,7 @@ const Home: React.FC = () => {
               </select>
             </div>
           </div>
-          <button type="submit" className="lg:w-auto h-14 md:h-16 lg:h-20 px-8 md:px-12 rounded-2xl md:rounded-[1.25rem] bg-primary text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:bg-[#6B006B] transition-all touch-active active:scale-95">
+          <button type="submit" className="lg:w-auto h-14 md:h-16 lg:h-20 px-8 md:px-12 rounded-xl bg-charcoal text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:bg-gold transition-all touch-active active:scale-95 border border-white/5">
             Book Room
           </button>
         </form>
@@ -195,7 +195,7 @@ const Home: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-12 md:mb-20 animate-fade-in">
             <div className="max-w-2xl">
               <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-3 md:mb-4 block">Featured Rooms</span>
-              <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif text-charcoal leading-[1.1]">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-charcoal leading-[1.1]">
                 {formatLuxuryText("Suites of *Style*")}
               </h2>
             </div>
@@ -223,8 +223,10 @@ const Home: React.FC = () => {
                 </div>
                 <div className="px-2">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-xl md:text-2xl font-black font-serif text-charcoal group-hover:text-gold transition-colors">{room.name}</h3>
-                    <p className="text-lg md:text-xl font-bold text-primary font-serif">{formatPrice(room.price, config.currency)}</p>
+                    <Link to={`/rooms/${room.id}`} className="block group/title">
+                      <h3 className="text-xl md:text-2xl font-black font-serif text-charcoal group-hover/title:text-gold transition-colors">{room.name}</h3>
+                    </Link>
+                    <p className="text-lg md:text-xl font-bold text-gold font-serif">{formatPrice(room.price, config.currency)}</p>
                   </div>
                   <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">{room.size} — {room.view}</p>
                 </div>
