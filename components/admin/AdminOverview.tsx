@@ -215,15 +215,15 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         <div className="space-y-12 animate-fade-in">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {stats.map(s => (
-                    <div key={s.label} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div key={s.label} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow min-w-0">
                         <div className="flex justify-between items-start mb-6">
                             <span className="text-2xl">{s.icon}</span>
                             <Sparkline data={s.trend} color={s.color} />
                         </div>
                         <div className="relative z-10">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gold mb-1">{s.label}</p>
-                            <div className="flex items-end gap-3 mb-1">
-                                <p className="text-3xl font-black text-charcoal">{s.value}</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-gold mb-1 truncate">{s.label}</p>
+                            <div className="flex items-baseline gap-2 mb-1 flex-wrap">
+                                <p className="text-2xl font-black text-charcoal tracking-tight leading-none">{s.value}</p>
                                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-full mb-1.5 ${s.growth.startsWith('+') ? 'bg-green-50 text-green-500' : 'bg-gray-50 text-gray-400'}`}>
                                     {s.growth}
                                 </span>

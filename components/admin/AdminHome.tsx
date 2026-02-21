@@ -63,7 +63,34 @@ export const AdminHome: React.FC<AdminHomeProps> = ({
                     </div>
                     <button
                         onClick={() => {
-                            setEditingHero({ id: Date.now().toString(), image: '', subtitle: '', title: '', description: '' });
+                            const templates = [
+                                {
+                                    subtitle: 'Unrivaled Elegance',
+                                    title: 'A New Standard of Living',
+                                    description: 'Experience the pinnacle of sophisticated design and bespoke comfort in our latest collection of premium residences.'
+                                },
+                                {
+                                    subtitle: 'A Legacy of Luxury',
+                                    title: 'Timeless Beauty, Modern Grace',
+                                    description: 'Where heritage craftsmanship meets contemporary innovation to create sanctuaries of enduring style.'
+                                },
+                                {
+                                    subtitle: 'Bespoke Sanctuaries',
+                                    title: 'Woven into the City\'s Fabric',
+                                    description: 'Intimate residences designed for those who seek the extraordinary in every detail of their urban lifestyle.'
+                                },
+                                {
+                                    subtitle: 'The Gold Standard',
+                                    title: 'Curated for the Connoisseur',
+                                    description: 'Every element refined to perfection, offering an atmosphere of prestige and unparalleled refinement.'
+                                }
+                            ];
+                            const template = templates[Math.floor(Math.random() * templates.length)];
+                            setEditingHero({
+                                id: Date.now().toString(),
+                                image: '',
+                                ...template
+                            });
                         }}
                         className="bg-charcoal text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-charcoal/20"
                     >
