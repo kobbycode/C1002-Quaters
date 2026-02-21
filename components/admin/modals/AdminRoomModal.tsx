@@ -40,6 +40,11 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
         setEditingRoom({ ...editingRoom, images: [...currentImages, url] });
     };
 
+    const addGalleryImages = (urls: string[]) => {
+        const currentImages = editingRoom.images || [];
+        setEditingRoom({ ...editingRoom, images: [...currentImages, ...urls] });
+    };
+
     const removeGalleryImage = (index: number) => {
         const currentImages = editingRoom.images || [];
         setEditingRoom({ ...editingRoom, images: currentImages.filter((_, i) => i !== index) });
@@ -272,6 +277,8 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                             <div className="col-span-full">
                                 <ImageUpload
                                     label="Add to Gallery"
+                                    multiple={true}
+                                    onImagesUploaded={addGalleryImages}
                                     onImageUploaded={addGalleryImage}
                                     onError={(msg) => showToast(msg, 'error')}
                                     folder="rooms/gallery"

@@ -11,61 +11,86 @@ interface ImageUploadProps {
     label?: string;
     allowUnauthenticated?: boolean;
     variant?: 'default' | 'compact';
+    multiple?: boolean;
+    onImagesUploaded?: (urls: string[]) => void;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded, onError, folder = 'uploads', label = 'Upload Image', allowUnauthenticated = false, variant = 'default' }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({
+    currentImage,
+    onImageUploaded,
+    onImagesUploaded,
+    onError,
+    folder = 'uploads',
+    label = 'Upload Image',
+    allowUnauthenticated = false,
+    variant = 'default',
+    multiple = false
+}) => {
     const [preview, setPreview] = useState<string | null>(currentImage || null);
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+        const files: File[] = Array.from(e.target.files || []);
+        if (files.length === 0) return;
 
-        // Create a preview
-        const objectUrl = URL.createObjectURL(file);
-        setPreview(objectUrl);
+        if (!multiple && files.length > 1) {
+            if (onError) onError("This component does not support multiple uploads.");
+            return;
+        }
+
         setUploading(true);
         setProgress(0);
 
-
-        // Create a reference to the file in Firebase Storage
         try {
             if (!allowUnauthenticated && !auth.currentUser) {
-                console.error("User not authenticated before upload!");
                 if (onError) onError("Authentication error. Please login again.");
-                else alert("You must be logged in to upload.");
                 setUploading(false);
                 return;
             }
-            if (auth.currentUser) {
-                console.log("Starting upload as:", auth.currentUser.email);
-            }
-            const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
-            const uploadTask = uploadBytesResumable(storageRef, file);
 
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    setProgress(progress);
-                },
-                (error) => {
-                    console.error("Upload failed:", error);
-                    setUploading(false);
-                    if (onError) onError("Failed to upload image. Please try again.");
-                    else alert("Failed to upload image.");
-                },
-                async () => {
-                    // Upload completed successfully, get the download URL
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    onImageUploaded(downloadURL);
-                    setUploading(false);
-                }
-            );
+            // If it's a single upload, we can still show a preview
+            if (!multiple && files[0]) {
+                const objectUrl = URL.createObjectURL(files[0]);
+                setPreview(objectUrl);
+            }
+
+            // Track overall progress more accurately
+            const totalBytes = files.reduce((acc, f) => acc + f.size, 0);
+            const progressMap = new Map<number, number>();
+
+            const results = await Promise.all(files.map((file, index) => {
+                const storageRef = ref(storage, `${folder}/${Date.now()}_${index}_${file.name}`);
+                const uploadTask = uploadBytesResumable(storageRef, file);
+
+                return new Promise<string>((resolve, reject) => {
+                    uploadTask.on(
+                        'state_changed',
+                        (snapshot) => {
+                            progressMap.set(index, snapshot.bytesTransferred);
+                            const currentTotal = Array.from(progressMap.values()).reduce((a, b) => a + b, 0);
+                            setProgress(totalBytes > 0 ? (currentTotal / totalBytes) * 100 : 100);
+                        },
+                        (error) => reject(error),
+                        async () => {
+                            const url = await getDownloadURL(uploadTask.snapshot.ref);
+                            resolve(url);
+                        }
+                    );
+                });
+            }));
+
+            if (multiple && onImagesUploaded) {
+                onImagesUploaded(results);
+            } else if (!multiple && onImageUploaded && results[0]) {
+                onImageUploaded(results[0]);
+            }
+
+            setUploading(false);
         } catch (error) {
-            console.error("Error initiating upload:", error);
+            console.error("Batch upload failed:", error);
+            if (onError) onError("Failed to upload one or more images.");
             setUploading(false);
         }
     };
@@ -114,6 +139,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 accept="image/*"
+                multiple={multiple}
                 className="hidden"
             />
         </div>
