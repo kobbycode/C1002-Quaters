@@ -41,9 +41,11 @@ const RoomCard: React.FC<{
   isAvailable?: boolean;
   selectedDates?: { checkIn: string; nights: number };
 }> = ({ room, wishlist, onToggleWishlist, onOpenGallery, isAvailable = true, selectedDates }) => {
-  const { config } = useSite();
+  const { config, getRoomMetrics } = useSite();
   const [searchParams] = useSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const metrics = useMemo(() => getRoomMetrics(room.id), [room.id, getRoomMetrics]);
 
   const roomImages = useMemo(() => {
     if (room.images && room.images.length > 0) {
@@ -155,7 +157,7 @@ const RoomCard: React.FC<{
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-1.5 h-1.5 rounded-full bg-gold" />
-              <p className="text-[10px] md:text-[11px] font-black text-gold uppercase tracking-[0.3em]">{room.category}</p>
+              <p className="text-[10px] md:text-[11px] font-black text-gold uppercase tracking-[0.3em]">{room.category} • {room.floor}</p>
             </div>
             <Link to={`/rooms/${room.id}`} className="block group/title">
               <h3 className="text-lg md:text-xl font-black font-serif text-charcoal leading-tight group-hover/title:text-gold transition-colors truncate">
@@ -166,9 +168,9 @@ const RoomCard: React.FC<{
           <div className="flex flex-col items-end shrink-0 ml-4">
             <div className="flex items-center gap-1 bg-gold/5 px-3 py-1.5 rounded-xl border border-gold/10">
               <span className="text-gold text-sm font-black">★</span>
-              <span className="text-charcoal text-sm font-black">{room.rating}</span>
+              <span className="text-charcoal text-sm font-black">{metrics.rating}</span>
             </div>
-            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1.5">{room.reviewsCount} Reviews</p>
+            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1.5">{metrics.reviewsCount} Reviews</p>
           </div>
         </div>
 

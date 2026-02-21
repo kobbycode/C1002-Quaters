@@ -262,8 +262,9 @@ const ReviewForm: React.FC<{ roomId: string, roomName: string }> = ({ roomId, ro
 };
 
 const RoomDetail: React.FC = () => {
-  const { rooms, config, bookings, reviews, loading, calculatePrice, isGalleryActive, setIsGalleryActive } = useSite();
+  const { rooms, config, bookings, reviews, loading, calculatePrice, isGalleryActive, setIsGalleryActive, getRoomMetrics } = useSite();
   const { id } = useParams<{ id: string }>();
+  // ... (keeping existing state)
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -274,6 +275,7 @@ const RoomDetail: React.FC = () => {
   const [checkOut, setCheckOut] = useState<Date | null>(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000));
 
   const room = rooms.find((r) => r.id === id);
+  const metrics = useMemo(() => id ? getRoomMetrics(id) : { rating: 5, reviewsCount: 0 }, [id, getRoomMetrics]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -534,6 +536,7 @@ const RoomDetail: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-3 mb-6">
                     <span className="text-gold font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] border border-gold/30 px-3 py-1 rounded-full">{room.category}</span>
+                    <span className="text-charcoal/60 font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] border border-charcoal/10 px-3 py-1 rounded-full">{room.floor}</span>
                     {room.isElite && <span className="bg-primary/10 text-primary font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] px-3 py-1 rounded-full">Elite Class</span>}
                   </div>
                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-black font-serif text-charcoal mb-6 tracking-tighter leading-tight">{room.name}</h1>
@@ -545,7 +548,7 @@ const RoomDetail: React.FC = () => {
                 </div>
                 <div className="flex items-center md:flex-col md:items-end gap-3 md:gap-1 mt-1 md:mt-0">
                   <div className="text-gold text-xl md:text-2xl font-bold tracking-tighter">★★★★★</div>
-                  <span className="text-[11px] md:text-xs font-black uppercase tracking-[0.2em] text-charcoal">{room.rating} <span className="text-gray-400 font-bold ml-1">/ {room.reviewsCount} Reviews</span></span>
+                  <span className="text-[11px] md:text-xs font-black uppercase tracking-[0.2em] text-charcoal">{metrics.rating} <span className="text-gray-400 font-bold ml-1">/ {metrics.reviewsCount} Reviews</span></span>
                 </div>
               </div>
               <p className="text-lg md:text-xl text-gray-500 leading-relaxed font-light italic border-l-2 border-gold/20 pl-6 py-2 md:py-3">
@@ -601,12 +604,12 @@ const RoomDetail: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-6 bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-50 flex-1 md:flex-none">
                   <div className="text-left">
-                    <p className="text-2xl md:text-3xl font-black text-charcoal leading-none mb-1">{room.rating} <span className="text-gold text-lg">★</span></p>
+                    <p className="text-2xl md:text-3xl font-black text-charcoal leading-none mb-1">{metrics.rating} <span className="text-gold text-lg">★</span></p>
                     <p className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest">Global Rating</p>
                   </div>
                   <div className="w-px h-10 bg-gray-100" />
                   <div className="text-left">
-                    <p className="text-2xl md:text-3xl font-black text-charcoal leading-none mb-1">{room.reviewsCount}</p>
+                    <p className="text-2xl md:text-3xl font-black text-charcoal leading-none mb-1">{metrics.reviewsCount}</p>
                     <p className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest">Patron Reviews</p>
                   </div>
                 </div>

@@ -16,6 +16,7 @@ export interface Room {
   tags?: string[]; // Array of tags like 'Best Seller', 'Popular'
   isBestSeller?: boolean;
   isElite?: boolean;
+  floor: string; // e.g. 'First Floor', 'Penthouse'
   maintenanceCost?: number; // Monthly maintenance cost
   operationalOverhead?: number; // % of price (e.g. 0.1 for 10%)
   status?: 'available' | 'cleaning' | 'maintenance';

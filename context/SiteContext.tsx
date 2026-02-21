@@ -41,6 +41,7 @@ interface SiteContextType {
   calculatePrice: (roomId: string, checkIn: Date, checkOut: Date) => ReturnType<typeof PricingEngine.calculatePrice>;
   addPricingRule: (rule: Omit<PricingRule, 'id'>) => void;
   deletePricingRule: (id: string) => void;
+  getRoomMetrics: (roomId: string) => { rating: number, reviewsCount: number };
 }
 
 const DEFAULT_CONFIG: SiteConfig = {
@@ -529,6 +530,22 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const getRoomMetrics = (roomId: string) => {
+    const roomReviews = reviews.filter(r => r.roomId === roomId && r.status === 'approved');
+    const reviewsCount = roomReviews.length;
+
+    if (reviewsCount === 0) {
+      // Return a default if no reviews exist, or use the base rating from the room doc
+      const room = rooms.find(r => r.id === roomId);
+      return { rating: room?.rating || 5, reviewsCount: 0 };
+    }
+
+    const totalRating = roomReviews.reduce((sum, r) => sum + r.rating, 0);
+    const rating = parseFloat((totalRating / reviewsCount).toFixed(1));
+
+    return { rating, reviewsCount };
+  };
+
   return (
     <SiteContext.Provider value={{
       rooms,
@@ -558,7 +575,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       deletePricingRule,
       logActivity,
       markNotificationRead,
-      addNotification
+      addNotification,
+      getRoomMetrics
     }}>
       {loading ? <GlobalLoader /> : children}
     </SiteContext.Provider>

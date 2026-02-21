@@ -23,6 +23,7 @@ export const ROOMS: Room[] = [
     guests: '2 Adults',
     view: 'Ocean View',
     category: 'Deluxe',
+    floor: 'Second Floor',
     amenities: ['65" Smart TV', 'Nespresso Machine', 'Rain Shower', 'WiFi'],
     isBestSeller: true
   },
@@ -47,6 +48,7 @@ export const ROOMS: Room[] = [
     guests: '4 Adults',
     view: 'Accra Skyline',
     category: 'Presidential',
+    floor: 'Penthouse Level',
     amenities: ['Butler Service', 'Walk in Closet'],
     isElite: true
   },
@@ -70,6 +72,7 @@ export const ROOMS: Room[] = [
     guests: '2 Adults',
     view: 'Private Garden',
     category: 'Villa',
+    floor: 'Ground Floor',
     amenities: ['Private Garden', 'Outdoor Shower']
   },
   {
@@ -92,6 +95,7 @@ export const ROOMS: Room[] = [
     guests: '3 Guests',
     view: 'City Skyline',
     category: 'Executive',
+    floor: 'Fourth Floor',
     amenities: ['Office Desk', 'Premium Bar', 'Dual Vanities']
   }
 ];

@@ -175,6 +175,16 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                             placeholder="e.g. Ocean View"
                         />
                     </div>
+                    <div className="col-span-2 md:col-span-1">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Floor Location</label>
+                        <input
+                            type="text"
+                            value={editingRoom.floor || ''}
+                            onChange={e => setEditingRoom({ ...editingRoom, floor: e.target.value })}
+                            className="w-full border-gray-100 bg-gray-50 rounded-xl p-5 text-sm font-bold"
+                            placeholder="e.g. Second Floor"
+                        />
+                    </div>
 
                     {/* Description */}
                     <div className="col-span-2">
