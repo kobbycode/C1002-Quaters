@@ -164,6 +164,33 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                             <div className="absolute top-6 right-6 flex flex-col items-end gap-2">
                                 {(() => {
                                     const todayStr = new Date().toISOString().split('T')[0];
+
+                                    // 1. Check for manual status (Cleaning/Maintenance)
+                                    if (room.status === 'maintenance') {
+                                        return (
+                                            <div className="bg-red-500 text-white px-3 py-1.5 rounded-xl shadow-xl flex flex-col items-end">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest">Maintenance</span>
+                                                </div>
+                                                <span className="text-[8px] font-bold text-white/80 uppercase mt-0.5">Out of Service</span>
+                                            </div>
+                                        );
+                                    }
+
+                                    if (room.status === 'cleaning') {
+                                        return (
+                                            <div className="bg-amber-500 text-white px-3 py-1.5 rounded-xl shadow-xl flex flex-col items-end">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest">Cleaning</span>
+                                                </div>
+                                                <span className="text-[8px] font-bold text-white/80 uppercase mt-0.5">Quick Refresh</span>
+                                            </div>
+                                        );
+                                    }
+
+                                    // 2. Check for active booking
                                     const activeBooking = bookings.find(b =>
                                         b.roomId === room.id &&
                                         b.isoCheckIn <= todayStr &&
@@ -183,6 +210,7 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                                         );
                                     }
 
+                                    // 3. Fallback to available
                                     const nextBooking = bookings
                                         .filter(b => b.roomId === room.id && b.isoCheckIn > todayStr && b.status !== 'cancelled')
                                         .sort((a, b) => a.isoCheckIn.localeCompare(b.isoCheckIn))[0];

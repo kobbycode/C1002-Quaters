@@ -450,6 +450,9 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const isRoomAvailable = (roomId: string, checkIn: string, checkOut: string) => {
+    const room = rooms.find(r => r.id === roomId);
+    if (room?.status && room.status !== 'available') return false;
+
     return !bookings
       .filter(b => b.roomId === roomId)
       .some(b => {

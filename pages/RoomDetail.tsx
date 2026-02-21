@@ -378,11 +378,11 @@ const RoomDetail: React.FC = () => {
   }, [bookings, id]);
 
   const pricing = useMemo(() => {
-    if (!room || !checkIn || !checkOut || nights === 0) return { total: 0, breakdown: null };
+    if (!room || !checkIn || !checkOut || nights === 0) return { finalTotal: 0, adjustments: [] };
     return calculatePrice(room.id, checkIn, checkOut);
   }, [room, checkIn, checkOut, nights, calculatePrice]);
 
-  const totalPrice = pricing.total;
+  const totalPrice = pricing.finalTotal;
   const formatDate = (date: Date | null) => date ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date) : 'Select Date';
 
   const categorizedAmenities: Record<string, string[]> = useMemo(() => {
@@ -713,9 +713,9 @@ const RoomDetail: React.FC = () => {
               <div className="space-y-4 pt-8 border-t border-gray-100 mb-8">
                 <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
                   <span className="text-gray-400">Base Rate ({nights} nights)</span>
-                  <span className="text-charcoal">{pricing.breakdown ? formatPrice(pricing.breakdown.subtotal, config.currency) : '-'}</span>
+                  <span className="text-charcoal">{pricing.subtotal ? formatPrice(pricing.subtotal, config.currency) : '-'}</span>
                 </div>
-                {pricing.breakdown?.adjustments.map((adj, i) => (
+                {pricing.adjustments?.map((adj: any, i: number) => (
                   <div key={i} className="flex justify-between text-xs font-medium tracking-widest text-emerald-600">
                     <span>{adj.ruleName}</span>
                     <span>{adj.amount > 0 ? '+' : ''}{formatPrice(adj.amount, config.currency)}</span>

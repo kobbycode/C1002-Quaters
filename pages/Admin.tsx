@@ -11,13 +11,14 @@ import { AdminBranding } from '../components/admin/AdminBranding';
 import { AdminOverview } from '../components/admin/AdminOverview';
 import { AdminBookings } from '../components/admin/AdminBookings';
 import { AdminRooms } from '../components/admin/AdminRooms';
+import { AdminAmenities } from '../components/admin/AdminAmenities';
 import { AdminHome } from '../components/admin/AdminHome';
 import { AdminNavigation } from '../components/admin/AdminNavigation';
 import { AdminPages } from '../components/admin/AdminPages';
 import { AdminFooter } from '../components/admin/AdminFooter';
 import { AdminSettings } from '../components/admin/AdminSettings';
-import { AdminAmenities } from '../components/admin/AdminAmenities';
 import { AdminReviews } from '../components/admin/AdminReviews';
+import { AdminActivity } from '../components/admin/AdminActivity';
 import { AdminNewsletter } from '../components/admin/AdminNewsletter';
 import { AdminConcierge } from '../components/admin/AdminConcierge';
 import { AdminConciergeLab } from '../components/admin/AdminConciergeLab';
@@ -35,11 +36,11 @@ import { AdminAmenityModal } from '../components/admin/modals/AdminAmenityModal'
 import { AdminBookingModal } from '../components/admin/modals/AdminBookingModal';
 import SEO from '../components/SEO';
 
-type Tab = 'overview' | 'bookings' | 'reviews' | 'emails' | 'pricing' | 'branding' | 'home' | 'pages' | 'gym' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'ailab' | 'patrons' | 'financials' | 'footer' | 'newsletter' | 'settings';
+type Tab = 'overview' | 'bookings' | 'reviews' | 'activity' | 'emails' | 'pricing' | 'branding' | 'home' | 'pages' | 'gym' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'ailab' | 'patrons' | 'financials' | 'footer' | 'newsletter' | 'settings';
 
 
 const Admin: React.FC = () => {
-  const { rooms, config, bookings, reviews, updateConfig, updateRooms, loading } = useSite();
+  const { rooms, config, bookings, reviews, updateConfig, updateRooms, loading, logActivity } = useSite();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [editingRoom, setEditingRoom] = useState<Partial<Room> | null>(null);
   const [editingNav, setEditingNav] = useState<NavLink | null>(null);
@@ -107,6 +108,12 @@ const Admin: React.FC = () => {
     if (existingIndex > -1) newRooms[existingIndex] = editingRoom as Room;
     else newRooms.push(editingRoom as Room);
     updateRooms(newRooms);
+    logActivity({
+      type: 'admin',
+      action: existingIndex > -1 ? 'Room Updated' : 'Room Created',
+      details: `${editingRoom.name} (${editingRoom.category}) was ${existingIndex > -1 ? 'modified' : 'added to the registry'}.`,
+      metadata: { roomId: editingRoom.id }
+    });
     setEditingRoom(null);
     showToast('Room saved successfully!');
   };
@@ -217,6 +224,7 @@ const Admin: React.FC = () => {
           </header>
 
           {/* Overview Tab */}
+
           {activeTab === 'overview' && (
             <AdminOverview
               rooms={rooms}
@@ -237,6 +245,11 @@ const Admin: React.FC = () => {
           {/* Reviews Tab */}
           {activeTab === 'reviews' && (
             <AdminReviews />
+          )}
+
+          {/* Activity Tab */}
+          {activeTab === 'activity' && (
+            <AdminActivity />
           )}
 
           {/* Emails Tab */}

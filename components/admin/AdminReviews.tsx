@@ -4,7 +4,7 @@ import { Review } from '../../types';
 import { useToast } from '../../context/ToastContext';
 
 export const AdminReviews: React.FC = () => {
-    const { reviews, updateReview, deleteReview } = useSite();
+    const { reviews, updateReview, deleteReview, logActivity } = useSite();
     const { showToast } = useToast();
 
     const pendingReviews = useMemo(() => reviews.filter(r => r.status === 'pending'), [reviews]);
@@ -12,7 +12,16 @@ export const AdminReviews: React.FC = () => {
 
     const handleApprove = async (id: string) => {
         try {
+            const review = reviews.find(r => r.id === id);
             await updateReview(id, { status: 'approved' });
+            if (review) {
+                await logActivity({
+                    type: 'review',
+                    action: 'Review Approved',
+                    details: `Moderator approved review from ${review.guestName} for ${review.roomName}.`,
+                    metadata: { reviewId: id }
+                });
+            }
             showToast('Review approved and published', 'success');
         } catch (err) {
             showToast('Failed to approve review', 'error');
@@ -21,7 +30,16 @@ export const AdminReviews: React.FC = () => {
 
     const handleReject = async (id: string) => {
         try {
+            const review = reviews.find(r => r.id === id);
             await updateReview(id, { status: 'rejected' });
+            if (review) {
+                await logActivity({
+                    type: 'review',
+                    action: 'Review Rejected',
+                    details: `Moderator rejected review from ${review.guestName} for ${review.roomName}.`,
+                    metadata: { reviewId: id }
+                });
+            }
             showToast('Review marked as rejected', 'success');
         } catch (err) {
             showToast('Failed to reject review', 'error');

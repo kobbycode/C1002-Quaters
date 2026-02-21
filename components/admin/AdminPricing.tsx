@@ -4,7 +4,7 @@ import { PricingRule, Room } from '../../types';
 import { formatPrice } from '../../utils/formatters';
 
 export const AdminPricing: React.FC = () => {
-    const { config, rooms, addPricingRule, deletePricingRule } = useSite();
+    const { config, rooms, addPricingRule, deletePricingRule, logActivity } = useSite();
     const rules = config.pricingRules || [];
     const [isCreating, setIsCreating] = useState(false);
     const [newRule, setNewRule] = useState<Omit<PricingRule, 'id' | 'isActive'>>({
@@ -24,6 +24,12 @@ export const AdminPricing: React.FC = () => {
         addPricingRule({
             ...newRule,
             isActive: true
+        });
+        logActivity({
+            type: 'admin',
+            action: 'Pricing Rule Added',
+            details: `Created new pricing rule: ${newRule.name} (${newRule.type}) with ${newRule.value}${newRule.adjustmentType === 'percentage' ? '%' : '$'} adjustment.`,
+            metadata: { ruleName: newRule.name }
         });
         setIsCreating(false);
         setNewRule({
@@ -88,7 +94,18 @@ export const AdminPricing: React.FC = () => {
                                 </div>
                                 <div className="flex gap-2">
                                     <button
-                                        onClick={() => deletePricingRule(rule.id)}
+                                        onClick={() => {
+                                            const rule = rules.find(r => r.id === rule.id);
+                                            deletePricingRule(rule.id);
+                                            if (rule) {
+                                                logActivity({
+                                                    type: 'admin',
+                                                    action: 'Pricing Rule Deleted',
+                                                    details: `Removed pricing rule: ${rule.name}.`,
+                                                    metadata: { ruleId: rule.id }
+                                                });
+                                            }
+                                        }}
                                         className="p-2 text-gray-300 hover:text-red-500 transition-colors"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>

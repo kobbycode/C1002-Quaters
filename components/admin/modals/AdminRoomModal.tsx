@@ -76,6 +76,19 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                         </select>
                     </div>
 
+                    <div className="col-span-2 md:col-span-1">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Operational Status</label>
+                        <select
+                            value={editingRoom.status || 'available'}
+                            onChange={e => setEditingRoom({ ...editingRoom, status: e.target.value as any })}
+                            className="w-full border-gray-100 bg-gray-50 rounded-xl p-5 text-sm font-bold capitalize"
+                        >
+                            <option value="available">Available</option>
+                            <option value="cleaning">Cleaning</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+
                     <div className="col-span-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Room Spec Tags</label>
                         <div className="flex flex-wrap gap-2">
@@ -91,8 +104,8 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                                         setEditingRoom({ ...editingRoom, tags: newTags });
                                     }}
                                     className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${(editingRoom.tags || []).includes(tag)
-                                            ? 'bg-gold text-white shadow-lg shadow-gold/20'
-                                            : 'bg-gray-50 text-gray-400 border border-gray-100 hover:border-gold/30'
+                                        ? 'bg-gold text-white shadow-lg shadow-gold/20'
+                                        : 'bg-gray-50 text-gray-400 border border-gray-100 hover:border-gold/30'
                                         }`}
                                 >
                                     {tag}

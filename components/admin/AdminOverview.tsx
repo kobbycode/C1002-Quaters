@@ -167,7 +167,9 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
 
     const liveSnapshot = useMemo(() => {
         const todayStr = new Date().toISOString().split('T')[0];
+
         const occupied = rooms.filter(r =>
+            r.status === 'available' && // Must be operational to be counted as occupied vs available
             bookings.some(b =>
                 b.roomId === r.id &&
                 b.isoCheckIn <= todayStr &&
@@ -175,8 +177,14 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                 b.status !== 'cancelled'
             )
         );
-        const available = rooms.filter(r => !occupied.find(o => o.id === r.id));
-        return { occupied, available };
+
+        const maintenance = rooms.filter(r => r.status === 'maintenance' || r.status === 'cleaning');
+        const available = rooms.filter(r =>
+            r.status === 'available' &&
+            !occupied.find(o => o.id === r.id)
+        );
+
+        return { occupied, maintenance, available };
     }, [rooms, bookings]);
 
     // Automated Email Scheduler
@@ -257,7 +265,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                             </div>
                             <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Right Now</span>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center px-4">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Available ({liveSnapshot.available.length})</span>
@@ -288,6 +296,22 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                                         <div className="py-4 text-center text-gray-300 text-[10px] font-bold uppercase">None currently</div>
                                     )}
                                     {liveSnapshot.occupied.length > 4 && <p className="text-[9px] text-gray-400 font-bold text-center">+{liveSnapshot.occupied.length - 4} more</p>}
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center px-4">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Maintenance ({liveSnapshot.maintenance.length})</span>
+                                </div>
+                                <div className="space-y-2">
+                                    {liveSnapshot.maintenance.length > 0 ? liveSnapshot.maintenance.slice(0, 4).map(r => (
+                                        <div key={r.id} className="bg-amber-50/50 p-3 rounded-xl border border-amber-100 flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-amber-500" />
+                                            <span className="text-[11px] font-black text-charcoal truncate">{r.name}</span>
+                                        </div>
+                                    )) : (
+                                        <div className="py-4 text-center text-gray-300 text-[10px] font-bold uppercase">All clear</div>
+                                    )}
+                                    {liveSnapshot.maintenance.length > 4 && <p className="text-[9px] text-gray-400 font-bold text-center">+{liveSnapshot.maintenance.length - 4} more</p>}
                                 </div>
                             </div>
                         </div>
@@ -432,7 +456,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                             <div className="w-1.5 h-6 bg-charcoal rounded-full" />
                             <h3 className="text-2xl font-black font-serif text-charcoal">Pulse Activity Feed</h3>
                         </div>
-                        <button onClick={() => setActiveTab('bookings')} className="text-[10px] font-black uppercase text-gold hover:underline tracking-widest">
+                        <button onClick={() => setActiveTab('activity')} className="text-[10px] font-black uppercase text-gold hover:underline tracking-widest">
                             Command Center
                         </button>
                     </div>
