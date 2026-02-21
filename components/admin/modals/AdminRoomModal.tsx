@@ -126,8 +126,9 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Price ({config.currency || 'GHS'})</label>
                         <input
                             type="number"
-                            value={editingRoom.price || 0}
+                            value={editingRoom.price === 0 ? '' : editingRoom.price}
                             onChange={e => setEditingRoom({ ...editingRoom, price: parseInt(e.target.value) || 0 })}
+                            onFocus={e => (e.target as HTMLInputElement).select()}
                             className="w-full border-gray-100 bg-gray-50 rounded-xl p-5 text-sm font-bold"
                         />
                     </div>

@@ -182,7 +182,15 @@ export const AdminPricing: React.FC = () => {
                                             <option value="percentage">%</option>
                                             <option value="fixed_amount">$</option>
                                         </select>
-                                        <input required type="number" value={newRule.value} onChange={e => setNewRule({ ...newRule, value: Number(e.target.value) })} className="w-full bg-gray-50 border-transparent rounded-xl p-4 focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all font-bold text-charcoal" placeholder="10" />
+                                        <input
+                                            required
+                                            type="number"
+                                            value={newRule.value === 0 ? '' : newRule.value}
+                                            onChange={e => setNewRule({ ...newRule, value: Number(e.target.value) })}
+                                            onFocus={e => (e.target as HTMLInputElement).select()}
+                                            className="w-full bg-gray-50 border-transparent rounded-xl p-4 focus:bg-white focus:ring-2 focus:ring-gold/20 focus:border-gold transition-all font-bold text-charcoal"
+                                            placeholder="10"
+                                        />
                                     </div>
                                     <p className="text-[10px] text-gray-400 mt-2 ml-1">Use negative values for discounts (e.g. -10)</p>
                                 </div>
