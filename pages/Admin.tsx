@@ -36,7 +36,7 @@ import { AdminAmenityModal } from '../components/admin/modals/AdminAmenityModal'
 import { AdminBookingModal } from '../components/admin/modals/AdminBookingModal';
 import SEO from '../components/SEO';
 
-type Tab = 'overview' | 'bookings' | 'reviews' | 'activity' | 'emails' | 'pricing' | 'branding' | 'home' | 'pages' | 'gym' | 'navigation' | 'rooms' | 'amenities' | 'concierge' | 'ailab' | 'patrons' | 'financials' | 'footer' | 'newsletter' | 'settings';
+type Tab = 'overview' | 'rooms' | 'bookings' | 'home' | 'gym' | 'amenities' | 'financials' | 'patrons' | 'pricing' | 'reviews' | 'activity' | 'emails' | 'branding' | 'pages' | 'navigation' | 'concierge' | 'ailab' | 'footer' | 'newsletter' | 'settings';
 
 
 const Admin: React.FC = () => {
@@ -165,7 +165,7 @@ const Admin: React.FC = () => {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mt-1">HQ Command Node</p>
         </div>
         <nav className="flex flex-col gap-1 overflow-y-auto no-scrollbar">
-          {(['overview', 'bookings', 'reviews', 'emails', 'pricing', 'branding', 'home', 'pages', 'gym', 'navigation', 'rooms', 'amenities', 'concierge', 'ailab', 'patrons', 'financials', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => {
+          {(['overview', 'rooms', 'bookings', 'home', 'gym', 'amenities', 'financials', 'patrons', 'pricing', 'reviews', 'activity', 'emails', 'branding', 'pages', 'navigation', 'concierge', 'ailab', 'footer', 'newsletter', 'settings'] as Tab[]).map(tab => {
             const getBadgeCount = () => {
               if (tab === 'bookings') return bookings.filter(b => b.status === 'pending').length;
               if (tab === 'reviews') return (reviews || []).filter(r => r.status === 'pending').length;
