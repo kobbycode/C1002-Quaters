@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SiteConfig } from '../../types';
 import { useToast } from '../../context/ToastContext';
+import ImageUpload from '../ImageUpload';
 
 interface AdminGymProps {
     config: SiteConfig;
@@ -52,16 +53,14 @@ export const AdminGym: React.FC<AdminGymProps> = ({
                         <div className="grid grid-cols-1 gap-4">
                             {(config.gymPage?.heroSlides || []).map((slide, idx) => (
                                 <div key={idx} className="flex gap-4">
-                                    <input
-                                        type="text"
-                                        value={slide}
-                                        onChange={e => {
+                                    <ImageUpload
+                                        currentImage={slide}
+                                        onImageUploaded={url => {
                                             const newSlides = [...(config.gymPage?.heroSlides || [])];
-                                            newSlides[idx] = e.target.value;
+                                            newSlides[idx] = url;
                                             updateConfig({ ...config, gymPage: { ...(config.gymPage || {}), heroSlides: newSlides } });
                                         }}
-                                        className="flex-1 bg-gray-50 border-gray-100 rounded-2xl p-4 text-xs font-mono outline-none focus:ring-2 ring-gold/20"
-                                        placeholder="Image URL"
+                                        label={`Slide ${idx + 1}`}
                                     />
                                     <button
                                         onClick={() => {
@@ -143,11 +142,10 @@ export const AdminGym: React.FC<AdminGymProps> = ({
 
                     <div>
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Facility Feature Image</label>
-                        <input
-                            type="text"
-                            value={config.gymPage?.facilityImage || ''}
-                            onChange={e => updateConfig({ ...config, gymPage: { ...(config.gymPage || {}), facilityImage: e.target.value } })}
-                            className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-xs font-mono outline-none focus:ring-2 ring-gold/20"
+                        <ImageUpload
+                            currentImage={config.gymPage?.facilityImage || ''}
+                            onImageUploaded={url => updateConfig({ ...config, gymPage: { ...(config.gymPage || {}), facilityImage: url } })}
+                            label="Facility Image"
                         />
                     </div>
 
