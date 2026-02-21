@@ -10,9 +10,10 @@ interface ImageUploadProps {
     folder?: string;
     label?: string;
     allowUnauthenticated?: boolean;
+    variant?: 'default' | 'compact';
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded, onError, folder = 'uploads', label = 'Upload Image', allowUnauthenticated = false }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded, onError, folder = 'uploads', label = 'Upload Image', allowUnauthenticated = false, variant = 'default' }) => {
     const [preview, setPreview] = useState<string | null>(currentImage || null);
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -76,7 +77,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded
             </label>
 
             <div
-                className={`relative w-full aspect-video rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center overflow-hidden transition-all group ${uploading ? 'opacity-50 pointer-events-none' : 'hover:border-gold hover:bg-gold/5'}`}
+                className={`relative rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center overflow-hidden transition-all group ${uploading ? 'opacity-50 pointer-events-none' : 'hover:border-gold hover:bg-gold/5'} ${variant === 'compact' ? 'w-full h-32' : 'w-full aspect-video'}`}
                 onClick={() => fileInputRef.current?.click()}
             >
                 {preview ? (
@@ -87,11 +88,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ currentImage, onImageUploaded
                         </div>
                     </>
                 ) : (
-                    <div className="text-center p-6">
-                        <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="text-center p-4">
+                        <svg className={`${variant === 'compact' ? 'w-5 h-5' : 'w-8 h-8'} text-gray-400 mx-auto mb-1`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span className="text-gray-400 text-xs font-bold uppercase tracking-widest block">Click to Upload</span>
+                        <span className={`${variant === 'compact' ? 'text-[8px]' : 'text-xs'} text-gray-400 font-bold uppercase tracking-widest block`}>Click to Upload</span>
                     </div>
                 )}
 

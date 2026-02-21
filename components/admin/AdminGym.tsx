@@ -61,6 +61,7 @@ export const AdminGym: React.FC<AdminGymProps> = ({
                                             updateConfig({ ...config, gymPage: { ...(config.gymPage || {}), heroSlides: newSlides } });
                                         }}
                                         label={`Slide ${idx + 1}`}
+                                        variant="compact"
                                     />
                                     <button
                                         onClick={() => {
@@ -146,6 +147,7 @@ export const AdminGym: React.FC<AdminGymProps> = ({
                             currentImage={config.gymPage?.facilityImage || ''}
                             onImageUploaded={url => updateConfig({ ...config, gymPage: { ...(config.gymPage || {}), facilityImage: url } })}
                             label="Facility Image"
+                            variant="compact"
                         />
                     </div>
 
