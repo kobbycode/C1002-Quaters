@@ -69,7 +69,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     phone: "+233243177596",
     email: "reservations@c1002quarters.com.gh"
   },
-  categories: ['Deluxe', 'Executive', 'Presidential', 'Villa'],
+  categories: ['Three Bedrooms', 'Two Bedrooms', 'One Bedroom', 'Studio', 'Deluxe', 'Executive', 'Presidential', 'Villa'],
   amenityDetails: {
     '65" Smart TV': { icon: 'tv', description: '4K resolution with pre-installed streaming services.', category: 'Entertainment & Tech', image: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&q=80&w=1200' },
     'WiFi': { icon: 'wifi', description: 'High-speed fiber connectivity throughout the suite.', category: 'Entertainment & Tech', image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=1200' },

@@ -144,6 +144,11 @@ const RoomCard: React.FC<{
               <span className="text-xs">🏆</span> Elite Pick
             </div>
           )}
+          {room.tags && room.tags.map(tag => (
+            <div key={tag} className="bg-charcoal/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-xl border border-white/10 flex items-center gap-1.5">
+              <span className="text-[10px]">●</span> {tag}
+            </div>
+          ))}
           {!isAvailable && (
             <div className="bg-red-500 text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-xl shadow-red-500/20 flex items-center gap-1.5 animate-pulse">
               <span className="text-xs">📅</span> Reserved
