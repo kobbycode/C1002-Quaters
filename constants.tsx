@@ -102,7 +102,7 @@ export const ROOMS: Room[] = [
     id: 'papafio-3br-exec',
     name: 'The Papafio 3-Bedroom Executive',
     description: 'The ultimate luxury experience at C1002 Quarters. A spacious three-bedroom suite designed for elite stay and comfort.',
-    price: 1100,
+    price: 1200,
     image: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&q=80&w=2400',
     rating: 5.0,
     reviewsCount: 12,
@@ -116,10 +116,10 @@ export const ROOMS: Room[] = [
     isElite: true
   },
   {
-    id: 'papafio-2br-suite',
-    name: 'Papafio 2-Bedroom Suite',
+    id: 'papafio-2br-v1',
+    name: 'Papafio 2-Bedroom Suite Alpha',
     description: 'A refined two-bedroom option within the Papafio wing, offering high-end amenities and sophisticated design.',
-    price: 800,
+    price: 850,
     image: 'https://images.unsplash.com/photo-1590490359683-658d3d23f972?auto=format&fit=crop&q=80&w=2400',
     rating: 4.9,
     reviewsCount: 8,
@@ -132,10 +132,26 @@ export const ROOMS: Room[] = [
     tags: ['Popular']
   },
   {
-    id: 'papafio-1br-deluxe',
+    id: 'papafio-2br-v2',
+    name: 'Papafio 2-Bedroom Suite Beta',
+    description: 'A premium variant of the two-bedroom Papafio suite with enhanced views and amenities.',
+    price: 900,
+    image: 'https://images.unsplash.com/photo-1590490359683-658d3d23f972?auto=format&fit=crop&q=80&w=2400',
+    rating: 4.9,
+    reviewsCount: 5,
+    size: '125m²',
+    guests: '4 Adults',
+    view: 'Ocean & City View',
+    category: 'Two Bedrooms',
+    floor: 'Fourth Floor',
+    amenities: ['Premium Bar', 'Nespresso Machine', 'WiFi'],
+    tags: ['High Demand']
+  },
+  {
+    id: 'papafio-1br',
     name: 'Papafio 1-Bedroom Deluxe',
     description: 'Perfect for couples or business travelers, this one-bedroom suite combines economy with luxury.',
-    price: 500,
+    price: 550,
     image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80&w=2400',
     rating: 4.8,
     reviewsCount: 15,
@@ -148,7 +164,7 @@ export const ROOMS: Room[] = [
     tags: ['Best Seller']
   },
   {
-    id: 'claudia-2br-premier',
+    id: 'claudia-2br',
     name: 'The Claudia 2-Bedroom Premier',
     description: 'Elegant two-bedroom suite with bespoke furniture and a warm atmosphere.',
     price: 750,
@@ -164,10 +180,10 @@ export const ROOMS: Room[] = [
     tags: ['Cozy']
   },
   {
-    id: 'claudia-studio-modern',
+    id: 'claudia-studio-v1',
     name: 'Claudia Studio Modern',
     description: 'A contemporary studio apartment with all the essentials for a modern traveler.',
-    price: 420,
+    price: 450,
     image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=2400',
     rating: 4.7,
     reviewsCount: 18,
@@ -180,10 +196,10 @@ export const ROOMS: Room[] = [
     tags: ['Tech-Ready']
   },
   {
-    id: 'claudia-studio-classic',
+    id: 'claudia-studio-v2',
     name: 'Claudia Studio Classic',
     description: 'Classic comfort in a compact space, ideal for short stays.',
-    price: 380,
+    price: 400,
     image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=2400',
     rating: 4.6,
     reviewsCount: 10,
@@ -196,10 +212,10 @@ export const ROOMS: Room[] = [
     tags: ['Value']
   },
   {
-    id: 'quaatey-1br-sig',
+    id: 'quaatey-1br-v1',
     name: 'Quaatey 1-Bedroom Signature',
     description: 'Experience the signature Quaatey charm in this spacious one-bedroom suite.',
-    price: 480,
+    price: 500,
     image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=2400',
     rating: 4.8,
     reviewsCount: 22,
@@ -212,10 +228,10 @@ export const ROOMS: Room[] = [
     tags: ['Signature']
   },
   {
-    id: 'quaatey-1br-classic',
+    id: 'quaatey-1br-v2',
     name: 'Quaatey 1-Bedroom Classic',
     description: 'A classic one-bedroom suite offering comfort and traditional hospitality.',
-    price: 420,
+    price: 450,
     image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=2400',
     rating: 4.7,
     reviewsCount: 30,
