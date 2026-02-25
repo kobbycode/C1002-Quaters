@@ -186,12 +186,22 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                     {/* Specs */}
                     <div className="col-span-2 md:col-span-1 lg:col-span-1">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Size (e.g. 45m²)</label>
-                        <input
-                            type="text"
-                            value={editingRoom.size || ''}
-                            onChange={e => setEditingRoom({ ...editingRoom, size: e.target.value })}
-                            className="w-full border-gray-100 bg-gray-50 rounded-xl p-5 text-sm font-bold"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={editingRoom.size || ''}
+                                onChange={e => setEditingRoom({ ...editingRoom, size: e.target.value })}
+                                className="w-full border-gray-100 bg-gray-50 rounded-xl p-5 text-sm font-bold pr-12"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setEditingRoom({ ...editingRoom, size: (editingRoom.size || '') + '²' })}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-100 w-8 h-8 rounded-lg text-xs font-bold text-gold hover:border-gold transition-all"
+                                title="Insert squared symbol"
+                            >
+                                ²
+                            </button>
+                        </div>
                     </div>
                     <div className="col-span-2 md:col-span-1 lg:col-span-1">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Max Guests</label>
