@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { SiteConfig } from '../../types';
 import { useToast } from '../../context/ToastContext';
 import { AdminNewsletterModal } from './modals/AdminNewsletterModal';
+import { useConfirmation } from '../../context/ConfirmationContext';
 
 interface AdminNewsletterProps {
     config: SiteConfig;
@@ -10,6 +11,7 @@ interface AdminNewsletterProps {
 
 export const AdminNewsletter: React.FC<AdminNewsletterProps> = ({ config, updateConfig }) => {
     const { showToast } = useToast();
+    const confirm = useConfirmation();
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const subscribers = config.newsletterSubscribers || [];
@@ -37,8 +39,15 @@ export const AdminNewsletter: React.FC<AdminNewsletterProps> = ({ config, update
         showToast('Subscriber list exported as CSV', 'success');
     };
 
-    const handleRemoveSubscriber = (email: string) => {
-        if (!window.confirm(`Are you sure you want to remove ${email}?`)) return;
+    const handleRemoveSubscriber = async (email: string) => {
+        const confirmed = await confirm({
+            title: 'Remove Patron?',
+            message: `Are you sure you want to remove ${email} from the correspondence circle?`,
+            confirmText: 'Remove',
+            type: 'danger'
+        });
+
+        if (!confirmed) return;
 
         const newSubscribers = subscribers.filter(s => s !== email);
         updateConfig({

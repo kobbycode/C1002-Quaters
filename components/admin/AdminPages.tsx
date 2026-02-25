@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SiteConfig } from '../../types';
 import { useToast } from '../../context/ToastContext';
+import ImageUpload from '../ImageUpload';
 
 interface AdminPagesProps {
     config: SiteConfig;
@@ -122,29 +123,48 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                             </div>
                         </div>
 
-                        <div className="space-y-8">
-                            <div>
-                                <div className="flex justify-between items-end mb-3">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Heritage Narrative - Phase I</label>
+                        <div className="mb-10">
+                            <ImageUpload
+                                label="Hero Aesthetic Index"
+                                currentImage={config.aboutPage?.heroImage}
+                                onImageUploaded={(url) => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heroImage: url } })}
+                                folder="about"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                            <div className="space-y-8">
+                                <div>
+                                    <div className="flex justify-between items-end mb-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Heritage Narrative - Phase I</label>
+                                    </div>
+                                    <textarea
+                                        rows={4}
+                                        value={config.aboutPage?.heritageDescription1 || ''}
+                                        onChange={e => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription1: e.target.value } })}
+                                        className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium leading-relaxed outline-none focus:ring-2 ring-gold/20"
+                                        placeholder="The beginning of the story..."
+                                    />
                                 </div>
-                                <textarea
-                                    rows={4}
-                                    value={config.aboutPage?.heritageDescription1 || ''}
-                                    onChange={e => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription1: e.target.value } })}
-                                    className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium leading-relaxed outline-none focus:ring-2 ring-gold/20"
-                                    placeholder="The beginning of the story..."
-                                />
+                                <div>
+                                    <div className="flex justify-between items-end mb-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Heritage Narrative - Phase II</label>
+                                    </div>
+                                    <textarea
+                                        rows={4}
+                                        value={config.aboutPage?.heritageDescription2 || ''}
+                                        onChange={e => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription2: e.target.value } })}
+                                        className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium leading-relaxed outline-none focus:ring-2 ring-gold/20"
+                                        placeholder="The growth and evolution..."
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <div className="flex justify-between items-end mb-3">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-gold block">Heritage Narrative - Phase II</label>
-                                </div>
-                                <textarea
-                                    rows={4}
-                                    value={config.aboutPage?.heritageDescription2 || ''}
-                                    onChange={e => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageDescription2: e.target.value } })}
-                                    className="w-full bg-gray-50 border-gray-100 rounded-2xl p-6 text-sm font-medium leading-relaxed outline-none focus:ring-2 ring-gold/20"
-                                    placeholder="The growth and evolution..."
+                            <div className="flex flex-col justify-end">
+                                <ImageUpload
+                                    label="Heritage Visual Archive"
+                                    currentImage={config.aboutPage?.heritageImage}
+                                    onImageUploaded={(url) => updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), heritageImage: url } })}
+                                    folder="about"
                                 />
                             </div>
                         </div>

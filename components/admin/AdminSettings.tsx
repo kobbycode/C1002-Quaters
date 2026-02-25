@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SiteConfig, Room } from '../../types';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmation } from '../../context/ConfirmationContext';
 
 interface AdminSettingsProps {
     config: SiteConfig;
@@ -11,6 +12,7 @@ interface AdminSettingsProps {
 
 export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConfig, rooms, updateRooms }) => {
     const { showToast } = useToast();
+    const confirm = useConfirmation();
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editValue, setEditValue] = useState('');
     const [editingTagIndex, setEditingTagIndex] = useState<number | null>(null);
@@ -114,7 +116,13 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
     };
 
     const handleSeedDatabase = async () => {
-        if (confirm('This will upload your current local data (Rooms & Config) to Firebase Firestore. Continue?')) {
+        const confirmed = await confirm({
+            title: 'Initialize Database?',
+            message: 'This will upload your current local data (Rooms & Config) to Firebase Firestore. Continue?',
+            confirmText: 'Continue Seed'
+        });
+
+        if (confirmed) {
             try {
                 const { seedDatabase } = await import('../../utils/seedData');
                 const success = await seedDatabase(config);
@@ -229,8 +237,15 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                                 </svg>
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    if (window.confirm(`Are you sure you want to delete the category "${cat}"?`)) {
+                                                onClick={async () => {
+                                                    const confirmed = await confirm({
+                                                        title: 'Delete Category?',
+                                                        message: `Are you sure you want to delete the category "${cat}"?`,
+                                                        confirmText: 'Delete',
+                                                        type: 'danger'
+                                                    });
+
+                                                    if (confirmed) {
                                                         const newCategories = config.categories.filter(c => c !== cat);
                                                         updateConfig({ ...config, categories: newCategories });
                                                         showToast(`Category "${cat}" removed`);
@@ -327,8 +342,15 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                                 </svg>
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    if (confirm(`Are you sure you want to delete the tag "${tag}"? This will remove it from all rooms.`)) {
+                                                onClick={async () => {
+                                                    const confirmed = await confirm({
+                                                        title: 'Delete Tag?',
+                                                        message: `Are you sure you want to delete the tag "${tag}"? This will remove it from all rooms.`,
+                                                        confirmText: 'Delete',
+                                                        type: 'danger'
+                                                    });
+
+                                                    if (confirmed) {
                                                         const newTags = (config.roomTags || []).filter(t => t !== tag);
                                                         const updatedRooms = rooms.map(r => ({
                                                             ...r,

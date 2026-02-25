@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useSite } from '../../context/SiteContext';
 import { Room } from '../../types';
 import { formatPrice } from '../../utils/formatters';
+import { useConfirmation } from '../../context/ConfirmationContext';
 
 interface AdminRoomsProps {
     onEditRoom: (room: Room) => void;
@@ -10,6 +11,7 @@ interface AdminRoomsProps {
 
 export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoom }) => {
     const { rooms, updateRoom, deleteRoom, config, bookings } = useSite();
+    const confirm = useConfirmation();
 
     const handleToggleBestSeller = async (id: string, current: boolean) => {
         await updateRoom(id, { isBestSeller: !current });
@@ -20,7 +22,14 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
     };
 
     const handleDelete = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this room? This cannot be undone.')) {
+        const confirmed = await confirm({
+            title: 'Delete Room?',
+            message: 'Are you sure you want to delete this room? This cannot be undone.',
+            confirmText: 'Delete',
+            type: 'danger'
+        });
+
+        if (confirmed) {
             await deleteRoom(id);
         }
     };

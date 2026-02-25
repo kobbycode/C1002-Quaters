@@ -5,6 +5,7 @@ import { Booking } from '../../types';
 import { useToast } from '../../context/ToastContext';
 import { AdminCalendar } from './AdminCalendar';
 import { ExportService } from '../../utils/export-service';
+import { useConfirmation } from '../../context/ConfirmationContext';
 
 interface AdminBookingsProps {
     onViewBooking: (booking: Booking) => void;
@@ -29,6 +30,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
 
     const { rooms, addBooking, deleteBooking, bookings, config, isRoomAvailable, calculatePrice } = useSite();
     const { showToast } = useToast();
+    const confirm = useConfirmation();
 
     const handleCreateBooking = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -124,7 +126,14 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
     }, [bookings, bookingSearch, bookingFilter, dateFilter]);
 
     const handleDelete = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this booking?')) {
+        const confirmed = await confirm({
+            title: 'Delete Booking?',
+            message: 'Are you sure you want to delete this booking?',
+            confirmText: 'Delete',
+            type: 'danger'
+        });
+
+        if (confirmed) {
             try {
                 await deleteBooking(id);
             } catch (err) {

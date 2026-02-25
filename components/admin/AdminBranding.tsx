@@ -58,6 +58,21 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                 <option>Minimalist & Zen</option>
                             </select>
                         </div>
+
+                        <div className="pt-6 border-t border-gray-50">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-black text-charcoal">Dark Mode Activation</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Inverts system logo and applies midnight aesthetic</p>
+                                </div>
+                                <button
+                                    onClick={() => updateConfig({ ...config, brand: { ...(config.brand || {}), darkMode: !config.brand?.darkMode } })}
+                                    className={`w-14 h-8 rounded-full transition-all relative ${config.brand?.darkMode ? 'bg-gold' : 'bg-gray-200'}`}
+                                >
+                                    <div className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all shadow-sm ${config.brand?.darkMode ? 'left-7' : 'left-1'}`} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

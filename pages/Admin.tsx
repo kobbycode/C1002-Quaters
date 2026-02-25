@@ -35,12 +35,14 @@ import { AdminRoomModal } from '../components/admin/modals/AdminRoomModal';
 import { AdminAmenityModal } from '../components/admin/modals/AdminAmenityModal';
 import { AdminBookingModal } from '../components/admin/modals/AdminBookingModal';
 import SEO from '../components/SEO';
+import { useConfirmation } from '../context/ConfirmationContext';
 
 type Tab = 'overview' | 'rooms' | 'bookings' | 'home' | 'gym' | 'amenities' | 'financials' | 'patrons' | 'pricing' | 'reviews' | 'activity' | 'emails' | 'branding' | 'pages' | 'navigation' | 'concierge' | 'ailab' | 'footer' | 'newsletter' | 'settings';
 
 
 const Admin: React.FC = () => {
   const { rooms, config, bookings, reviews, updateConfig, updateRooms, loading, logActivity } = useSite();
+  const confirm = useConfirmation();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [editingRoom, setEditingRoom] = useState<Partial<Room> | null>(null);
   const [editingNav, setEditingNav] = useState<NavLink | null>(null);
@@ -144,8 +146,15 @@ const Admin: React.FC = () => {
     showToast('Amenity details updated!');
   };
 
-  const handleDeleteAmenity = (name: string) => {
-    if (window.confirm(`Are you sure you want to delete "${name}"? This will remove it from the registry.`)) {
+  const handleDeleteAmenity = async (name: string) => {
+    const confirmed = await confirm({
+      title: 'Delete Amenity?',
+      message: `Are you sure you want to delete "${name}"? This will remove it from the registry.`,
+      confirmText: 'Delete',
+      type: 'danger'
+    });
+
+    if (confirmed) {
       const newDetails = { ...config.amenityDetails };
       delete newDetails[name];
       updateConfig({ ...config, amenityDetails: newDetails });

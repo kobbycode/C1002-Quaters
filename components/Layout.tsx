@@ -118,7 +118,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div
-      className="flex flex-col min-h-screen font-sans"
+      className="flex flex-col min-h-screen font-sans dark:bg-background-dark dark:text-white transition-colors duration-500"
       style={{
         ['--primary-color' as any]: config.brand.primaryColor,
         ['--gold-color' as any]: config.brand.primaryColor, // Mapping gold to primary for consistent luxury feel
@@ -126,13 +126,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     >
       <header
         className={`fixed top-0 z-50 w-full transition-all duration-300 px-6 md:px-10 lg:px-40 py-0 flex items-center justify-between border-b ${isGalleryActive ? 'opacity-0 pointer-events-none visibility-hidden' : ''} ${isScrolled || !isHome
-          ? 'bg-white text-charcoal border-gray-100 shadow-sm'
+          ? 'bg-white dark:bg-charcoal text-charcoal dark:text-white border-gray-100 dark:border-white/5 shadow-sm'
           : 'bg-black/10 backdrop-blur-md text-white border-white/10'
           }`}
       >
         <Link to="/" className="flex items-center gap-3 group z-[60]">
           <div className="transition-transform hover:scale-105 -my-12">
-            <img src="/logo.png" alt={config.brand.name} className={`h-40 w-auto object-contain ${isScrolled || !isHome ? '' : 'brightness-0 invert'}`} />
+            <img
+              src="/logo.png"
+              alt={config.brand.name}
+              className={`h-40 w-auto object-contain ${(isScrolled || !isHome) && !config.brand.darkMode ? '' : 'brightness-0 invert'
+                }`}
+            />
           </div>
         </Link>
 
@@ -147,7 +152,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   onClick={handleNavClick}
                   className={`text-sm font-medium transition-colors ${isActive
                     ? 'text-primary'
-                    : 'hover:text-primary'
+                    : 'hover:text-primary dark:text-white/70 dark:hover:text-primary'
                     }`}
                 >
                   {link.label}
@@ -399,11 +404,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         )}
       </div>
 
-      <footer className="bg-white border-t border-gray-200 pt-12 md:pt-20 pb-10 px-6 md:px-10 lg:px-40">
+      <footer className="bg-white dark:bg-charcoal border-t border-gray-200 dark:border-white/5 pt-12 md:pt-20 pb-10 px-6 md:px-10 lg:px-40 transition-colors duration-500">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12 md:mb-20">
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-3 text-charcoal">
-              <img src="/logo.png" alt={config.brand.name} className="h-24 md:h-40 w-auto object-contain" />
+              <img
+                src="/logo.png"
+                alt={config.brand.name}
+                className={`h-24 md:h-40 w-auto object-contain ${config.brand.darkMode ? 'brightness-0 invert' : ''}`}
+              />
             </div>
             <p className="text-gray-500 text-xs md:text-sm leading-loose">
               {config.footer.aboutText}

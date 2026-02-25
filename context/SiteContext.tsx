@@ -54,7 +54,8 @@ const DEFAULT_CONFIG: SiteConfig = {
     socials: {
       instagram: "@c1002quarters",
       linkedin: "c1002-quarters-accra"
-    }
+    },
+    darkMode: false
   },
   navLinks: [
     { id: '1', label: 'About', path: '/about' },
@@ -158,6 +159,15 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [isGalleryActive, setIsGalleryActive] = useState(false);
+
+  // Synchronize Dark Mode Class
+  useEffect(() => {
+    if (config.brand.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [config.brand.darkMode]);
 
   // Firestore Subscriptions
   useEffect(() => {

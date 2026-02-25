@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AmenityDetail } from '../../../types';
+import ImageUpload from '../../ImageUpload';
 
 interface AdminAmenityModalProps {
     editingAmenity: { name: string, detail: AmenityDetail } | null;
@@ -28,9 +29,18 @@ export const AdminAmenityModal: React.FC<AdminAmenityModalProps> = ({
 
     return (
         <div className="fixed inset-0 z-[100] bg-charcoal/90 backdrop-blur-xl flex items-center justify-center p-6 animate-fade-in">
-            <div className="bg-white w-full max-w-lg rounded-[3rem] p-12 shadow-2xl relative overflow-hidden">
+            <div className="bg-white w-full max-w-lg rounded-[3rem] p-12 shadow-2xl relative overflow-hidden overflow-y-auto max-h-[90vh]">
                 <h2 className="text-3xl font-black font-serif mb-10 text-charcoal">Amenity Registry</h2>
                 <div className="space-y-6">
+                    <div>
+                        <ImageUpload
+                            label="Visual Identifier"
+                            currentImage={editingAmenity.detail.image}
+                            onImageUploaded={(url) => setEditingAmenity({ ...editingAmenity, detail: { ...editingAmenity.detail, image: url } })}
+                            folder="amenities"
+                            variant="compact"
+                        />
+                    </div>
                     <div>
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Amenity Name</label>
                         <input

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SiteConfig, NavLink } from '../../types';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmation } from '../../context/ConfirmationContext';
 
 interface AdminNavigationProps {
     config: SiteConfig;
@@ -14,6 +15,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
     setEditingNav
 }) => {
     const { showToast } = useToast();
+    const confirm = useConfirmation();
     // Local drag and drop state for navigation links
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -97,10 +99,19 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
                                 Modify
                             </button>
                             <button
-                                onClick={() => {
-                                    const newLinks = config.navLinks.filter(l => l.id !== link.id);
-                                    updateConfig({ ...config, navLinks: newLinks });
-                                    showToast('Navigation link removed');
+                                onClick={async () => {
+                                    const confirmed = await confirm({
+                                        title: 'Remove Link?',
+                                        message: `Are you sure you want to remove the "${link.label}" navigation link?`,
+                                        confirmText: 'Remove',
+                                        type: 'danger'
+                                    });
+
+                                    if (confirmed) {
+                                        const newLinks = config.navLinks.filter(l => l.id !== link.id);
+                                        updateConfig({ ...config, navLinks: newLinks });
+                                        showToast('Navigation link removed');
+                                    }
                                 }}
                                 className="text-[10px] font-black uppercase text-red-400 hover:text-red-600"
                             >

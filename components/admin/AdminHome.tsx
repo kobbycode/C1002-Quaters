@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SiteConfig, HeroSlide } from '../../types';
 import { formatLuxuryText } from '../../utils/formatters';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmation } from '../../context/ConfirmationContext';
 import ImageUpload from '../ImageUpload';
 
 interface AdminHomeProps {
@@ -16,6 +17,7 @@ export const AdminHome: React.FC<AdminHomeProps> = ({
     setEditingHero
 }) => {
     const { showToast } = useToast();
+    const confirm = useConfirmation();
     // Local drag and drop state for hero slides
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -137,10 +139,19 @@ export const AdminHome: React.FC<AdminHomeProps> = ({
                                     Modify
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        const newSlides = (config.heroSlides || []).filter(s => s.id !== slide.id);
-                                        updateConfig({ ...config, heroSlides: newSlides });
-                                        showToast('Slide removed');
+                                    onClick={async () => {
+                                        const confirmed = await confirm({
+                                            title: 'Remove Slide?',
+                                            message: `Are you sure you want to remove the slide "${slide.title || 'Untitled'}"?`,
+                                            confirmText: 'Remove',
+                                            type: 'danger'
+                                        });
+
+                                        if (confirmed) {
+                                            const newSlides = (config.heroSlides || []).filter(s => s.id !== slide.id);
+                                            updateConfig({ ...config, heroSlides: newSlides });
+                                            showToast('Slide removed');
+                                        }
                                     }}
                                     className="text-[10px] font-black uppercase text-red-400 hover:text-red-600"
                                 >

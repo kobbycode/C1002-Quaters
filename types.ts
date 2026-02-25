@@ -63,6 +63,7 @@ export interface SiteConfig {
       instagram: string;
       linkedin: string;
     };
+    darkMode?: boolean;
   };
   navLinks: NavLink[];
   footer: FooterConfig;
