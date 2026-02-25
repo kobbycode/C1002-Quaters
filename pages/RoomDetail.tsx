@@ -539,7 +539,10 @@ const RoomDetail: React.FC = () => {
                     <span className="text-charcoal/60 font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] border border-charcoal/10 px-3 py-1 rounded-full">{room.floor}</span>
                     {room.isElite && <span className="bg-primary/10 text-primary font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] px-3 py-1 rounded-full">Elite Class</span>}
                   </div>
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-charcoal mb-6 tracking-tighter leading-tight">{room.name}</h1>
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-charcoal mb-6 tracking-tighter leading-tight">
+                    {room.roomCode && <span className="text-gold mr-4">{room.roomCode}</span>}
+                    {room.name}
+                  </h1>
                   <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-gray-400 text-[11px] font-bold uppercase tracking-[0.2em]">
                     <span className="flex items-center gap-2.5"><svg className="w-4 h-4 text-gold/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>{room.size}</span>
                     <span className="flex items-center gap-2.5"><svg className="w-4 h-4 text-gold/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>{room.guests} Guests</span>

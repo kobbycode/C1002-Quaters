@@ -2,6 +2,7 @@
 export interface Room {
   id: string;
   name: string;
+  roomCode?: string;
   description: string;
   price: number;
   image: string;

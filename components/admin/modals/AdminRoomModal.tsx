@@ -58,13 +58,23 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                 <div className="grid grid-cols-2 gap-8">
                     {/* Basic Info */}
                     <div className="col-span-2 md:col-span-1">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Room Name</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Suite ID / Code</label>
+                        <input
+                            type="text"
+                            value={editingRoom.roomCode || ''}
+                            onChange={e => setEditingRoom({ ...editingRoom, roomCode: e.target.value })}
+                            className="w-full border-gray-100 bg-gray-50 rounded-xl p-5 text-sm font-bold"
+                            placeholder="e.g. P101"
+                        />
+                    </div>
+                    <div className="col-span-2 md:col-span-1">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Room Name / Type</label>
                         <input
                             type="text"
                             value={editingRoom.name || ''}
                             onChange={e => setEditingRoom({ ...editingRoom, name: e.target.value })}
                             className="w-full border-gray-100 bg-gray-50 rounded-xl p-5 text-sm font-bold"
-                            placeholder="e.g. Presidential Suite"
+                            placeholder="e.g. 3 Bedrooms"
                         />
                     </div>
                     <div className="col-span-2 md:col-span-1">
