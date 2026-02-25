@@ -321,14 +321,16 @@ const RoomDetail: React.FC = () => {
 
   const galleryImages: string[] = useMemo(() => {
     if (!room) return [];
-    if (room.images && room.images.length > 0) return room.images;
-    const defaultImages = [
-      room.image,
+
+    const baseGallery = room.images && room.images.length > 0 ? room.images : [
       `https://images.unsplash.com/photo-1590490359683-658d3d23f972?q=80&w=2000&auto=format&fit=crop`,
       `https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2000&auto=format&fit=crop`,
       `https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=2000&auto=format&fit=crop`,
     ];
-    return defaultImages.filter(Boolean);
+
+    // Always prepend the primary thumbnail image
+    const combined = [room.image, ...baseGallery.filter(img => img !== room.image)];
+    return combined.filter(Boolean);
   }, [room]);
 
   const handleNext = useCallback(() => {

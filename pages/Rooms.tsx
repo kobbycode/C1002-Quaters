@@ -48,11 +48,12 @@ const RoomCard: React.FC<{
   const metrics = useMemo(() => getRoomMetrics(room.id), [room.id, getRoomMetrics]);
 
   const roomImages = useMemo(() => {
-    if (room.images && room.images.length > 0) {
-      return room.images;
-    }
-    return [room.image];
-  }, [room]);
+    const gallery = room.images || [];
+    // Always include the primary image as the first item, followed by gallery images
+    // Filter out duplicates in case the primary image is also in the gallery
+    const combined = [room.image, ...gallery.filter(img => img !== room.image)];
+    return combined.filter(Boolean);
+  }, [room.image, room.images]);
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
