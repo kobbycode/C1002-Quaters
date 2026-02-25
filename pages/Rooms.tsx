@@ -166,7 +166,7 @@ const RoomCard: React.FC<{
             </div>
             <Link to={`/rooms/${room.id}`} className="block group/title">
               <h3 className="text-lg md:text-xl font-black text-charcoal leading-tight group-hover/title:text-gold transition-colors truncate">
-                {room.roomCode && <span className="text-gold mr-2">{room.roomCode}</span>}
+                {room.roomCode && <span className="text-gold text-sm md:text-base italic mr-2">{room.roomCode}</span>}
                 {room.name}
               </h3>
             </Link>
