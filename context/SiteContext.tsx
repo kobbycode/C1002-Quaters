@@ -170,7 +170,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 1. Subscribe to Rooms
     const unsubscribeRooms = onSnapshot(collection(db, 'rooms'), (snapshot) => {
-      const roomData = snapshot.docs.map(doc => doc.data() as Room);
+      const roomData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Room));
       if (roomData.length > 0) setRooms(roomData);
       roomsLoaded = true;
       if (configLoaded && bookingsLoaded && reviewsLoaded) setLoading(false);

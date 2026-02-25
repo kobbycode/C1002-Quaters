@@ -145,6 +145,34 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                         />
                     </div>
 
+                    <div className="col-span-2 py-4 flex gap-6">
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                checked={editingRoom.isBestSeller || false}
+                                onChange={e => setEditingRoom({ ...editingRoom, isBestSeller: e.target.checked })}
+                                className="hidden"
+                            />
+                            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${editingRoom.isBestSeller ? 'bg-gold border-gold' : 'border-gray-200 group-hover:border-gold/50'}`}>
+                                {editingRoom.isBestSeller && <span className="text-white text-xs">✨</span>}
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-charcoal">Best Seller Badge</span>
+                        </label>
+
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                checked={editingRoom.isElite || false}
+                                onChange={e => setEditingRoom({ ...editingRoom, isElite: e.target.checked })}
+                                className="hidden"
+                            />
+                            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${editingRoom.isElite ? 'bg-primary border-primary' : 'border-gray-200 group-hover:border-primary/50'}`}>
+                                {editingRoom.isElite && <span className="text-white text-xs">🏆</span>}
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-charcoal">Elite Pick Badge</span>
+                        </label>
+                    </div>
+
                     {/* Specs */}
                     <div className="col-span-2 md:col-span-1 lg:col-span-1">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 block">Size (e.g. 45m²)</label>
