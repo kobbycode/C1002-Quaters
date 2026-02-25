@@ -25,14 +25,16 @@ export const CommandSearch: React.FC<CommandSearchProps> = ({ isOpen, onClose })
         // Search Rooms
         rooms.forEach(room => {
             const name = room.name.toLowerCase();
+            const code = (room.roomCode || '').toLowerCase();
             const category = room.category.toLowerCase();
-            if (name.includes(q) || category.includes(q)) {
+
+            if (name.includes(q) || code.includes(q) || category.includes(q)) {
                 matches.push({
                     type: 'room',
-                    title: room.name,
+                    title: room.roomCode ? `${room.roomCode} - ${room.name}` : room.name,
                     subtitle: `${room.category} • ${formatPrice(room.price, config.currency)}/night`,
-                    // Prioritize rooms that start with the query
-                    isPriority: name.startsWith(q),
+                    // Prioritize rooms that start with the query (name or code)
+                    isPriority: name.startsWith(q) || code.startsWith(q),
                     action: () => {
                         if (isAdmin) {
                             navigate(`/admin?tab=rooms&edit=${room.id}`);
