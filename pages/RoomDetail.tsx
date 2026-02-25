@@ -542,7 +542,7 @@ const RoomDetail: React.FC = () => {
                     {room.isElite && <span className="bg-primary/10 text-primary font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] px-3 py-1 rounded-full">Elite Class</span>}
                   </div>
                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-charcoal mb-6 tracking-tighter leading-tight">
-                    {room.roomCode && <span className="text-gold text-2xl md:text-3xl italic mr-4">{room.roomCode}</span>}
+                    {room.roomCode && <span className="text-gold text-base md:text-xl italic mr-4 uppercase tracking-widest">{room.roomCode}</span>}
                     {room.name}
                   </h1>
                   <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-gray-400 text-[11px] font-bold uppercase tracking-[0.2em]">
