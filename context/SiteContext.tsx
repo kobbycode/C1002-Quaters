@@ -216,6 +216,27 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           navLinks: finalNavLinks
         };
 
+        // Auto-migration for legacy "1957" content to new "2025" branding
+        let needsSync = false;
+        if (mergedConfig.aboutPage) {
+          if (mergedConfig.aboutPage.heritageTitle?.includes('1957')) {
+            mergedConfig.aboutPage.heritageTitle = mergedConfig.aboutPage.heritageTitle.replace('1957', '2025');
+            needsSync = true;
+          }
+          if (mergedConfig.aboutPage.heritageDescription1?.includes('independence')) {
+            mergedConfig.aboutPage.heritageDescription1 = "Established to celebrate the vibrant spirit of modern Accra, C1002 Quarters was created with a goal to provide a world class place that honors the culture of Ghana.";
+            needsSync = true;
+          }
+        }
+        if (mergedConfig.foundingYear === '1957') {
+          mergedConfig.foundingYear = '2025';
+          needsSync = true;
+        }
+
+        if (needsSync) {
+          updateConfig(mergedConfig);
+        }
+
         setConfig(mergedConfig);
       }
       configLoaded = true;
