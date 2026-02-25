@@ -62,9 +62,10 @@ const Amenities: React.FC = () => {
         <div className="space-y-24">
           {(Object.entries(categorizedAmenities) as [string, (AmenityDetail & { name: string })[]][]).map(([category, items]) => (
             <div key={category} className="animate-fade-in group">
-              <div className="flex items-center gap-6 mb-12">
-                <h2 className="text-xl md:text-2xl font-black text-charcoal font-serif uppercase tracking-wider">{category}</h2>
-                <div className="h-[1px] flex-1 bg-gray-200 group-hover:bg-gold/30 transition-colors" />
+              <div className="flex items-center gap-6 mb-12 justify-center">
+                <div className="h-[1px] flex-1 bg-gray-200 group-hover:bg-gold/30 transition-colors hidden md:block" />
+                <h2 className="text-xl md:text-2xl font-black text-charcoal font-serif uppercase tracking-wider text-center">{category}</h2>
+                <div className="h-[1px] flex-1 bg-gray-200 group-hover:bg-gold/30 transition-colors hidden md:block" />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

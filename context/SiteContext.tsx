@@ -101,7 +101,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     heroTitle: "Accra's Landmark \n *of Distinction*",
     heroSubtitle: "The C1002 Quarters Story",
     heroImage: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400",
-    heritageTitle: "A Top Spot Since *1957*",
+    heritageTitle: "A Top Spot Since *2025*",
     heritageDescription1: "Founded in the year of Ghana's independence, C1002 Quarters began with a goal to create a world class place that honors the culture of Accra.",
     heritageDescription2: "Located in the heart of the city's Spintex district, we provide an experience that welcomes everyone, where every guest is treated as a friend.",
     heritageImage: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1200",
@@ -141,7 +141,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     ]
   },
 
-  foundingYear: "1957",
+  foundingYear: "2025",
   conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Akwaaba'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
   roomTags: ['Best Seller', 'Popular', 'Elite'],
   adminEmails: ['admin@c1002quarters.com', 'reservations@c1002quarters.com.gh']
