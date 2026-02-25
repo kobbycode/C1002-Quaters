@@ -154,7 +154,7 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                                 className="hidden"
                             />
                             <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${editingRoom.isBestSeller ? 'bg-gold border-gold' : 'border-gray-200 group-hover:border-gold/50'}`}>
-                                {editingRoom.isBestSeller && <span className="text-white text-xs">✨</span>}
+                                {editingRoom.isBestSeller && <span className="text-white text-[10px]">✓</span>}
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-charcoal">Best Seller Badge</span>
                         </label>

@@ -135,8 +135,8 @@ const RoomCard: React.FC<{
 
         <div className="absolute top-6 left-6 flex flex-col gap-2 pointer-events-none z-10">
           {room.isBestSeller && (
-            <div className="bg-gold text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-xl shadow-gold/20 flex items-center gap-1.5 animate-bounce">
-              <span className="text-xs">✨</span> Best Seller
+            <div className="bg-gold text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-xl shadow-gold/20 flex items-center gap-1.5">
+              Best Seller
             </div>
           )}
           {room.isElite && (
