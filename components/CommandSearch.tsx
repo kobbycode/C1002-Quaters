@@ -40,7 +40,7 @@ export const CommandSearch: React.FC<CommandSearchProps> = ({ isOpen, onClose })
                             navigate(`/admin?tab=rooms&edit=${room.id}`);
                             onClose();
                         } else {
-                            navigate(`/room/${room.id}`);
+                            navigate(`/rooms/${room.id}`);
                             onClose();
                         }
                     }
