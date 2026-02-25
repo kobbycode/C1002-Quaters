@@ -176,8 +176,7 @@ export const ROOMS: Room[] = [
     view: 'Garden View',
     category: 'Two Bedrooms',
     floor: 'First Floor',
-    amenities: ['Nespresso Machine', 'Smart TV', 'WiFi'],
-    tags: ['Cozy']
+    amenities: ['Nespresso Machine', 'Smart TV', 'WiFi']
   },
   {
     id: 'claudia-studio-v1',

@@ -146,7 +146,7 @@ const RoomCard: React.FC<{
             </div>
           )}
           {room.tags && room.tags
-            .filter(tag => !['tech-ready', 'value'].includes(tag.toLowerCase()))
+            .filter(tag => !['tech-ready', 'value', 'cozy'].includes(tag.toLowerCase()))
             .map(tag => (
               <div key={tag} className="bg-charcoal/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-xl border border-white/10 flex items-center gap-1.5">
                 <span className="text-[10px]">●</span> {tag}
