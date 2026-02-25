@@ -24,11 +24,15 @@ export const CommandSearch: React.FC<CommandSearchProps> = ({ isOpen, onClose })
 
         // Search Rooms
         rooms.forEach(room => {
-            if (room.name.toLowerCase().includes(q) || room.category.toLowerCase().includes(q)) {
+            const name = room.name.toLowerCase();
+            const category = room.category.toLowerCase();
+            if (name.includes(q) || category.includes(q)) {
                 matches.push({
                     type: 'room',
                     title: room.name,
                     subtitle: `${room.category} • ${formatPrice(room.price, config.currency)}/night`,
+                    // Prioritize rooms that start with the query
+                    isPriority: name.startsWith(q),
                     action: () => {
                         if (isAdmin) {
                             navigate(`/admin?tab=rooms&edit=${room.id}`);
@@ -38,8 +42,15 @@ export const CommandSearch: React.FC<CommandSearchProps> = ({ isOpen, onClose })
                             onClose();
                         }
                     }
-                });
+                } as any);
             }
+        });
+
+        // Sort matches to bring priority rooms to the top
+        matches.sort((a: any, b: any) => {
+            if (a.isPriority && !b.isPriority) return -1;
+            if (!a.isPriority && b.isPriority) return 1;
+            return 0;
         });
 
         // Search Amenities (for Guests)
@@ -52,13 +63,20 @@ export const CommandSearch: React.FC<CommandSearchProps> = ({ isOpen, onClose })
                         title: key,
                         subtitle: 'Hotel Experience',
                         action: () => {
-                            navigate('/amenities');
+                            if (key.toLowerCase().includes('gym')) {
+                                navigate('/gym');
+                            } else {
+                                navigate('/amenities');
+                            }
                             onClose();
                         }
                     });
                 }
             });
         }
+
+        // ... rest of the search logic ...
+        // (rest omitted for brevity in replace_file_content target)
 
         // Search Bookings & Subscribers (Admin Only)
         if (isAdmin) {
@@ -162,7 +180,7 @@ export const CommandSearch: React.FC<CommandSearchProps> = ({ isOpen, onClose })
                                         }`}>
                                         {result.type === 'room' && '🏨'}
                                         {result.type === 'booking' && '📅'}
-                                        {result.type === 'amenity' && '✨'}
+                                        {result.type === 'amenity' && (result.title.toLowerCase().includes('gym') ? '🏋️' : '⭐')}
                                         {result.type === 'subscriber' && '✉️'}
                                     </div>
                                     <div className="flex-1 min-w-0">
