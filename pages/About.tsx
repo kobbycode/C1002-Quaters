@@ -15,7 +15,7 @@ const About: React.FC = () => {
     "description": aboutPage.heroSubtitle,
     "url": window.location.origin + "/#/about",
     "logo": aboutPage.heroImage,
-    "foundingDate": "1957",
+    "foundingDate": "2025",
     "address": {
       "@type": "PostalAddress",
       "addressLocality": "Accra",

@@ -102,7 +102,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     heroSubtitle: "The C1002 Quarters Story",
     heroImage: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2400",
     heritageTitle: "A Top Spot Since *2025*",
-    heritageDescription1: "Founded in the year of Ghana's independence, C1002 Quarters began with a goal to create a world class place that honors the culture of Accra.",
+    heritageDescription1: "Established to celebrate the vibrant spirit of modern Accra, C1002 Quarters was created with a goal to provide a world class place that honors the culture of Ghana.",
     heritageDescription2: "Located in the heart of the city's Spintex district, we provide an experience that welcomes everyone, where every guest is treated as a friend.",
     heritageImage: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1200",
     pillars: [
