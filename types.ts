@@ -21,6 +21,7 @@ export interface Room {
   maintenanceCost?: number; // Monthly maintenance cost
   operationalOverhead?: number; // % of price (e.g. 0.1 for 10%)
   status?: 'available' | 'cleaning' | 'maintenance';
+  isFeatured?: boolean;
 }
 
 

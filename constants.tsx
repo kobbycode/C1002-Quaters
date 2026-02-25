@@ -25,7 +25,8 @@ export const ROOMS: Room[] = [
     category: 'Deluxe',
     floor: 'Second Floor',
     amenities: ['65" Smart TV', 'Nespresso Machine', 'Rain Shower', 'WiFi'],
-    isBestSeller: true
+    isBestSeller: true,
+    isFeatured: true
   },
   {
     id: 'presidentialwing',
@@ -50,7 +51,8 @@ export const ROOMS: Room[] = [
     category: 'Presidential',
     floor: 'Penthouse Level',
     amenities: ['Butler Service', 'Walk in Closet'],
-    isElite: true
+    isElite: true,
+    isFeatured: true
   },
   {
     id: 'gardenvilla',
@@ -113,7 +115,8 @@ export const ROOMS: Room[] = [
     floor: 'Top Floor',
     amenities: ['Butler Service', 'Private Kitchen', 'Smart TV', 'WiFi'],
     tags: ['Premium', 'Spacious'],
-    isElite: true
+    isElite: true,
+    isFeatured: true
   },
   {
     id: 'papafio-2br-v1',
@@ -221,8 +224,7 @@ export const ROOMS: Room[] = [
     view: 'Street View',
     category: 'One Bedroom',
     floor: 'Second Floor',
-    amenities: ['Smart TV', 'WiFi', 'Rain Shower'],
-    tags: ['Signature']
+    amenities: ['Smart TV', 'WiFi', 'Rain Shower']
   },
   {
     id: 'quaatey-1br-v2',

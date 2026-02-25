@@ -11,7 +11,14 @@ const Home: React.FC = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const slides = config.heroSlides;
-  const featuredSuites = useMemo(() => rooms.slice(0, 3), [rooms]);
+  const featuredSuites = useMemo(() => {
+    const featured = rooms.filter(r => r.isFeatured);
+    if (featured.length >= 3) return featured.slice(0, 3);
+
+    // If not enough featured rooms, fill with others
+    const others = rooms.filter(r => !r.isFeatured);
+    return [...featured, ...others].slice(0, 3);
+  }, [rooms]);
 
   const today = new Date().toISOString().split('T')[0];
   const threeDaysLater = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
