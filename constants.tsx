@@ -192,8 +192,7 @@ export const ROOMS: Room[] = [
     view: 'City View',
     category: 'Studio',
     floor: 'Ground Floor',
-    amenities: ['Smart TV', 'WiFi', 'Kitchenette'],
-    tags: ['Tech-Ready']
+    amenities: ['Smart TV', 'WiFi', 'Kitchenette']
   },
   {
     id: 'claudia-studio-v2',
@@ -208,8 +207,7 @@ export const ROOMS: Room[] = [
     view: 'Quiet Side',
     category: 'Studio',
     floor: 'Ground Floor',
-    amenities: ['WiFi', 'Shower', 'TV'],
-    tags: ['Value']
+    amenities: ['WiFi', 'Shower', 'TV']
   },
   {
     id: 'quaatey-1br-v1',
