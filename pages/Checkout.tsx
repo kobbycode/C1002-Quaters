@@ -63,6 +63,21 @@ const Checkout: React.FC = () => {
     return param ? parseInt(param) : 1;
   });
 
+  const [adults, setAdults] = useState<number>(() => {
+    const param = searchParams.get('adults');
+    return param ? parseInt(param) : 1;
+  });
+
+  const [children, setChildren] = useState<number>(() => {
+    const param = searchParams.get('children');
+    return param ? parseInt(param) : 0;
+  });
+
+  const [roomsCount, setRoomsCount] = useState<number>(() => {
+    const param = searchParams.get('rooms');
+    return param ? parseInt(param) : 1;
+  });
+
   const dates = useMemo(() => {
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkInDate);
@@ -524,7 +539,8 @@ const Checkout: React.FC = () => {
                 </div>
 
                 <div className="text-[11px] font-bold text-charcoal uppercase tracking-[0.2em]">
-                  {nights} {nights === 1 ? 'NIGHT' : 'NIGHTS'} | 1 ROOM, 2 ADULTS
+                  {nights} {nights === 1 ? 'NIGHT' : 'NIGHTS'} | {roomsCount} {roomsCount === 1 ? 'ROOM' : 'ROOMS'}, {adults} {adults === 1 ? 'ADULT' : 'ADULTS'}
+                  {children > 0 && `, ${children} ${children === 1 ? 'CHILD' : 'CHILDREN'}`}
                 </div>
 
                 {/* Room Card Selection */}

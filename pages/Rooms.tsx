@@ -341,13 +341,31 @@ const Rooms: React.FC = () => {
     return date.toISOString().split('T')[0];
   }, [checkIn, nights]);
 
+  const [adults, setAdults] = useState<number>(() => {
+    const param = searchParams.get('adults');
+    return param ? parseInt(param) : 1;
+  });
+
+  const [children, setChildren] = useState<number>(() => {
+    const param = searchParams.get('children');
+    return param ? parseInt(param) : 0;
+  });
+
+  const [roomsCount, setRoomsCount] = useState<number>(() => {
+    const param = searchParams.get('rooms');
+    return param ? parseInt(param) : 1;
+  });
+
   // Sync state with URL
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('checkIn', checkIn);
     newParams.set('nights', nights.toString());
+    newParams.set('adults', adults.toString());
+    newParams.set('children', children.toString());
+    newParams.set('rooms', roomsCount.toString());
     setSearchParams(newParams, { replace: true });
-  }, [checkIn, nights]);
+  }, [checkIn, nights, adults, children, roomsCount]);
 
   const allAmenities = useMemo(() => {
     const set = new Set<string>();
@@ -395,18 +413,12 @@ const Rooms: React.FC = () => {
         room.amenities.includes(amenity)
       );
 
-      let guestMatch = true;
-      if (guestParam === 'Family') {
-        guestMatch = room.guests >= 3 || room.category === 'Villa' || room.category === 'Presidential';
-      } else if (guestParam === '1 Adult') {
-        guestMatch = true;
-      } else if (guestParam === '2 Adults') {
-        guestMatch = room.guests >= 2;
-      }
+      const guestCapacity = parseInt(room.guests) || 0;
+      const guestMatch = guestCapacity >= (adults + children);
 
       return categoryMatch && priceMatch && amenitiesMatch && guestMatch;
     });
-  }, [selectedCategories, priceRange, selectedAmenities, searchParams, rooms]);
+  }, [selectedCategories, priceRange, selectedAmenities, adults, children, rooms]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev =>
@@ -498,62 +510,109 @@ const Rooms: React.FC = () => {
   }, [galleryOpen]);
 
   return (
-    <div className="pt-24 min-h-screen bg-background-light">
-      <BookingStepper currentStep={2} onSearchClick={() => setIsFilterDrawerOpen(true)} />
-      <div className="max-w-[1450px] mx-auto px-6 md:px-10 py-8">
-        {/* Booking Info Header */}
-        <div className="bg-white border-b border-gray-100 -mx-6 md:-mx-10 px-6 md:px-10 py-4 mb-4 flex flex-wrap items-center justify-between gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-3">
-              <span className="font-bold">{new Date(checkIn).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}</span>
-              <svg className="w-3 h-3 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-              <span className="font-bold">{new Date(isoCheckOut).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}</span>
+    <div className="pt-24 min-h-screen bg-background-light overflow-x-hidden">
+      <div className="hidden md:block">
+        <BookingStepper currentStep={2} onSearchClick={() => setIsFilterDrawerOpen(true)} />
+      </div>
+
+      {/* Booking Info Header */}
+      <div className="bg-white border-b border-gray-100 mb-6">
+        {/* Mobile View - Matches Reference Image */}
+        <div className="md:hidden">
+          <div className="px-6 py-5 border-t border-b border-gray-100 flex items-center justify-between">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-black text-charcoal tracking-wider uppercase flex-1 min-w-0">
+              <span className="truncate">{new Date(checkIn).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}</span>
+              <svg className="w-3 h-3 text-gold shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+              <span className="truncate">{new Date(isoCheckOut).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}</span>
             </div>
-            <div className="w-px h-4 bg-gray-200" />
-            <div className="flex items-center gap-2">
-              <span className="text-gold">🌙</span>
-              <span>{nights} {nights === 1 ? 'Night' : 'Nights'}</span>
-            </div>
-            <div className="w-px h-4 bg-gray-200" />
-            <div className="flex items-center gap-3 cursor-pointer group">
-              <span>1 Room, 2 Adults, 0 Children</span>
-              <svg className="w-3.5 h-3.5 text-gold group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-            </div>
+            <button
+              onClick={() => setIsFilterDrawerOpen(true)}
+              className="p-2 -mr-2 text-charcoal hover:text-gold transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-400">Promo Code</span>
-            <div className="flex items-center border-b border-gray-200">
-              <input
-                type="text"
-                placeholder="ENTER PROMO CODE HERE"
-                value={promoInput}
-                onChange={(e) => setPromoInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleApplyPromo()}
-                className="py-1 px-2 outline-none focus:border-gold transition-colors text-[10px] w-48 placeholder:text-gray-300 bg-transparent"
-              />
-              <button
-                onClick={handleApplyPromo}
-                className="text-charcoal hover:text-gold transition-colors ml-2 font-black"
-              >
-                APPLY
-              </button>
+          <div className="px-6 py-5 flex flex-wrap items-center gap-y-4 text-[11px] font-black text-charcoal tracking-wider uppercase border-b border-gray-100">
+            <div className="flex items-center gap-2 pr-4 border-r border-gray-100 shrink-0">
+              <svg className="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+              <span>{nights} {nights === 1 ? 'NIGHT' : 'NIGHTS'}</span>
             </div>
-            {discount > 0 && <span className="text-[9px] text-green-600 font-black">-{discount * 100}% OFF</span>}
+            <div className="flex items-center gap-3 pl-4">
+              <svg className="w-5 h-5 text-charcoal shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span className="leading-tight">{roomsCount} {roomsCount === 1 ? 'ROOM' : 'ROOMS'}, {adults} {adults === 1 ? 'ADULT' : 'ADULTS'}, {children} {children === 1 ? 'CHILD' : 'CHILDREN'}</span>
+            </div>
           </div>
         </div>
+
+        {/* Desktop View - Kept for consistency */}
+        <div className="hidden md:block">
+          <div className="max-w-[1450px] mx-auto px-10 py-4 flex items-center justify-between gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-3">
+                <span className="font-bold text-charcoal">{new Date(checkIn).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}</span>
+                <svg className="w-3 h-3 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                <span className="font-bold text-charcoal">{new Date(isoCheckOut).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}</span>
+              </div>
+              <div className="w-px h-4 bg-gray-200" />
+              <div className="flex items-center gap-2">
+                <span className="text-gold">🌙</span>
+                <span className="text-charcoal">{nights} {nights === 1 ? 'Night' : 'Nights'}</span>
+              </div>
+              <div className="w-px h-4 bg-gray-200" />
+              <div
+                onClick={() => setIsFilterDrawerOpen(true)}
+                className="flex items-center gap-3 cursor-pointer group hover:bg-gray-50 px-3 py-2 -mx-3 rounded-lg transition-all"
+              >
+                <span className="font-bold text-charcoal">{roomsCount === 1 ? '1 Room' : `${roomsCount} Rooms`}, {adults + children} {adults + children === 1 ? 'Guest' : 'Guests'}</span>
+                <svg className="w-3.5 h-3.5 text-gold group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-gray-400">Promo Code</span>
+              <div className="flex items-center border-b border-gray-200">
+                <input
+                  type="text"
+                  placeholder="PROMO CODE"
+                  value={promoInput}
+                  onChange={(e) => setPromoInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleApplyPromo()}
+                  className="py-1 px-2 outline-none focus:border-gold transition-colors text-[10px] w-40 placeholder:text-gray-300 bg-transparent"
+                />
+                <button
+                  onClick={handleApplyPromo}
+                  className="text-charcoal hover:text-gold transition-colors ml-2 font-black"
+                >
+                  APPLY
+                </button>
+              </div>
+              {discount > 0 && <span className="text-[9px] text-green-600 font-black">-{discount * 100}% OFF</span>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-[1450px] mx-auto px-6 md:px-10 py-8">
 
         {/* Filter / View Toggle Bar */}
         <div className="flex items-center justify-between mb-8 pb-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsFilterDrawerOpen(true)}
-              className="px-6 py-3 border border-charcoal/80 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-charcoal hover:text-white transition-all flex items-center gap-3 bg-white"
+              className="flex items-center gap-2 px-4 py-2 border border-charcoal text-charcoal text-[10px] font-black uppercase tracking-wider hover:bg-charcoal hover:text-white transition-all active:scale-95 group"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
-              Filter Rooms
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              FILTER ROOMS
             </button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 border transition-colors bg-white ${viewMode === 'grid' ? 'border-charcoal text-charcoal' : 'border-gray-100 text-charcoal/30 hover:border-gold'}`}
@@ -702,6 +761,47 @@ const Rooms: React.FC = () => {
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Guest Distribution */}
+              <div>
+                <h3 className="text-gold text-[10px] font-black mb-6 uppercase tracking-[0.4em]">Guest Configuration</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100">
+                    <div>
+                      <p className="text-[10px] font-black text-charcoal uppercase tracking-widest">Adults</p>
+                      <p className="text-[8px] text-gray-400 font-bold uppercase mt-0.5">Ages 13+</p>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <button onClick={() => setAdults(Math.max(1, adults - 1))} className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gold transition-colors">-</button>
+                      <span className="text-xs font-black text-charcoal">{adults}</span>
+                      <button onClick={() => setAdults(adults + 1)} className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gold transition-colors">+</button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100">
+                    <div>
+                      <p className="text-[10px] font-black text-charcoal uppercase tracking-widest">Children</p>
+                      <p className="text-[8px] text-gray-400 font-bold uppercase mt-0.5">Ages 0-12</p>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <button onClick={() => setChildren(Math.max(0, children - 1))} className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gold transition-colors">-</button>
+                      <span className="text-xs font-black text-charcoal">{children}</span>
+                      <button onClick={() => setChildren(children + 1)} className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gold transition-colors">+</button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100">
+                    <div>
+                      <p className="text-[10px] font-black text-charcoal uppercase tracking-widest">Rooms</p>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <button onClick={() => setRoomsCount(Math.max(1, roomsCount - 1))} className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gold transition-colors">-</button>
+                      <span className="text-xs font-black text-charcoal">{roomsCount}</span>
+                      <button onClick={() => setRoomsCount(roomsCount + 1)} className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gold transition-colors">+</button>
                     </div>
                   </div>
                 </div>

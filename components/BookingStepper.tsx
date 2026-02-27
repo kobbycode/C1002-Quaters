@@ -45,31 +45,31 @@ const BookingStepper: React.FC<StepperProps> = ({ currentStep, onSearchClick }) 
     };
 
     return (
-        <div className="w-full bg-[#f3f3f3] py-8 mb-12 animate-fade-in border-b border-gray-200/50">
+        <div className="w-full bg-[#f3f3f3] py-6 md:py-8 mb-8 md:mb-12 animate-fade-in border-b border-gray-200/50">
             <div className="max-w-[1400px] mx-auto px-4 md:px-10">
-                <div className="flex flex-wrap items-center justify-center gap-x-8 md:gap-x-12 gap-y-6">
+                <div className="flex flex-wrap items-center justify-center gap-x-4 md:gap-x-12 gap-y-4 md:gap-y-6">
                     {steps.map((step) => {
                         const isActive = step.id <= currentStep;
                         const isCurrent = step.id === currentStep;
-                        const isNavigable = step.id <= currentStep && step.id !== 4; // Can't manually navigate to confirmation
+                        const isNavigable = step.id <= currentStep && step.id !== 4;
 
                         return (
                             <div
                                 key={step.id}
                                 onClick={() => handleStepClick(step.id)}
-                                className={`flex items-center gap-3 md:gap-4 transition-all duration-300 ${isNavigable ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-50'
+                                className={`flex items-center gap-2 md:gap-4 transition-all duration-300 ${isNavigable ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-50'
                                     } ${step.id > currentStep ? 'grayscale' : ''}`}
                             >
                                 <div
-                                    className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-sm font-black transition-all duration-500 ${isActive
-                                            ? 'bg-charcoal text-white shadow-lg shadow-charcoal/20'
-                                            : 'border-2 border-charcoal/30 text-charcoal/40 bg-white'
+                                    className={`w-7 h-7 md:w-10 md:h-10 shrink-0 rounded-full flex items-center justify-center text-[10px] md:text-sm font-black transition-all duration-500 ${isActive
+                                        ? 'bg-charcoal text-white shadow-lg shadow-charcoal/20'
+                                        : 'border-2 border-charcoal/30 text-charcoal/40 bg-white'
                                         } ${isCurrent ? 'ring-4 ring-gold/20' : ''}`}
                                 >
                                     {step.id}
                                 </div>
                                 <span
-                                    className={`text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-500 ${isActive ? 'text-charcoal' : 'text-charcoal/40'
+                                    className={`text-[8px] md:text-[11px] font-black uppercase tracking-[0.1em] md:tracking-[0.2em] transition-colors duration-500 whitespace-nowrap ${isActive ? 'text-charcoal' : 'text-charcoal/40'
                                         }`}
                                 >
                                     {step.label}

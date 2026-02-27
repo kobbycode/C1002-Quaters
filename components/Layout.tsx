@@ -118,7 +118,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div
-      className="flex flex-col min-h-screen font-sans dark:bg-background-dark dark:text-white transition-colors duration-500"
+      className="flex flex-col min-h-screen font-sans dark:bg-background-dark dark:text-white transition-colors duration-500 overflow-x-hidden"
       style={{
         ['--primary-color' as any]: config.brand.primaryColor,
         ['--gold-color' as any]: config.brand.primaryColor, // Mapping gold to primary for consistent luxury feel
@@ -268,7 +268,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <CommandSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Premium Mobile Menu Overlay */}
-      <div className={`fixed inset-0 z-[100] md:hidden transition-all duration-500 ${isMobileMenuOpen ? 'visible' : 'invisible pointer-events-none'}`}>
+      <div className={`fixed inset-0 z-[100] md:hidden transition-all duration-500 overflow-hidden ${isMobileMenuOpen ? 'visible' : 'invisible pointer-events-none'}`}>
         {/* Blurred Backdrop */}
         <div
           className={`absolute inset-0 transition-all duration-700 bg-charcoal/40 backdrop-blur-xl ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
@@ -396,7 +396,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </div>
             <div className="relative">
               <div className="absolute inset-0 bg-primary rounded-full animate-pulse opacity-30"></div>
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/40 relative z-10 transition-transform hover:scale-110 active:scale-95">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/40 relative z-10 transition-transform hover:scale-110 active:scale-95 overflow-hidden">
                 <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
               </div>
             </div>

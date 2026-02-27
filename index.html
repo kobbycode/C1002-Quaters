@@ -1,13 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C1002 Quarters | Ghanaian Luxury Suites</title>
     <link rel="icon" type="image/png" href="/logo.png">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -30,25 +32,52 @@
         };
     </script>
     <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #root {
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
         body {
             font-family: "Plus Jakarta Sans", sans-serif;
         }
+
         .font-serif {
             font-family: "Playfair Display", serif;
         }
+
         @keyframes fade-in {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .animate-fade-in {
             animation: fade-in 0.8s ease-out forwards;
         }
     </style>
 
-<link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/index.css">
 </head>
+
 <body class="bg-background-light text-charcoal dark:bg-background-dark dark:text-white transition-colors duration-500">
     <div id="root"></div>
-<script type="module" src="/index.tsx"></script>
+    <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>
