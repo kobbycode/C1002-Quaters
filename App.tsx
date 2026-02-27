@@ -20,6 +20,7 @@ import Profile from './pages/Profile';
 import { AuthGuard } from './components/AuthGuard';
 import { AuthProvider } from './context/AuthContext';
 import { ConfirmationProvider } from './context/ConfirmationContext';
+import ScrollToTop from './components/ScrollToTop';
 
 const App: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const App: React.FC = () => {
         <AuthProvider>
           <SiteProvider>
             <Router>
+              <ScrollToTop />
               <Toast />
               <Layout>
                 <Routes>

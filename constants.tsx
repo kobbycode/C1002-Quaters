@@ -23,7 +23,9 @@ export const ROOMS: Room[] = [
     guests: '2 Adults',
     view: 'Ocean View',
     category: 'Deluxe',
+    roomCode: 'AC-01',
     floor: 'Second Floor',
+    bedType: '1 King Bed',
     amenities: ['65" Smart TV', 'Nespresso Machine', 'Rain Shower', 'WiFi'],
     isBestSeller: true,
     isFeatured: true
@@ -49,7 +51,9 @@ export const ROOMS: Room[] = [
     guests: '4 Adults',
     view: 'Accra Skyline',
     category: 'Presidential',
+    roomCode: 'GC-01',
     floor: 'Penthouse Level',
+    bedType: '2 King Beds',
     amenities: ['Butler Service', 'Walk in Closet'],
     isElite: true,
     isFeatured: true
@@ -74,7 +78,9 @@ export const ROOMS: Room[] = [
     guests: '2 Adults',
     view: 'Private Garden',
     category: 'Villa',
+    roomCode: 'GV-01',
     floor: 'Ground Floor',
+    bedType: '1 King Bed',
     amenities: ['Private Garden', 'Outdoor Shower']
   },
   {
@@ -97,7 +103,9 @@ export const ROOMS: Room[] = [
     guests: '3 Guests',
     view: 'City Skyline',
     category: 'Executive',
+    roomCode: 'IS-01',
     floor: 'Fourth Floor',
+    bedType: '1 King Bed',
     amenities: ['Office Desk', 'Premium Bar', 'Dual Vanities']
   },
   {
@@ -112,7 +120,9 @@ export const ROOMS: Room[] = [
     guests: '6 Adults',
     view: 'Panoramic City View',
     category: 'Three Bedrooms',
+    roomCode: 'PE-03',
     floor: 'Top Floor',
+    bedType: '3 King Beds',
     amenities: ['Butler Service', 'Private Kitchen', 'Smart TV', 'WiFi'],
     tags: ['Premium', 'Spacious'],
     isElite: true,
@@ -130,7 +140,9 @@ export const ROOMS: Room[] = [
     guests: '4 Adults',
     view: 'City Skyline',
     category: 'Two Bedrooms',
+    roomCode: 'PA-02',
     floor: 'Third Floor',
+    bedType: '2 Queen Beds',
     amenities: ['Nespresso Machine', 'Rain Shower', 'WiFi'],
     tags: ['Popular']
   },
@@ -146,7 +158,9 @@ export const ROOMS: Room[] = [
     guests: '4 Adults',
     view: 'Ocean & City View',
     category: 'Two Bedrooms',
+    roomCode: 'PB-02',
     floor: 'Fourth Floor',
+    bedType: '1 King, 2 Singles',
     amenities: ['Premium Bar', 'Nespresso Machine', 'WiFi'],
     tags: ['High Demand']
   },
@@ -162,7 +176,9 @@ export const ROOMS: Room[] = [
     guests: '2 Adults',
     view: 'Garden View',
     category: 'One Bedroom',
+    roomCode: 'PD-01',
     floor: 'Second Floor',
+    bedType: '1 King Bed',
     amenities: ['Smart TV', 'WiFi', 'Rain Shower'],
     tags: ['Best Seller']
   },
@@ -178,7 +194,9 @@ export const ROOMS: Room[] = [
     guests: '4 Adults',
     view: 'Garden View',
     category: 'Two Bedrooms',
+    roomCode: 'CP-02',
     floor: 'First Floor',
+    bedType: '2 Full Beds',
     amenities: ['Nespresso Machine', 'Smart TV', 'WiFi']
   },
   {
@@ -193,7 +211,9 @@ export const ROOMS: Room[] = [
     guests: '2 Adults',
     view: 'City View',
     category: 'Studio',
+    roomCode: 'CM-ST',
     floor: 'Ground Floor',
+    bedType: '1 Queen Bed',
     amenities: ['Smart TV', 'WiFi', 'Kitchenette']
   },
   {
@@ -208,7 +228,9 @@ export const ROOMS: Room[] = [
     guests: '1 Adult',
     view: 'Quiet Side',
     category: 'Studio',
+    roomCode: 'CC-ST',
     floor: 'Ground Floor',
+    bedType: '1 Queen Bed',
     amenities: ['WiFi', 'Shower', 'TV']
   },
   {
@@ -223,7 +245,9 @@ export const ROOMS: Room[] = [
     guests: '2 Adults',
     view: 'Street View',
     category: 'One Bedroom',
+    roomCode: 'QS-01',
     floor: 'Second Floor',
+    bedType: '1 King Bed',
     amenities: ['Smart TV', 'WiFi', 'Rain Shower']
   },
   {
@@ -238,7 +262,9 @@ export const ROOMS: Room[] = [
     guests: '2 Adults',
     view: 'Inner Court',
     category: 'One Bedroom',
+    roomCode: 'QC-01',
     floor: 'First Floor',
+    bedType: '1 Queen Bed',
     amenities: ['WiFi', 'TV', 'Shower'],
     tags: ['Classical']
   }

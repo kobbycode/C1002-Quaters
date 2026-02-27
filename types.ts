@@ -22,6 +22,7 @@ export interface Room {
   operationalOverhead?: number; // % of price (e.g. 0.1 for 10%)
   status?: 'available' | 'cleaning' | 'maintenance';
   isFeatured?: boolean;
+  bedType?: string; // e.g. 'King Bed', 'Twin Beds'
 }
 
 
