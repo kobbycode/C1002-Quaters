@@ -117,17 +117,17 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       }}
     >
       <header
-        className={`fixed top-0 z-50 w-full transition-all duration-300 px-6 md:px-10 lg:px-20 xl:px-40 py-4 md:py-5 lg:py-6 flex items-center justify-between border-b ${isGalleryActive ? 'opacity-0 pointer-events-none visibility-hidden' : ''} ${isScrolled || !isHome
+        className={`fixed top-0 z-50 w-full transition-all duration-300 px-6 md:px-10 lg:px-40 py-0 flex items-center justify-between border-b ${isGalleryActive ? 'opacity-0 pointer-events-none visibility-hidden' : ''} ${isScrolled || !isHome
           ? 'bg-white dark:bg-charcoal text-charcoal dark:text-white border-gray-100 dark:border-white/5 shadow-sm'
           : 'bg-black/10 backdrop-blur-md text-white border-white/10'
           }`}
       >
         <Link to="/" className="flex items-center gap-3 group z-[60]">
-          <div className="transition-transform hover:scale-105 flex items-center">
+          <div className="transition-transform hover:scale-105 -my-12">
             <img
               src="/logo.png"
               alt={config.brand.name}
-              className={`h-12 md:h-14 lg:h-18 xl:h-20 w-auto object-contain ${(isScrolled || !isHome) && !config.brand.darkMode ? '' : 'brightness-0 invert'
+              className={`h-40 w-auto object-contain ${(isScrolled || !isHome) && !config.brand.darkMode ? '' : 'brightness-0 invert'
                 }`}
             />
           </div>
