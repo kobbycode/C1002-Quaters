@@ -25,7 +25,7 @@ export const isUserAdmin = (email: string | null | undefined, config?: SiteConfi
     }
 
     // Legacy/Fallback check
-    if (emailLower === 'admin@quarters.com') {
+    if (emailLower === 'c.quarterss@gmail.com') {
         return true;
     }
 
