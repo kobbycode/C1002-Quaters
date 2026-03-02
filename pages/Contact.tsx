@@ -72,12 +72,12 @@ const Contact: React.FC = () => {
                 {config.footer.address}
               </p>
               <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.footer.address + ", Accra, Ghana")}`}
+                href={`https://www.google.com/maps/dir/?api=1&destination=${contactPage.coordinates?.lat || 5.626},${contactPage.coordinates?.lng || -0.106}&travelmode=driving`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-primary hover:text-gold transition-colors group/link"
               >
-                <span>Find Us on Maps</span>
+                <span>Get Directions</span>
                 <svg className="w-4 h-4 transform group-hover/link:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
