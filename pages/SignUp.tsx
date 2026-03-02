@@ -54,7 +54,7 @@ const SignUp = () => {
             await addNotification({
                 userId: userCredential.user.uid,
                 title: `Welcome to ${config.brand.name}`,
-                message: `Akwaaba, ${name.split(' ')[0]}! We're delighted to have you with us. Explore our suites to find your perfect stay.`,
+                message: `Obaake, ${name.split(' ')[0]}! We're delighted to have you with us. Explore our suites to find your perfect stay.`,
                 type: 'system',
                 link: '/rooms'
             });
@@ -114,7 +114,7 @@ const SignUp = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-charcoal font-medium outline-none focus:border-gold transition-colors"
-                            placeholder="john@example.com"
+                            placeholder="guest@c1002quarters.com"
                             required
                         />
                     </div>

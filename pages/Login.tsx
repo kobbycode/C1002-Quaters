@@ -66,7 +66,7 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-charcoal font-medium outline-none focus:border-gold transition-colors"
-                            placeholder="john@example.com"
+                            placeholder="guest@c1002quarters.com"
                             required
                         />
                     </div>

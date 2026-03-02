@@ -106,7 +106,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     heritageDescription2: "Located in the heart of the city's Spintex district, we provide an experience that welcomes everyone, where every guest is treated as a friend.",
     heritageImage: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1200",
     pillars: [
-      { title: "True Akwaaba", description: "The warmest welcome in West Africa ensuring every stay is personal and memorable." },
+      { title: "True Obaake", description: "The warmest welcome in West Africa ensuring every stay is personal and memorable." },
       { title: "Accra Modern", description: "A blend of contemporary design with traditional Ghanaian craftsmanship." },
       { title: "Global Standards", description: "World class amenities and service protocols curated for the global traveler." }
     ]
@@ -142,7 +142,7 @@ const DEFAULT_CONFIG: SiteConfig = {
   },
 
   foundingYear: "2025",
-  conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Akwaaba'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
+  conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Obaake'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
   roomTags: ['Best Seller', 'Popular', 'Elite'],
   adminEmails: ['c.quarterss@gmail.com'],
   currency: 'GHS'
@@ -356,7 +356,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await addNotification({
           userId: bookingData.guestId,
           title: 'Booking Confirmed!',
-          message: `Akwaaba, ${bookingData.guestName.split(' ')[0]}! Your reservation for ${bookingData.roomName} is confirmed for ${bookingData.checkInDate}.`,
+          message: `Obaake, ${bookingData.guestName.split(' ')[0]}! Your reservation for ${bookingData.roomName} is confirmed for ${bookingData.checkInDate}.`,
           type: 'booking',
           link: '/profile'
         });

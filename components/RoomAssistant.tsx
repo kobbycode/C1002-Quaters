@@ -36,7 +36,7 @@ const RoomAssistant: React.FC<RoomAssistantProps> = ({ roomId, roomName }) => {
                 {isExpanded && (
                     <div className="px-6 pb-6 animate-fade-in">
                         <p className="text-xs text-gray-500 mb-6 font-medium leading-relaxed bg-gray-50 p-4 rounded-xl italic">
-                            "Akwaaba! I'm specifically trained to help with the {roomName}. Ask me about its amenities, layout, or check if it's available for your preferred dates."
+                            "Obaake! I'm specifically trained to help with the {roomName}. Ask me about its amenities, layout, or check if it's available for your preferred dates."
                         </p>
                         <div className="flex flex-wrap gap-2 mb-6">
                             {[

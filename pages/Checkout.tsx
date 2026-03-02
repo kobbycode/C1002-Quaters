@@ -215,7 +215,7 @@ const Checkout: React.FC = () => {
             <div className="space-y-4 mb-10">
               <span className="text-gold font-black uppercase tracking-[0.6em] text-[10px] block">Reservation Secured</span>
               <h1 className="text-4xl md:text-6xl font-black font-serif text-charcoal leading-tight">
-                Akwaaba, <span className="italic font-normal underline decoration-gold/30 underline-offset-8">{formData.firstName}</span>.
+                Obaake, <span className="italic font-normal underline decoration-gold/30 underline-offset-8">{formData.firstName}</span>.
               </h1>
             </div>
 
@@ -322,7 +322,7 @@ const Checkout: React.FC = () => {
                       value={formData.email}
                       onChange={e => setFormData({ ...formData, email: e.target.value })}
                       className="w-full border-b border-gray-200 py-3 px-1 focus:border-charcoal outline-none transition-all text-sm font-medium placeholder:text-gray-200"
-                      placeholder="JOHN@EXAMPLE.COM"
+                      placeholder="GUEST@C1002QUARTERS.COM"
                     />
                   </div>
                   <div className="space-y-2">

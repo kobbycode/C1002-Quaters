@@ -111,8 +111,6 @@ export interface SiteConfig {
   aiLabInstructions?: string;
   pricingRules?: PricingRule[];
   adminEmails?: string[];
-
-  // bookings: Booking[]; // Deprecated, moved to root collection
 }
 
 export interface Booking {
