@@ -68,7 +68,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     aboutText: "Modern comfort in the heart of Accra. Experience the Landmark of Distinction.",
     address: "Market High Street, 33, GZ-121-1024",
     phone: "+233243177596",
-    email: "reservations@c1002quarters.com.gh"
+    email: "c.quarterss@gmail.com"
   },
   categories: ['Three Bedrooms', 'Two Bedrooms', 'One Bedroom', 'Studio', 'Deluxe', 'Executive', 'Presidential', 'Villa'],
   amenityDetails: {
@@ -142,9 +142,9 @@ const DEFAULT_CONFIG: SiteConfig = {
   },
 
   foundingYear: "2025",
-  conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Akwaaba'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
+  conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Obaake'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
   roomTags: ['Best Seller', 'Popular', 'Elite'],
-  adminEmails: ['admin@c1002quarters.com', 'reservations@c1002quarters.com.gh'],
+  adminEmails: ['admin@c1002quarters.com', 'c.quarterss@gmail.com'],
   currency: 'GHS'
 };
 
