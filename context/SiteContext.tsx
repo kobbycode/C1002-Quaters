@@ -145,7 +145,11 @@ const DEFAULT_CONFIG: SiteConfig = {
   conciergePrompt: "You are the Elite Concierge for C1002 Quarters, a luxury hotel in Okpoi Gonno, Spintex Road, Accra. Be sophisticated, warm, and helpful. Use Ghanaian expressions like 'Obaake'. If asked for recommendations, use Google Maps grounding to find high-end spots near Spintex. Always provide links if available.",
   roomTags: ['Best Seller', 'Popular', 'Elite'],
   adminEmails: ['c.quarterss@gmail.com'],
-  currency: 'GHS'
+  currency: 'GHS',
+  promoCodes: [
+    { code: 'OBAAKE10', discountType: 'percentage', value: 10, isActive: true, description: '10% Welcome Discount' },
+    { code: 'ACCRA50', discountType: 'fixed_amount', value: 50, isActive: true, description: '50 GHS Fixed Discount' }
+  ]
 };
 
 const SiteContext = createContext<SiteContextType | undefined>(undefined);

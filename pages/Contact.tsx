@@ -4,21 +4,48 @@ import { formatLuxuryText } from '../utils/formatters';
 import CustomMap from '../components/Map';
 
 const Contact: React.FC = () => {
-  const { config } = useSite();
+  const { config, sendEmail } = useSite();
   const { contactPage } = config;
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
 
   const whatsappNumber = config.footer.phone.replace(/\D/g, '');
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Hello%20${encodeURIComponent(config.brand.name)}%2C%20Obaake!%20I'm%20visiting%20the%20contact%20page%20and%20would%20like%20to%20speak%20with%20a%20concierge.`;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    try {
+      // Send email to admin
+      await sendEmail(
+        config.adminEmails || ['c.quarterss@gmail.com'],
+        `New Inquiry from ${formData.name}`,
+        `
+        <div style="font-family: serif; padding: 40px; color: #1a1a1a;">
+          <h1 style="border-bottom: 2px solid #D4AF37; padding-bottom: 10px;">New Elite Inquiry</h1>
+          <p><strong>Name:</strong> ${formData.name}</p>
+          <p><strong>Email:</strong> ${formData.email}</p>
+          <p><strong>Message:</strong></p>
+          <p style="background: #f9f9f9; padding: 20px; border-radius: 10px; font-style: italic;">
+            "${formData.message}"
+          </p>
+        </div>
+        `
+      );
+
       setIsSubmitted(true);
-    }, 2000);
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Something went wrong. Please try again or contact us via WhatsApp.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -145,6 +172,8 @@ const Contact: React.FC = () => {
                         <input
                           required
                           type="text"
+                          value={formData.name}
+                          onChange={e => setFormData({ ...formData, name: e.target.value })}
                           className="w-full bg-gray-50/50 border-b-2 border-gray-100 py-4 px-1 focus:border-primary text-base font-serif transition-all outline-none bg-transparent placeholder:text-gray-300 placeholder:font-serif"
                           placeholder="What is your name?"
                         />
@@ -154,6 +183,8 @@ const Contact: React.FC = () => {
                         <input
                           required
                           type="email"
+                          value={formData.email}
+                          onChange={e => setFormData({ ...formData, email: e.target.value })}
                           className="w-full bg-gray-50/50 border-b-2 border-gray-100 py-4 px-1 focus:border-primary text-base font-serif transition-all outline-none bg-transparent placeholder:text-gray-300 placeholder:font-serif"
                           placeholder="Where can we write to you?"
                         />
@@ -165,6 +196,8 @@ const Contact: React.FC = () => {
                       <textarea
                         required
                         rows={5}
+                        value={formData.message}
+                        onChange={e => setFormData({ ...formData, message: e.target.value })}
                         className="w-full bg-gray-50/50 border-b-2 border-gray-100 py-4 px-1 focus:border-primary text-base font-serif transition-all outline-none bg-transparent placeholder:text-gray-300 placeholder:font-serif resize-none"
                         placeholder="Tell us about your plans..."
                       />

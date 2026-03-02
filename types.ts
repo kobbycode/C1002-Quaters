@@ -55,6 +55,14 @@ export interface HeroSlide {
   description: string;
 }
 
+export interface PromoCode {
+  code: string;
+  discountType: 'percentage' | 'fixed_amount';
+  value: number; // e.g. 10 for 10%
+  description?: string;
+  isActive: boolean;
+}
+
 export interface SiteConfig {
   brand: {
     name: string;
@@ -111,6 +119,7 @@ export interface SiteConfig {
   aiLabInstructions?: string;
   pricingRules?: PricingRule[];
   adminEmails?: string[];
+  promoCodes?: PromoCode[];
 }
 
 export interface Booking {

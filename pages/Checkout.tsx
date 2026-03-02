@@ -12,6 +12,7 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { getNames, getCode } from 'country-list';
 import { isValidPhoneNumber } from 'libphonenumber-js';
+import { PromoCode } from '../types';
 
 // Get sorted country names
 const allCountryNames = getNames().sort();
@@ -48,8 +49,13 @@ const Checkout: React.FC = () => {
   const [showPriceBreakdown, setShowPriceBreakdown] = useState(false);
   const [showFeeDetails, setShowFeeDetails] = useState(false);
   const [promoCode, setPromoCode] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
   const [phoneCountry, setPhoneCountry] = useState('gh'); // For PhoneInput sync
   const [phoneError, setPhoneError] = useState<string | null>(null);
+
+  const [guestNames, setGuestNames] = useState<string[]>([]);
+  const [showGuestInputs, setShowGuestInputs] = useState(false);
 
   // Initial state from URL with fallbacks
   const [checkIn, setCheckIn] = useState<string>(() => {
@@ -100,24 +106,54 @@ const Checkout: React.FC = () => {
     const gymTotal = hasGymAccess ? (GYM_DAILY_FEE * nights) : 0;
 
     // Calculate Taxes & Fees (8% + 4% = 12%)
-    const taxesAndFees = calculation.finalTotal * 0.12;
-    const finalTotal = calculation.finalTotal + gymTotal + taxesAndFees;
+    const subtotalBeforeTax = calculation.finalTotal + gymTotal;
+
+    // Apply Promo Discount
+    let discount = 0;
+    if (appliedPromo) {
+      if (appliedPromo.discountType === 'percentage') {
+        discount = subtotalBeforeTax * (appliedPromo.value / 100);
+      } else {
+        discount = appliedPromo.value;
+      }
+    }
+
+    const taxesAndFees = (subtotalBeforeTax - discount) * 0.12;
+    const finalTotal = subtotalBeforeTax - discount + taxesAndFees;
 
     const adjustments = [...calculation.adjustments];
     if (hasGymAccess) {
       adjustments.push({ ruleName: 'Elite Gym Access', amount: gymTotal });
     }
+    if (discount > 0) {
+      adjustments.push({ ruleName: `Promo: ${appliedPromo.code}`, amount: -discount });
+    }
 
     return {
       total: finalTotal,
       taxesAndFees,
+      discount,
       breakdown: {
         ...calculation,
         adjustments,
         finalTotal
       }
     };
-  }, [dates, room, calculatePrice, nights, hasGymAccess]);
+  }, [dates, room, calculatePrice, nights, hasGymAccess, appliedPromo]);
+
+  const handleApplyPromo = () => {
+    setPromoError(null);
+    if (!promoCode) return;
+
+    const code = config.promoCodes?.find(c => c.code.toUpperCase() === promoCode.toUpperCase() && c.isActive);
+    if (code) {
+      setAppliedPromo(code);
+      setPromoCode('');
+    } else {
+      setPromoError('INVALID OR EXPIRED CODE');
+      setAppliedPromo(null);
+    }
+  };
 
   const totalAmount = pricing.total;
   const taxesAndFees = pricing.taxesAndFees;
@@ -167,7 +203,10 @@ const Checkout: React.FC = () => {
       checkOutDate: dates?.formattedCheckOut || 'Flexible',
       isoCheckIn: dates?.isoCheckIn || '',
       isoCheckOut: dates?.isoCheckOut || '',
-      hasGymAccess
+      hasGymAccess,
+      guestNames: guestNames.filter(name => name.trim() !== ''),
+      promoCode: appliedPromo?.code || null,
+      discount: pricing.discount
     };
 
     await addBooking(bookingData);
@@ -196,8 +235,9 @@ const Checkout: React.FC = () => {
 
   if (isSuccess) {
     const whatsappNumber = config.footer.phone.replace(/[^0-9]/g, '');
+    const promoInfo = appliedPromo ? `\n🎁 Promo: ${appliedPromo.code} (-${formatPrice(pricing.discount, config.currency)})` : '';
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      `🥂 *New Reservation: ${config.brand.name}*\n\nRef: ${room.name}\n👤 ${formData.firstName} ${formData.lastName}\n💰 ${paymentMethod === 'paystack' ? 'PAID' : 'PAY ON ARRIVAL'}\n\nPlease confirm reception! ✨`
+      `🥂 *New Reservation: ${config.brand.name}*\n\nRef: ${room.name}\n👤 ${formData.firstName} ${formData.lastName}${promoInfo}\n💰 ${paymentMethod === 'paystack' ? 'PAID' : 'PAY ON ARRIVAL'}\n\nPlease confirm reception! ✨`
     )}`;
 
     return (
@@ -307,10 +347,37 @@ const Checkout: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex">
-                  <button type="button" className="text-[11px] font-bold uppercase tracking-widest text-charcoal border-b-2 border-charcoal/10 hover:border-charcoal transition-all">
-                    Add Guest Names
-                  </button>
+                <div className="space-y-4">
+                  <div className="flex">
+                    <button
+                      type="button"
+                      onClick={() => setShowGuestInputs(!showGuestInputs)}
+                      className="text-[11px] font-bold uppercase tracking-widest text-charcoal border-b-2 border-charcoal/10 hover:border-charcoal transition-all"
+                    >
+                      {showGuestInputs ? 'Hide Guest Names' : 'Add Guest Names'}
+                    </button>
+                  </div>
+
+                  {showGuestInputs && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                      {Array.from({ length: (adults + children) - 1 }).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Guest {i + 2} Full Name</label>
+                          <input
+                            type="text"
+                            placeholder={`GUEST ${i + 2} NAME`}
+                            value={guestNames[i] || ''}
+                            onChange={e => {
+                              const newNames = [...guestNames];
+                              newNames[i] = e.target.value;
+                              setGuestNames(newNames);
+                            }}
+                            className="w-full border-b border-gray-200 py-3 px-1 focus:border-charcoal outline-none transition-all text-sm font-medium placeholder:text-gray-200"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
@@ -548,6 +615,25 @@ const Checkout: React.FC = () => {
                   <div className="aspect-[4/3] w-full overflow-hidden rounded-sm">
                     <img src={room.images?.[0] || room.image} alt={room.name} className="w-full h-full object-cover" />
                   </div>
+                  {/* Gym Access Toggle */}
+                  <div className="bg-charcoal/5 p-4 rounded-sm mb-6 border border-charcoal/10">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-[11px] font-black uppercase tracking-widest text-charcoal">Elite Gym Access</h4>
+                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Complementary for Elite members, {formatPrice(GYM_DAILY_FEE, config.currency)}/day for guests.</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={hasGymAccess}
+                          onChange={() => setHasGymAccess(!hasGymAccess)}
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-charcoal"></div>
+                      </label>
+                    </div>
+                  </div>
+
                   <div className="space-y-1">
                     <h3 className="text-lg font-bold text-charcoal uppercase tracking-tight">{room.name}</h3>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
@@ -627,14 +713,26 @@ const Checkout: React.FC = () => {
 
                 <div className="pt-8">
                   <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="PROMO CODE"
-                      value={promoCode}
-                      onChange={e => setPromoCode(e.target.value)}
-                      className="flex-1 border border-gray-200 p-3 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-charcoal transition-colors"
-                    />
-                    <button className="bg-charcoal text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-colors">
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        placeholder="PROMO CODE"
+                        value={promoCode}
+                        onChange={e => setPromoCode(e.target.value.toUpperCase())}
+                        className={`w-full border ${promoError ? 'border-red-500' : 'border-gray-200'} p-3 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-charcoal transition-colors`}
+                      />
+                      {promoError && (
+                        <p className="absolute -bottom-5 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{promoError}</p>
+                      )}
+                      {appliedPromo && (
+                        <p className="absolute -bottom-5 left-0 text-[8px] font-black text-green-600 uppercase tracking-widest">CODE {appliedPromo.code} APPLIED!</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleApplyPromo}
+                      disabled={!promoCode}
+                      className="bg-charcoal text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-50"
+                    >
                       Apply
                     </button>
                   </div>
