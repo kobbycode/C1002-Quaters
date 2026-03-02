@@ -150,7 +150,7 @@ const RoomCard: React.FC<{
     <div className="group bg-white border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col md:flex-row relative mb-12 min-h-[460px] animate-fade-in">
       {/* Column 1: Carousel Image */}
       <div
-        className="w-full md:w-[350px] lg:w-[450px] xl:w-[550px] shrink-0 relative overflow-hidden group/image cursor-pointer"
+        className="w-full md:w-[350px] lg:w-[400px] shrink-0 relative overflow-hidden group/image cursor-pointer"
         onClick={() => onOpenGallery(room, currentImageIndex)}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -186,7 +186,7 @@ const RoomCard: React.FC<{
       </div>
 
       {/* Column 2: Room Info */}
-      <div className="flex-1 p-8 md:p-12 lg:p-16 xl:p-20 flex flex-col justify-center border-r border-gray-100">
+      <div className="flex-1 p-8 md:p-10 lg:p-12 flex flex-col justify-center border-r border-gray-100">
         <div className="flex items-center gap-1 mb-2">
           {[...Array(5)].map((_, i) => (
             <span key={i} className={`text-xs ${i < Math.floor(metrics.averageRating) ? 'text-gold' : 'text-gray-200'}`}>★</span>
@@ -201,7 +201,7 @@ const RoomCard: React.FC<{
           </span>
         )}
         <Link to={`/rooms/${room.id}`} className="block mb-4">
-          <h3 className="text-2xl md:text-3xl lg:text-5xl font-black text-charcoal uppercase tracking-tighter hover:text-gold transition-colors font-serif">
+          <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-charcoal uppercase tracking-tighter hover:text-gold transition-colors font-serif">
             {room.name}
           </h3>
         </Link>
@@ -248,7 +248,7 @@ const RoomCard: React.FC<{
       </div>
 
       {/* Column 3: Price & Actions */}
-      <div className="w-full md:w-[280px] lg:w-[380px] xl:w-[450px] shrink-0 p-8 md:p-12 lg:p-16 xl:p-20 flex flex-col items-center justify-center text-center bg-gray-50/30">
+      <div className="w-full md:w-[260px] lg:w-[300px] shrink-0 p-8 md:p-10 lg:p-12 flex flex-col items-center justify-center text-center bg-gray-50/30">
         <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-2">From</span>
         <div className="flex flex-col items-center mb-1">
           {discount > 0 && (
@@ -256,10 +256,10 @@ const RoomCard: React.FC<{
               {formatPrice(room.price, config.currency)}
             </span>
           )}
-          <span className="text-4xl md:text-5xl lg:text-7xl font-black text-charcoal font-serif tracking-tighter">
+          <span className="text-3xl md:text-4xl font-black text-charcoal font-serif tracking-tighter">
             {formatPrice(discountedPrice, config.currency)}
           </span>
-          <span className="text-[10px] lg:text-[12px] font-black text-gray-400 uppercase tracking-widest mt-1">/ Night</span>
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">/ Night</span>
         </div>
         <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-8 mt-2 line-clamp-2 px-4 leading-relaxed">
           INCLUDES {formatPrice(40, config.currency)} FEES, EXCLUDES TAXES
@@ -269,7 +269,7 @@ const RoomCard: React.FC<{
         <Link
           to={isAvailable ? `/checkout?room=${room.id}&checkIn=${selectedDates?.checkIn}&nights=${selectedDates?.nights}${searchParams.toString().replace(/checkIn=[^&]*&?/, '').replace(/nights=[^&]*&?/, '') ? `&${searchParams.toString().replace(/checkIn=[^&]*&?/, '').replace(/nights=[^&]*&?/, '')}` : ''}` : '#'}
           onClick={(e) => !isAvailable && e.preventDefault()}
-          className={`w-full py-5 lg:py-8 rounded-sm font-black uppercase tracking-[0.2em] text-[10px] lg:text-[13px] transition-all shadow-xl flex items-center justify-center ${isAvailable
+          className={`w-full py-5 rounded-sm font-black uppercase tracking-[0.2em] text-[10px] transition-all shadow-xl flex items-center justify-center ${isAvailable
             ? 'bg-charcoal text-white hover:bg-gold active:scale-95'
             : 'bg-gray-100 text-gray-400 cursor-not-allowed grayscale'
             }`}
