@@ -7,6 +7,7 @@ import { EmailService } from '../utils/email-service';
 import { PricingEngine } from '../utils/pricing-engine';
 import { ROOMS as INITIAL_ROOMS } from '../constants';
 import GlobalLoader from '../components/GlobalLoader';
+import { useAuth } from './AuthContext';
 
 
 interface SiteContextType {
@@ -164,6 +165,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [isGalleryActive, setIsGalleryActive] = useState(false);
+  const { isAdmin } = useAuth();
 
   // Synchronize Dark Mode Class
   useEffect(() => {
@@ -265,9 +267,22 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, (error) => console.error("Error listening to reviews:", error));
 
     // 5. Subscribe to Notifications
+    let firstNotifLoad = true;
     const unsubscribeNotifications = onSnapshot(collection(db, 'notifications'), (snapshot) => {
       const notifData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
       setNotifications(notifData);
+
+      // Play sound for NEW notifications if user is admin
+      if (!firstNotifLoad && isAdmin) {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.play().catch(err => console.log('Audio playback prevented:', err));
+          }
+        });
+      }
+
+      firstNotifLoad = false;
       notificationsLoaded = true;
       if (roomsLoaded && configLoaded && bookingsLoaded && reviewsLoaded && activitiesLoaded) setLoading(false);
     }, (error) => console.error("Error listening to notifications:", error));
@@ -366,6 +381,15 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
 
+      // Admin notification for sound prompt
+      await addNotification({
+        userId: 'admin',
+        title: 'New Guest Booking!',
+        message: `${bookingData.guestName} has booked ${bookingData.roomName}.`,
+        type: 'booking',
+        link: '/admin'
+      });
+
       // Send confirmation email
       try {
         const fullBooking: Booking = {
@@ -415,6 +439,15 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
               link: '/profile'
             });
           }
+
+          // Admin notification for sound prompt
+          await addNotification({
+            userId: 'admin',
+            title: `System Alert: Status Change`,
+            message: `${oldBooking.guestName}'s status for ${oldBooking.roomName} is now ${data.status.replace('-', ' ')}.`,
+            type: 'system',
+            link: '/admin'
+          });
           await logActivity({
             type: 'booking',
             action: 'Status Updated',
@@ -432,6 +465,17 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
               message: `The payment for your booking at ${oldBooking.roomName} is now ${data.paymentStatus}.`,
               type: 'payment',
               link: '/profile'
+            });
+          }
+
+          // Admin prompt for payment
+          if (data.paymentStatus === 'paid') {
+            await addNotification({
+              userId: 'admin',
+              title: 'Confirmed: Payment Received',
+              message: `${oldBooking.guestName} has successfully paid for ${oldBooking.roomName}.`,
+              type: 'payment',
+              link: '/admin'
             });
           }
 

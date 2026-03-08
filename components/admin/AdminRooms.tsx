@@ -367,11 +367,14 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                                     );
 
                                     if (activeBooking) {
+                                        const isArrived = activeBooking.status === 'arrived';
                                         return (
-                                            <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl border border-red-100 shadow-xl flex flex-col items-end animate-pulse">
+                                            <div className={`bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl border shadow-xl flex flex-col items-end ${isArrived ? 'border-primary/30 animate-none' : 'border-red-100 animate-pulse'}`}>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                                    <span className="text-[9px] font-black uppercase tracking-widest text-red-500">Occupied</span>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${isArrived ? 'bg-primary' : 'bg-red-500'}`} />
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest ${isArrived ? 'text-primary' : 'text-red-500'}`}>
+                                                        {isArrived ? 'In-House' : 'Occupied'}
+                                                    </span>
                                                 </div>
                                                 <span className="text-[8px] font-bold text-gray-400 uppercase mt-0.5">Until {activeBooking.isoCheckOut}</span>
                                             </div>
