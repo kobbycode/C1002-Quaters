@@ -33,14 +33,21 @@ export const AdminCalendar: React.FC<AdminCalendarProps> = ({ onViewBooking, onB
             date.getFullYear() === today.getFullYear();
     };
 
-    const getBookingForRoomAndDate = (roomId: string, date: Date) => {
+    const getBookingsForRoomAndDate = (roomId: string, date: Date) => {
         const isoStr = date.toISOString().split('T')[0];
-        return bookings.find(b =>
+        return bookings.filter(b =>
             b.roomId === roomId &&
             b.isoCheckIn <= isoStr &&
             b.isoCheckOut > isoStr &&
             b.status !== 'cancelled'
         );
+    };
+
+    const getStatusColor = (status: Booking['status'], paymentStatus: Booking['paymentStatus']) => {
+        if (status === 'arrived') return '#c026d3'; // Fuchsia/Purple for Checked In
+        if (status === 'checked-out') return '#94a3b8'; // Slate for Checked Out
+        if (paymentStatus === 'paid') return '#8B008B'; // Primary for Paid
+        return '#1a1a2e'; // Dark for Pending
     };
 
     return (
@@ -118,18 +125,20 @@ export const AdminCalendar: React.FC<AdminCalendarProps> = ({ onViewBooking, onB
                                         </div>
                                     </td>
                                     {days.map((day, dIdx) => {
-                                        const booking = getBookingForRoomAndDate(room.id, day);
+                                        const dayBookings = getBookingsForRoomAndDate(room.id, day);
+                                        const booking = dayBookings[0];
+                                        const isConflict = dayBookings.length > 1;
+
                                         const iso = day.toISOString().split('T')[0];
                                         const isStart = booking?.isoCheckIn === iso;
-                                        const isEnd = booking?.isoCheckOut === iso;
 
                                         return (
                                             <td
                                                 key={dIdx}
                                                 className={`relative border-r border-gray-100/50 p-1 group-hover:border-gray-200 transition-colors ${isToday(day) ? 'bg-gold/5' : ''}`}
-                                                onClick={() => !booking && onBookSlot(room.id, iso)}
+                                                onClick={() => dayBookings.length === 0 && onBookSlot(room.id, iso)}
                                             >
-                                                {!booking && (
+                                                {dayBookings.length === 0 && (
                                                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
                                                         <div className="w-8 h-8 rounded-full bg-gold/10 text-gold flex items-center justify-center">
                                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
@@ -140,18 +149,28 @@ export const AdminCalendar: React.FC<AdminCalendarProps> = ({ onViewBooking, onB
                                                 {booking && isStart && (
                                                     <div
                                                         onClick={(e) => { e.stopPropagation(); onViewBooking(booking); }}
-                                                        className="absolute inset-y-2 left-1 z-10 rounded-2xl p-2 cursor-pointer transition-all hover:scale-[1.02] hover:shadow-xl group/booking overflow-hidden flex flex-col justify-center"
+                                                        className={`absolute inset-y-2 left-1 z-10 rounded-2xl p-2 cursor-pointer transition-all hover:scale-[1.02] hover:shadow-xl group/booking overflow-hidden flex flex-col justify-center ${isConflict ? 'border-2 border-red-500 animate-pulse' : ''}`}
                                                         style={{
                                                             width: `calc(${booking.nights * 100}% + ${(booking.nights - 1) * 4}px)`,
-                                                            backgroundColor: booking.paymentStatus === 'paid' ? '#8B008B' : '#1a1a2e',
-                                                            boxShadow: '0 4px 20px -5px rgba(0,0,0,0.3)'
+                                                            backgroundColor: getStatusColor(booking.status, booking.paymentStatus),
+                                                            boxShadow: isConflict ? '0 0 20px rgba(239, 68, 68, 0.4)' : '0 4px 20px -5px rgba(0,0,0,0.3)'
                                                         }}
                                                     >
+                                                        {isConflict && (
+                                                            <div className="absolute top-1 left-2 flex items-center gap-1">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                                                                <span className="text-[7px] font-black text-white uppercase tracking-tighter">Conflict</span>
+                                                            </div>
+                                                        )}
                                                         <div className="absolute top-0 right-0 p-2 opacity-20 group-hover/booking:opacity-100 transition-opacity">
                                                             <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                         </div>
                                                         <p className="text-[10px] font-black text-white truncate leading-none mb-1">{booking.guestName}</p>
-                                                        <p className="text-[8px] font-bold text-white/50 uppercase tracking-widest truncate">{booking.paymentStatus === 'paid' ? 'Paid' : 'Pending'}</p>
+                                                        <p className="text-[8px] font-bold text-white/50 uppercase tracking-widest truncate">
+                                                            {booking.status === 'arrived' ? 'Checked In' :
+                                                                booking.status === 'checked-out' ? 'Checked Out' :
+                                                                    booking.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                                                        </p>
                                                     </div>
                                                 )}
                                             </td>
@@ -165,14 +184,26 @@ export const AdminCalendar: React.FC<AdminCalendarProps> = ({ onViewBooking, onB
             </div>
 
             {/* Legend */}
-            <div className="p-6 bg-white border-t border-gray-100 flex items-center gap-8">
+            <div className="p-6 bg-white border-t border-gray-100 flex items-center flex-wrap gap-8">
                 <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-primary" />
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Confirmed (Paid)</span>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#8B008B' }} />
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Paid</span>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-charcoal" />
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Reservation (Pending)</span>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#c026d3' }} />
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">In (Arrived)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#1a1a2e' }} />
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pending</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#94a3b8' }} />
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Checked Out</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full border-2 border-red-500 bg-red-100" />
+                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Conflict</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-gold/10 border border-gold/20" />

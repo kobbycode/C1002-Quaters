@@ -26,13 +26,23 @@ const Sparkline: React.FC<{ data: number[], color: string }> = ({ data, color })
     const pathData = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
     return (
-        <svg width={width} height={height} className="overflow-visible">
-            <path d={pathData} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <svg width={width} height={height} className="overflow-visible group/spark">
+            <path
+                d={pathData}
+                fill="none"
+                stroke={color}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="transition-all duration-300 group-hover/spark:stroke-gold"
+            />
+            {/* Subtle glow filter could be added here but keeping it clean for now */}
         </svg>
     );
 };
 
 const RevenueChart: React.FC<{ data: { date: string, value: number }[], projected?: { date: string, value: number }[] }> = ({ data, projected = [] }) => {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const allData = [...data, ...projected];
     const max = Math.max(...allData.map(d => d.value)) || 1;
     const width = 800;
@@ -55,9 +65,44 @@ const RevenueChart: React.FC<{ data: { date: string, value: number }[], projecte
         : '';
     const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
 
+    const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+        const svg = e.currentTarget;
+        const rect = svg.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (width / rect.width);
+
+        // Find nearest point
+        let nearestIdx = 0;
+        let minDist = Infinity;
+
+        [...points, ...projPoints].forEach((p, i) => {
+            const dist = Math.abs(p.x - x);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestIdx = i;
+            }
+        });
+
+        if (minDist < 50) {
+            setHoveredIndex(nearestIdx);
+        } else {
+            setHoveredIndex(null);
+        }
+    };
+
+    const hoveredData = hoveredIndex !== null ? allData[hoveredIndex] : null;
+    const hoveredPoint = hoveredIndex !== null ? (hoveredIndex < points.length ? points[hoveredIndex] : projPoints[hoveredIndex - points.length]) : null;
+
     return (
-        <div className="w-full h-64 relative">
-            <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="overflow-visible">
+        <div className="w-full h-64 relative group/chart">
+            <svg
+                width="100%"
+                height="100%"
+                viewBox={`0 0 ${width} ${height}`}
+                preserveAspectRatio="none"
+                className="overflow-visible"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={() => setHoveredIndex(null)}
+            >
                 <defs>
                     <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#8B008B" />
@@ -75,19 +120,52 @@ const RevenueChart: React.FC<{ data: { date: string, value: number }[], projecte
                         strokeWidth="1"
                     />
                 ))}
+
+                {hoveredPoint && (
+                    <line
+                        x1={hoveredPoint.x}
+                        y1={padding}
+                        x2={hoveredPoint.x}
+                        y2={height - padding}
+                        stroke="#8B008B"
+                        strokeWidth="1"
+                        strokeDasharray="4,4"
+                        className="animate-fade-in"
+                    />
+                )}
+
                 <path d={areaPath} fill="url(#revenueGradient)" opacity="0.1" />
                 <path d={linePath} fill="none" stroke="#8B008B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                 {projPath && (
                     <path d={projPath} fill="none" stroke="#8B008B" strokeWidth="2" strokeDasharray="6,4" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
                 )}
+
                 {points.map((p, i) => (
-                    <g key={i} className="group/point">
-                        <circle cx={p.x} cy={p.y} r="4" fill="white" stroke="#8B008B" strokeWidth="2" />
-                    </g>
+                    <circle
+                        key={i}
+                        cx={p.x}
+                        cy={p.y}
+                        r={hoveredIndex === i ? "6" : "4"}
+                        fill={hoveredIndex === i ? "#8B008B" : "white"}
+                        stroke="#8B008B"
+                        strokeWidth="2"
+                        className="transition-all duration-200"
+                    />
                 ))}
                 {projPoints.map((p, i) => (
-                    <circle key={`proj-${i}`} cx={p.x} cy={p.y} r="3" fill="white" stroke="#8B008B" strokeWidth="1.5" strokeDasharray="2,1" />
+                    <circle
+                        key={`proj-${i}`}
+                        cx={p.x}
+                        cy={p.y}
+                        r={hoveredIndex === points.length + i ? "5" : "3"}
+                        fill={hoveredIndex === points.length + i ? "#8B008B" : "white"}
+                        stroke="#8B008B"
+                        strokeWidth="1.5"
+                        strokeDasharray="2,1"
+                        className="transition-all duration-200"
+                    />
                 ))}
+
                 {allData.filter((_, i) => i % Math.ceil(allData.length / 5) === 0 || i === allData.length - 1).map((d, i) => {
                     const idx = allData.indexOf(d);
                     const p = idx < data.length ? points[idx] : projPoints[idx - data.length];
@@ -98,6 +176,25 @@ const RevenueChart: React.FC<{ data: { date: string, value: number }[], projecte
                     );
                 })}
             </svg>
+
+            {hoveredData && hoveredPoint && (
+                <div
+                    className="absolute pointer-events-none bg-charcoal text-white p-3 rounded-xl shadow-xl z-20 animate-fade-in min-w-[120px]"
+                    style={{
+                        left: `${(hoveredPoint.x / width) * 100}%`,
+                        top: `${(hoveredPoint.y / height) * 100}%`,
+                        transform: 'translate(-50%, -120%)'
+                    }}
+                >
+                    <p className="text-[8px] font-black uppercase tracking-widest text-gray-400 mb-1">{hoveredData.date}</p>
+                    <p className="text-sm font-black text-gold">
+                        {new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS' }).format(hoveredData.value)}
+                    </p>
+                    {hoveredIndex >= data.length && (
+                        <p className="text-[7px] font-black uppercase text-gray-500 mt-1">Projected</p>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
@@ -214,24 +311,31 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
     return (
         <div className="space-y-12 animate-fade-in">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                {stats.map(s => (
-                    <div key={s.label} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow min-w-0">
-                        <div className="flex justify-between items-start mb-6">
-                            <span className="text-2xl">{s.icon}</span>
-                            <Sparkline data={s.trend} color={s.color} />
-                        </div>
-                        <div className="relative z-10">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gold mb-1 truncate">{s.label}</p>
-                            <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-                                <p className="text-2xl font-black text-charcoal tracking-tight leading-none">{s.value}</p>
-                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full mb-1.5 ${s.growth.startsWith('+') ? 'bg-green-50 text-green-500' : 'bg-gray-50 text-gray-400'}`}>
-                                    {s.growth}
-                                </span>
+                {stats.map(s => {
+                    const isPositive = s.growth.startsWith('+');
+                    const isNeutral = s.growth === '0%' || s.growth === 'Elite' || s.growth === 'Foresight';
+
+                    return (
+                        <div key={s.label} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:-translate-y-1 transition-all duration-300 min-w-0">
+                            <div className="flex justify-between items-start mb-6">
+                                <span className="text-2xl group-hover:scale-110 transition-transform duration-300">{s.icon}</span>
+                                <Sparkline data={s.trend} color={s.color} />
                             </div>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{s.sub}</p>
+                            <div className="relative z-10">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-gold mb-1 truncate">{s.label}</p>
+                                <div className="flex items-baseline gap-2 mb-1 flex-wrap">
+                                    <p className="text-2xl font-black text-charcoal tracking-tight leading-none">{s.value}</p>
+                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full mb-1.5 flex items-center gap-1 ${isPositive ? 'bg-green-50 text-green-500' : isNeutral ? 'bg-gray-50 text-gray-400' : 'bg-red-50 text-red-500'}`}>
+                                        {!isNeutral && (isPositive ? '↑' : '↓')}
+                                        {s.growth}
+                                    </span>
+                                </div>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{s.sub}</p>
+                            </div>
+                            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

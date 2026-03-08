@@ -6,6 +6,8 @@ import { useToast } from '../../context/ToastContext';
 import { AdminCalendar } from './AdminCalendar';
 import { ExportService } from '../../utils/export-service';
 import { useConfirmation } from '../../context/ConfirmationContext';
+import { BulkActionBar } from './BulkActionBar';
+import { Highlighter } from './Highlighter';
 
 interface AdminBookingsProps {
     onViewBooking: (booking: Booking) => void;
@@ -27,10 +29,20 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
     const [bookingFilter, setBookingFilter] = useState<'all' | 'rent' | 'reservation'>('all');
     const [dateFilter, setDateFilter] = useState('');
     const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-    const { rooms, addBooking, deleteBooking, bookings, config, isRoomAvailable, calculatePrice } = useSite();
+    const { rooms, addBooking, deleteBooking, updateBooking, bookings, config, isRoomAvailable, calculatePrice } = useSite();
     const { showToast } = useToast();
     const confirm = useConfirmation();
+
+    const handleUpdateStatus = async (id: string, data: Partial<Booking>, message: string) => {
+        try {
+            await updateBooking(id, data);
+            showToast(message, 'success');
+        } catch (error) {
+            showToast('Failed to update booking status.', 'error');
+        }
+    };
 
     const handleCreateBooking = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -136,9 +148,59 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
         if (confirmed) {
             try {
                 await deleteBooking(id);
+                setSelectedIds(prev => prev.filter(item => item !== id));
             } catch (err) {
                 console.error("Delete error:", err);
             }
+        }
+    };
+
+    const handleToggleSelect = (id: string) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const handleToggleSelectAll = () => {
+        if (selectedIds.length === filteredBookings.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(filteredBookings.map(b => b.id));
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        const confirmed = await confirm({
+            title: 'Bulk Delete Bookings',
+            message: `Are you sure you want to delete ${selectedIds.length} bookings? This action cannot be undone.`,
+            confirmText: 'Delete All',
+            type: 'danger'
+        });
+
+        if (confirmed) {
+            try {
+                await Promise.all(selectedIds.map(id => deleteBooking(id)));
+                showToast(`Successfully deleted ${selectedIds.length} bookings`, 'success');
+                setSelectedIds([]);
+            } catch (error) {
+                showToast('Failed to delete some bookings', 'error');
+            }
+        }
+    };
+
+    const handleBulkExport = () => {
+        const bookingsToExport = bookings.filter(b => selectedIds.includes(b.id));
+        ExportService.exportBookingsToExcel(bookingsToExport, rooms);
+        showToast(`Exported ${selectedIds.length} bookings`, 'success');
+    };
+
+    const handleBulkStatusUpdate = async (update: Partial<Booking>) => {
+        try {
+            await Promise.all(selectedIds.map(id => updateBooking(id, update)));
+            showToast(`Updated ${selectedIds.length} bookings`, 'success');
+            setSelectedIds([]);
+        } catch (error) {
+            showToast('Failed to update some bookings', 'error');
         }
     };
 
@@ -287,6 +349,21 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="bg-charcoal text-white">
+                                    <th className="px-10 py-8 w-16">
+                                        <div
+                                            onClick={handleToggleSelectAll}
+                                            className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all cursor-pointer ${selectedIds.length === filteredBookings.length && filteredBookings.length > 0
+                                                ? 'bg-gold border-gold'
+                                                : 'border-white/20 hover:border-white/40'
+                                                }`}
+                                        >
+                                            {selectedIds.length === filteredBookings.length && filteredBookings.length > 0 && (
+                                                <svg className="w-4 h-4 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            )}
+                                        </div>
+                                    </th>
                                     <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Guest Information</th>
                                     <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Stay Details</th>
                                     <th className="px-8 py-8 text-[10px] font-black uppercase tracking-[0.3em]">Financials</th>
@@ -296,21 +373,40 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredBookings.map((booking) => (
-                                    <tr key={booking.id} className="group hover:bg-gray-50/50 transition-colors">
+                                    <tr key={booking.id} className={`group hover:bg-gray-50/50 transition-colors ${selectedIds.includes(booking.id) ? 'bg-gold/[0.03]' : ''}`}>
+                                        <td className="px-10 py-8">
+                                            <div
+                                                onClick={() => handleToggleSelect(booking.id)}
+                                                className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all cursor-pointer ${selectedIds.includes(booking.id)
+                                                    ? 'bg-gold border-gold shadow-lg shadow-gold/20'
+                                                    : 'border-gray-200 group-hover:border-gray-300'
+                                                    }`}
+                                            >
+                                                {selectedIds.includes(booking.id) && (
+                                                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="px-10 py-8">
                                             <div className="flex items-center gap-6">
                                                 <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">👤</div>
                                                 <div>
-                                                    <p className="text-base font-black text-charcoal mb-1">{booking.guestName}</p>
+                                                    <p className="text-base font-black text-charcoal mb-1">
+                                                        <Highlighter text={booking.guestName} search={bookingSearch} />
+                                                    </p>
                                                     <p className="text-[10px] font-bold text-gray-400 tracking-wider flex items-center gap-2">
                                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                        {booking.guestEmail}
+                                                        <Highlighter text={booking.guestEmail} search={bookingSearch} />
                                                     </p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-8">
-                                            <p className="text-sm font-black text-charcoal mb-1">{booking.roomName}</p>
+                                            <p className="text-sm font-black text-charcoal mb-1">
+                                                <Highlighter text={booking.roomName} search={bookingSearch} />
+                                            </p>
                                             <div className="flex items-center gap-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                                                 <span>{new Date(booking.date).toLocaleDateString()}</span>
                                                 <span className="w-1 h-1 bg-gray-200 rounded-full" />
@@ -341,20 +437,53 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                                             </div>
                                         </td>
                                         <td className="px-10 py-8 text-right">
-                                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {/* Quick Actions */}
+                                                {booking.paymentStatus !== 'paid' && (
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(booking.id, { paymentStatus: 'paid' }, 'Marked as Paid')}
+                                                        className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-all cursor-pointer"
+                                                        title="Mark as Paid"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                                                    </button>
+                                                )}
+
+                                                {booking.status === 'pending' && (
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(booking.id, { status: 'arrived' }, 'Checked In')}
+                                                        className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all cursor-pointer"
+                                                        title="Check In"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                                                    </button>
+                                                )}
+
+                                                {booking.status === 'arrived' && (
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(booking.id, { status: 'checked-out' }, 'Checked Out')}
+                                                        className="p-2.5 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition-all cursor-pointer"
+                                                        title="Check Out"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                                                    </button>
+                                                )}
+
+                                                <div className="w-px h-6 bg-gray-100 mx-1" />
+
                                                 <button
                                                     onClick={() => onViewBooking(booking)}
-                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gold hover:border-gold/30 hover:shadow-lg transition-all cursor-pointer"
+                                                    className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gold hover:border-gold/30 transition-all cursor-pointer"
                                                     title="View Details"
                                                 >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(booking.id)}
-                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-100 hover:shadow-lg transition-all cursor-pointer"
+                                                    className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-100 transition-all cursor-pointer"
                                                     title="Delete Booking"
                                                 >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                                 </button>
                                             </div>
                                         </td>
@@ -369,6 +498,36 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                         )}
                     </div>
                 </div>
+            )}
+
+            {selectedIds.length > 0 && (
+                <BulkActionBar
+                    count={selectedIds.length}
+                    onClear={() => setSelectedIds([])}
+                    actions={[
+                        {
+                            label: 'Export Selected',
+                            icon: '📊',
+                            onClick: handleBulkExport
+                        },
+                        {
+                            label: 'Mark Paid',
+                            icon: '💰',
+                            onClick: () => handleBulkStatusUpdate({ paymentStatus: 'paid' })
+                        },
+                        {
+                            label: 'Mark Arrived',
+                            icon: '🔑',
+                            onClick: () => handleBulkStatusUpdate({ status: 'arrived' })
+                        },
+                        {
+                            label: 'Delete',
+                            icon: '🗑️',
+                            onClick: handleBulkDelete,
+                            variant: 'danger'
+                        }
+                    ]}
+                />
             )}
         </div>
     );

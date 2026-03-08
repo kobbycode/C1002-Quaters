@@ -3,6 +3,7 @@ import { useSite } from '../../context/SiteContext';
 import { formatPrice } from '../../utils/formatters';
 import { Booking } from '../../types';
 import { ExportService } from '../../utils/export-service';
+import { Highlighter } from './Highlighter';
 
 export const AdminPatrons: React.FC = () => {
     const { bookings, config } = useSite();
@@ -86,8 +87,12 @@ export const AdminPatrons: React.FC = () => {
                                     {patron.totalSpent > 5000 ? '💎' : patron.totalNights > 10 ? '⭐' : '👤'}
                                 </div>
                                 <div>
-                                    <h4 className="text-base font-black text-charcoal">{patron.name}</h4>
-                                    <p className="text-[10px] font-bold text-gray-400 truncate w-40">{patron.email}</p>
+                                    <h4 className="text-base font-black text-charcoal">
+                                        <Highlighter text={patron.name} search={searchTerm} />
+                                    </h4>
+                                    <p className="text-[10px] font-bold text-gray-400 truncate w-40">
+                                        <Highlighter text={patron.email} search={searchTerm} />
+                                    </p>
                                 </div>
                             </div>
                             <div className="text-right">

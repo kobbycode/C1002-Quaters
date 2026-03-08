@@ -169,11 +169,17 @@ export const useAnalytics = ({
             const nights = rangeBookings.reduce((acc, b) => acc + b.nights, 0);
             const avgNights = count > 0 ? nights / count : 0;
 
-            return { revenue, count, avgNights };
+            const totalCapacity = rooms.length * length;
+            const occupancy = totalCapacity > 0 ? (nights / totalCapacity) * 100 : 0;
+
+            return { revenue, count, avgNights, occupancy };
         };
 
-        const currentPeriod = getRangeStats(0, 7);
-        const previousPeriod = getRangeStats(7, 7);
+        const current7d = getRangeStats(0, 7);
+        const previous7d = getRangeStats(7, 7);
+
+        const current30d = getRangeStats(0, 30);
+        const previous30d = getRangeStats(30, 30);
 
         const calculateGrowth = (current: number, previous: number) => {
             if (previous === 0) return current > 0 ? '+100%' : '0%';
@@ -192,23 +198,26 @@ export const useAnalytics = ({
 
         return {
             revenue: {
-                growth: calculateGrowth(currentPeriod.revenue, previousPeriod.revenue),
+                growth: calculateGrowth(current30d.revenue, previous30d.revenue),
                 trend: getDailyTrend(7, 'revenue')
             },
             bookings: {
-                growth: calculateGrowth(currentPeriod.count, previousPeriod.count),
+                growth: calculateGrowth(current30d.count, previous30d.count),
                 trend: getDailyTrend(7, 'count')
             },
+            occupancy: {
+                growth: calculateGrowth(current30d.occupancy, previous30d.occupancy)
+            },
             duration: {
-                growth: calculateGrowth(currentPeriod.avgNights, previousPeriod.avgNights),
+                growth: calculateGrowth(current30d.avgNights, previous30d.avgNights),
                 trend: getDailyTrend(7, 'avgNights')
             }
         };
-    }, [bookings, now]);
+    }, [bookings, rooms, now]);
 
     const stats = useMemo(() => [
         { label: 'Realized Revenue', value: formatPrice(financialData.realizedRevenue, config.currency || 'GHS'), sub: `${formatPrice(parseInt(financialData.revPAR), config.currency || 'GHS')} RevPAR`, growth: statsData.revenue.growth, icon: '💰', trend: statsData.revenue.trend, color: '#8B008B' },
-        { label: 'Occupancy Rate', value: `${financialData.occupancyRate}%`, sub: '30-Day Inventory Yield', growth: '+0.0%', icon: '📈', trend: Array(7).fill(financialData.occupancyRate), color: '#10b981' },
+        { label: 'Occupancy Rate', value: `${financialData.occupancyRate}%`, sub: '30-Day Inventory Yield', growth: statsData.occupancy.growth, icon: '📈', trend: Array(7).fill(financialData.occupancyRate), color: '#10b981' },
         { label: 'Top Performer', value: financialData.roomPerformance[0]?.score.toString() || '0', sub: financialData.roomPerformance[0]?.name || 'No data', growth: 'Elite', icon: '🏆', trend: Array(7).fill(financialData.roomPerformance[0]?.score || 0), color: '#fbbf24' },
         { label: 'Avg. Duration', value: `${financialData.avgStayDuration} Nights`, sub: 'Guest Commitment', growth: statsData.duration.growth, icon: '⏳', trend: statsData.duration.trend, color: '#3b82f6' },
         { label: 'Monthly Forecast', value: formatPrice(financialData.forecastedRevenue, config.currency || 'GHS'), sub: 'Next 30 Days Projection', growth: 'Foresight', icon: '🔮', trend: [financialData.realizedRevenue * 0.8, financialData.realizedRevenue, financialData.forecastedRevenue], color: '#6B006B' },
