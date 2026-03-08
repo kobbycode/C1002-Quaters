@@ -3,6 +3,7 @@ import { useSite } from '../../context/SiteContext';
 import { Room } from '../../types';
 import { formatPrice } from '../../utils/formatters';
 import { useConfirmation } from '../../context/ConfirmationContext';
+import { AdminRoomDetailModal } from './modals/AdminRoomDetailModal';
 
 interface AdminRoomsProps {
     onEditRoom: (room: Room) => void;
@@ -18,6 +19,8 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [sortBy, setSortBy] = useState<string>('newest');
+    const [selectedRoomDetail, setSelectedRoomDetail] = useState<Room | null>(null);
 
     const handleToggleBestSeller = async (id: string, current: boolean) => {
         await updateRoom(id, { isBestSeller: !current });
@@ -45,7 +48,8 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
         return rooms.filter(room => {
             const matchesSearch =
                 room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (room.roomCode || '').toLowerCase().includes(searchQuery.toLowerCase());
+                (room.roomCode || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                room.category.toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesCategory = selectedCategory === 'all' || room.category === selectedCategory;
 
@@ -64,8 +68,17 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                 selectedTags.every(tag => (room.tags || []).includes(tag));
 
             return matchesSearch && matchesCategory && matchesStatus && matchesTags;
+        }).sort((a, b) => {
+            switch (sortBy) {
+                case 'price-asc': return a.price - b.price;
+                case 'price-desc': return b.price - a.price;
+                case 'name-asc': return a.name.localeCompare(b.name);
+                case 'category-asc': return a.category.localeCompare(b.category);
+                case 'rating-desc': return b.rating - a.rating;
+                default: return 0; // 'newest' or default
+            }
         });
-    }, [rooms, searchQuery, selectedCategory, selectedStatus, selectedTags, bookings]);
+    }, [rooms, searchQuery, selectedCategory, selectedStatus, selectedTags, bookings, sortBy]);
 
     // Calculate financial metrics for each room
     const roomMetrics = useMemo(() => {
@@ -153,6 +166,19 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                         <option value="occupied">Occupied</option>
                         <option value="cleaning">Cleaning</option>
                         <option value="maintenance">Maintenance</option>
+                    </select>
+
+                    <select
+                        value={sortBy}
+                        onChange={e => setSortBy(e.target.value)}
+                        className="bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest focus:ring-gold focus:border-gold"
+                    >
+                        <option value="newest">Newest First</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="name-asc">Name: A-Z</option>
+                        <option value="category-asc">Category: A-Z</option>
+                        <option value="rating-desc">Rating: High to Low</option>
                     </select>
                 </div>
             </div>
@@ -302,6 +328,13 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
+                                <button
+                                    onClick={() => setSelectedRoomDetail(room)}
+                                    className="px-5 bg-gold/10 text-gold rounded-xl hover:bg-gold hover:text-white transition-all border border-gold/20"
+                                    title="View Detailed Analysis"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -329,6 +362,15 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                     </div>
                 )}
             </div>
+
+            {selectedRoomDetail && (
+                <AdminRoomDetailModal
+                    room={selectedRoomDetail}
+                    bookings={bookings}
+                    config={config}
+                    onClose={() => setSelectedRoomDetail(null)}
+                />
+            )}
         </div>
     );
 };
