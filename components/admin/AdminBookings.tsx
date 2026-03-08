@@ -149,7 +149,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                     <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">
                         <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <h3 className="text-xl font-serif font-black text-charcoal">New Manual Reservation</h3>
-                            <button onClick={() => setIsCreating(false)} className="text-gray-400 hover:text-charcoal transition-colors">
+                            <button onClick={() => setIsCreating(false)} className="text-gray-400 hover:text-charcoal transition-colors cursor-pointer">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
@@ -198,8 +198,8 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                                 </div>
                             </div>
                             <div className="pt-4 border-t border-gray-50 flex gap-3">
-                                <button type="button" onClick={() => setIsCreating(false)} className="flex-1 py-4 rounded-xl font-bold text-xs uppercase tracking-widest text-gray-400 hover:bg-gray-50 transition-colors">Cancel</button>
-                                <button type="submit" className="flex-1 py-4 bg-charcoal text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-gold transition-colors shadow-lg shadow-charcoal/20">Create Reservation</button>
+                                <button type="button" onClick={() => setIsCreating(false)} className="flex-1 py-4 rounded-xl font-bold text-xs uppercase tracking-widest text-gray-400 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+                                <button type="submit" className="flex-1 py-4 bg-charcoal text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-gold transition-colors shadow-lg shadow-charcoal/20 cursor-pointer">Create Reservation</button>
                             </div>
                         </form>
                     </div>
@@ -225,7 +225,7 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                         <button
                             key={f}
                             onClick={() => setBookingFilter(f)}
-                            className={`px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${bookingFilter === f ? 'bg-white text-gold shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
+                            className={`px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all cursor-pointer ${bookingFilter === f ? 'bg-white text-gold shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
                         >
                             {f}
                         </button>
@@ -237,13 +237,13 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                 <div className="flex bg-gray-50 rounded-[1.5rem] p-1.5 gap-1.5 border border-gray-100">
                     <button
                         onClick={() => setViewMode('list')}
-                        className={`px-6 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'list' ? 'bg-white text-charcoal shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
+                        className={`px-6 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white text-charcoal shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
                     >
                         List
                     </button>
                     <button
                         onClick={() => setViewMode('calendar')}
-                        className={`px-6 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'calendar' ? 'bg-white text-charcoal shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
+                        className={`px-6 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${viewMode === 'calendar' ? 'bg-white text-charcoal shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
                     >
                         Calendar
                     </button>
@@ -252,13 +252,13 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                 <div className="flex flex-wrap gap-4 items-center">
                     <button
                         onClick={() => ExportService.exportBookingsToExcel(filteredBookings, rooms)}
-                        className="bg-white text-green-600 px-6 py-3 rounded-xl border border-green-100 font-black text-[10px] uppercase tracking-widest hover:bg-green-50 transition-all flex items-center gap-2"
+                        className="bg-white text-green-600 px-6 py-3 rounded-xl border border-green-100 font-black text-[10px] uppercase tracking-widest hover:bg-green-50 transition-all flex items-center gap-2 cursor-pointer"
                     >
                         <span className="text-lg">📊</span> Export to Excel
                     </button>
                     <button
                         onClick={() => setIsCreating(true)}
-                        className="bg-gold text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#C5A059] transition-all shadow-xl shadow-gold/20 flex items-center gap-2"
+                        className="bg-gold text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#C5A059] transition-all shadow-xl shadow-gold/20 flex items-center gap-2 cursor-pointer"
                     >
                         <span className="text-lg">+</span> New Booking
                     </button>
@@ -344,14 +344,14 @@ export const AdminBookings: React.FC<AdminBookingsProps> = ({ onViewBooking }) =
                                             <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => onViewBooking(booking)}
-                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gold hover:border-gold/30 hover:shadow-lg transition-all"
+                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gold hover:border-gold/30 hover:shadow-lg transition-all cursor-pointer"
                                                     title="View Details"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(booking.id)}
-                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-100 hover:shadow-lg transition-all"
+                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-100 hover:shadow-lg transition-all cursor-pointer"
                                                     title="Delete Booking"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>

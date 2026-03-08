@@ -21,13 +21,13 @@ export const AdminAmenities: React.FC<AdminAmenitiesProps> = ({ config, onEditAm
                         <div className="flex gap-4">
                             <button
                                 onClick={() => onEditAmenity(name, detail)}
-                                className="text-[10px] font-black uppercase text-primary hover:underline"
+                                className="text-[10px] font-black uppercase text-primary hover:underline cursor-pointer"
                             >
                                 Edit Node
                             </button>
                             <button
                                 onClick={() => onDelete(name)}
-                                className="text-[10px] font-black uppercase text-red-500 hover:underline"
+                                className="text-[10px] font-black uppercase text-red-500 hover:underline cursor-pointer"
                             >
                                 Delete
                             </button>

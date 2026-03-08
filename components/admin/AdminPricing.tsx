@@ -75,7 +75,7 @@ export const AdminPricing: React.FC = () => {
                 </div>
                 <button
                     onClick={() => setIsCreating(true)}
-                    className="bg-gold text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#C5A059] transition-all shadow-xl shadow-gold/20 flex items-center gap-2"
+                    className="bg-gold text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#C5A059] transition-all shadow-xl shadow-gold/20 flex items-center gap-2 cursor-pointer"
                 >
                     <span className="text-lg">+</span> New Rule
                 </button>
@@ -106,7 +106,7 @@ export const AdminPricing: React.FC = () => {
                                                 });
                                             }
                                         }}
-                                        className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                                        className="p-2 text-gray-300 hover:text-red-500 transition-colors cursor-pointer"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
@@ -153,7 +153,7 @@ export const AdminPricing: React.FC = () => {
                     <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
                         <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <h3 className="text-xl font-serif font-black text-charcoal">Define Pricing Strategy</h3>
-                            <button onClick={() => setIsCreating(false)} className="text-gray-400 hover:text-charcoal transition-colors">
+                            <button onClick={() => setIsCreating(false)} className="text-gray-400 hover:text-charcoal transition-colors cursor-pointer">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
@@ -217,7 +217,7 @@ export const AdminPricing: React.FC = () => {
                                                     key={i}
                                                     type="button"
                                                     onClick={() => toggleDay(i)}
-                                                    className={`w-12 h-12 rounded-xl flex items-center justify-center font-black transition-all ${newRule.daysOfWeek?.includes(i) ? 'bg-gold text-white shadow-lg shadow-gold/20 scale-110' : 'bg-gray-50 text-gray-300 hover:bg-gray-100'}`}
+                                                    className={`w-12 h-12 rounded-xl flex items-center justify-center font-black transition-all cursor-pointer ${newRule.daysOfWeek?.includes(i) ? 'bg-gold text-white shadow-lg shadow-gold/20 scale-110' : 'bg-gray-50 text-gray-300 hover:bg-gray-100'}`}
                                                 >
                                                     {day}
                                                 </button>
@@ -239,7 +239,7 @@ export const AdminPricing: React.FC = () => {
                                         <button
                                             type="button"
                                             onClick={() => setNewRule({ ...newRule, roomCategories: ['all'] })}
-                                            className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${newRule.roomCategories?.includes('all') ? 'bg-charcoal text-white border-charcoal' : 'bg-white text-gray-400 border-gray-200'}`}
+                                            className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all cursor-pointer ${newRule.roomCategories?.includes('all') ? 'bg-charcoal text-white border-charcoal' : 'bg-white text-gray-400 border-gray-200'}`}
                                         >
                                             All Rooms
                                         </button>
@@ -255,7 +255,7 @@ export const AdminPricing: React.FC = () => {
                                                         setNewRule({ ...newRule, roomCategories: [...current, cat] });
                                                     }
                                                 }}
-                                                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${newRule.roomCategories?.includes(cat) ? 'bg-charcoal text-white border-charcoal' : 'bg-white text-gray-400 border-gray-200'}`}
+                                                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all cursor-pointer ${newRule.roomCategories?.includes(cat) ? 'bg-charcoal text-white border-charcoal' : 'bg-white text-gray-400 border-gray-200'}`}
                                             >
                                                 {cat}
                                             </button>
@@ -265,8 +265,8 @@ export const AdminPricing: React.FC = () => {
                             </div>
 
                             <div className="pt-6 border-t border-gray-50 flex gap-4">
-                                <button type="button" onClick={() => setIsCreating(false)} className="flex-1 py-4 rounded-xl font-bold text-xs uppercase tracking-widest text-gray-400 hover:bg-gray-50 transition-colors">Cancel</button>
-                                <button type="submit" className="flex-1 py-4 bg-gold text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#C5A059] transition-colors shadow-lg shadow-gold/20">Create Rule</button>
+                                <button type="button" onClick={() => setIsCreating(false)} className="flex-1 py-4 rounded-xl font-bold text-xs uppercase tracking-widest text-gray-400 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+                                <button type="submit" className="flex-1 py-4 bg-gold text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#C5A059] transition-colors shadow-lg shadow-gold/20 cursor-pointer">Create Rule</button>
                             </div>
                         </form>
                     </div>

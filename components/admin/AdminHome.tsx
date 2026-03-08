@@ -94,7 +94,7 @@ export const AdminHome: React.FC<AdminHomeProps> = ({
                                 ...template
                             });
                         }}
-                        className="bg-charcoal text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-charcoal/20"
+                        className="bg-charcoal text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-charcoal/20 cursor-pointer"
                     >
                         + Compose Slide
                     </button>
@@ -112,7 +112,7 @@ export const AdminHome: React.FC<AdminHomeProps> = ({
                             className={`flex items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-100 group transition-all hover:border-gold/30 ${dragOverIndex === index ? 'border-dashed border-2 border-gold scale-[1.01]' : ''}`}
                         >
                             <div className="flex items-center gap-8 flex-1 min-w-0">
-                                <div className="cursor-move opacity-30 group-hover:opacity-100 transition-opacity">
+                                <div className="cursor-move cursor-pointer opacity-30 group-hover:opacity-100 transition-opacity">
                                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
                                     </svg>
@@ -134,7 +134,7 @@ export const AdminHome: React.FC<AdminHomeProps> = ({
                             <div className="flex items-center gap-4 ml-6">
                                 <button
                                     onClick={() => setEditingHero(slide)}
-                                    className="text-[10px] font-black uppercase text-primary hover:underline"
+                                    className="text-[10px] font-black uppercase text-primary hover:underline cursor-pointer"
                                 >
                                     Modify
                                 </button>
@@ -153,7 +153,7 @@ export const AdminHome: React.FC<AdminHomeProps> = ({
                                             showToast('Slide removed');
                                         }
                                     }}
-                                    className="text-[10px] font-black uppercase text-red-400 hover:text-red-600"
+                                    className="text-[10px] font-black uppercase text-red-400 hover:text-red-600 cursor-pointer"
                                 >
                                     Delete
                                 </button>

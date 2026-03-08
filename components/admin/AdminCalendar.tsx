@@ -64,13 +64,13 @@ export const AdminCalendar: React.FC<AdminCalendarProps> = ({ onViewBooking, onB
                             d.setDate(d.getDate() - 7);
                             setViewDate(d);
                         }}
-                        className="p-3 hover:bg-white hover:text-gold hover:shadow-sm rounded-xl transition-all text-gray-400"
+                        className="p-3 hover:bg-white hover:text-gold hover:shadow-sm rounded-xl transition-all text-gray-400 cursor-pointer"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" /></svg>
                     </button>
                     <button
                         onClick={() => setViewDate(new Date())}
-                        className="px-6 py-2.5 bg-white text-charcoal text-[10px] font-black uppercase tracking-widest rounded-xl shadow-sm hover:text-gold transition-all"
+                        className="px-6 py-2.5 bg-white text-charcoal text-[10px] font-black uppercase tracking-widest rounded-xl shadow-sm hover:text-gold transition-all cursor-pointer"
                     >
                         Go to Today
                     </button>
@@ -80,7 +80,7 @@ export const AdminCalendar: React.FC<AdminCalendarProps> = ({ onViewBooking, onB
                             d.setDate(d.getDate() + 7);
                             setViewDate(d);
                         }}
-                        className="p-3 hover:bg-white hover:text-gold hover:shadow-sm rounded-xl transition-all text-gray-400"
+                        className="p-3 hover:bg-white hover:text-gold hover:shadow-sm rounded-xl transition-all text-gray-400 cursor-pointer"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
                     </button>

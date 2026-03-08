@@ -39,7 +39,7 @@ export const AdminRoomDetailModal: React.FC<AdminRoomDetailModalProps> = ({
             <div className="bg-white w-full max-w-5xl rounded-[3rem] p-12 overflow-y-auto max-h-[90vh] shadow-2xl relative">
                 <button
                     onClick={onClose}
-                    className="absolute top-8 right-10 text-gray-400 hover:text-charcoal transition-colors p-2"
+                    className="absolute top-8 right-10 text-gray-400 hover:text-charcoal transition-colors p-2 cursor-pointer"
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -112,8 +112,8 @@ export const AdminRoomDetailModal: React.FC<AdminRoomDetailModalProps> = ({
                                         <td className="px-8 py-6 text-xs font-black text-charcoal">{formatPrice(booking.totalPrice, config.currency)}</td>
                                         <td className="px-8 py-6">
                                             <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${booking.status === 'confirmed' || booking.status === 'arrived' ? 'bg-emerald-50 text-emerald-600' :
-                                                    booking.status === 'cancelled' ? 'bg-red-50 text-red-500' :
-                                                        'bg-amber-50 text-amber-600'
+                                                booking.status === 'cancelled' ? 'bg-red-50 text-red-500' :
+                                                    'bg-amber-50 text-amber-600'
                                                 }`}>
                                                 {booking.status || 'Pending'}
                                             </span>
@@ -135,7 +135,7 @@ export const AdminRoomDetailModal: React.FC<AdminRoomDetailModalProps> = ({
                 <div className="mt-12 flex justify-end">
                     <button
                         onClick={onClose}
-                        className="bg-charcoal text-white font-black px-12 py-5 rounded-2xl uppercase tracking-widest text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/10"
+                        className="bg-charcoal text-white font-black px-12 py-5 rounded-2xl uppercase tracking-widest text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/10 cursor-pointer"
                     >
                         Close Analysis
                     </button>

@@ -39,7 +39,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                         <div className="flex items-center gap-4 ml-6">
                             <button
                                 onClick={() => setEditingAboutPage(true)}
-                                className="text-[10px] font-black uppercase text-primary hover:underline"
+                                className="text-[10px] font-black uppercase text-primary hover:underline cursor-pointer"
                             >
                                 Modify
                             </button>
@@ -58,7 +58,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                         <div className="flex items-center gap-4 ml-6">
                             <button
                                 onClick={() => setEditingContactPage(true)}
-                                className="text-[10px] font-black uppercase text-primary hover:underline"
+                                className="text-[10px] font-black uppercase text-primary hover:underline cursor-pointer"
                             >
                                 Modify
                             </button>
@@ -95,7 +95,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 <h2 className="text-3xl font-black font-serif text-charcoal">About Manuscript</h2>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-gold mt-2">Historical & Brand Narrative</p>
                             </div>
-                            <button onClick={() => setEditingAboutPage(false)} className="p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                            <button onClick={() => setEditingAboutPage(false)} className="p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors cursor-pointer">
                                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
@@ -181,7 +181,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                         const newPillars = [...(config.aboutPage?.pillars || []), { title: 'New Pillar', description: '' }];
                                         updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), pillars: newPillars } });
                                     }}
-                                    className="px-4 py-2 bg-charcoal text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gold transition-all"
+                                    className="px-4 py-2 bg-charcoal text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gold transition-all cursor-pointer"
                                 >
                                     + Add Pillar
                                 </button>
@@ -195,7 +195,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                                 const newPillars = (config.aboutPage?.pillars || []).filter((_, i) => i !== idx);
                                                 updateConfig({ ...config, aboutPage: { ...(config.aboutPage || {}), pillars: newPillars } });
                                             }}
-                                            className="absolute top-4 right-4 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500"
+                                            className="absolute top-4 right-4 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500 cursor-pointer"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                         </button>
@@ -234,7 +234,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                     setEditingAboutPage(false);
                                     showToast('Manuscript Synchronized');
                                 }}
-                                className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20"
+                                className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20 cursor-pointer"
                             >
                                 Synchronize Narrative
                             </button>
@@ -252,7 +252,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                 <h2 className="text-3xl font-black font-serif text-charcoal">Spatial Coordinates</h2>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-gold mt-2">Gateway & Physical Presence</p>
                             </div>
-                            <button onClick={() => setEditingContactPage(false)} className="p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                            <button onClick={() => setEditingContactPage(false)} className="p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors cursor-pointer">
                                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
@@ -288,7 +288,7 @@ export const AdminPages: React.FC<AdminPagesProps> = ({
                                     setEditingContactPage(false);
                                     showToast('Coordinates Calibrated');
                                 }}
-                                className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20"
+                                className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20 cursor-pointer"
                             >
                                 Update Vector Node
                             </button>

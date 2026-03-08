@@ -74,7 +74,7 @@ export const AdminAmenityModal: React.FC<AdminAmenityModalProps> = ({
                 <div className="mt-12 flex flex-col gap-4">
                     <button
                         onClick={() => onSave(originalName)}
-                        className="w-full bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20"
+                        className="w-full bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20 cursor-pointer"
                     >
                         Update Registry Node
                     </button>
@@ -82,14 +82,14 @@ export const AdminAmenityModal: React.FC<AdminAmenityModalProps> = ({
                         {originalName && (
                             <button
                                 onClick={() => onDelete(originalName)}
-                                className="flex-1 bg-red-50 text-red-500 font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-red-500 hover:text-white transition-all"
+                                className="flex-1 bg-red-50 text-red-500 font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-red-500 hover:text-white transition-all cursor-pointer"
                             >
                                 Delete
                             </button>
                         )}
                         <button
                             onClick={() => setEditingAmenity(null)}
-                            className="flex-1 bg-gray-100 text-charcoal font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gray-200 transition-all"
+                            className="flex-1 bg-gray-100 text-charcoal font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gray-200 transition-all cursor-pointer"
                         >
                             Discard
                         </button>

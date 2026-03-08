@@ -58,7 +58,7 @@ export const AdminNewsletterModal: React.FC<AdminNewsletterModalProps> = ({
                         <h3 className="text-2xl font-serif font-black text-charcoal">Broadcast Correspondence</h3>
                         <p className="text-[10px] font-black uppercase tracking-widest text-gold mt-1">Messaging {config.newsletterSubscribers?.length || 0} Patrons</p>
                     </div>
-                    <button onClick={onClose} className="text-gray-400 hover:text-charcoal transition-colors p-2">
+                    <button onClick={onClose} className="text-gray-400 hover:text-charcoal transition-colors p-2 cursor-pointer">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
@@ -84,7 +84,7 @@ export const AdminNewsletterModal: React.FC<AdminNewsletterModalProps> = ({
                                     type="button"
                                     onClick={handleAiDraft}
                                     disabled={isAiGenerating}
-                                    className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary hover:text-[#6B006B] transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary hover:text-[#6B006B] transition-colors disabled:opacity-50 cursor-pointer"
                                 >
                                     {isAiGenerating ? (
                                         <>
@@ -113,14 +113,14 @@ export const AdminNewsletterModal: React.FC<AdminNewsletterModalProps> = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:bg-gray-50 transition-all"
+                            className="flex-1 py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:bg-gray-50 transition-all cursor-pointer"
                         >
                             Discard
                         </button>
                         <button
                             type="submit"
                             disabled={isSending}
-                            className="flex-1 py-5 bg-charcoal text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-gold transition-all shadow-xl shadow-charcoal/20 disabled:opacity-50 flex items-center justify-center gap-3"
+                            className="flex-1 py-5 bg-charcoal text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-gold transition-all shadow-xl shadow-charcoal/20 disabled:opacity-50 flex items-center justify-center gap-3 cursor-pointer"
                         >
                             {isSending ? (
                                 <>

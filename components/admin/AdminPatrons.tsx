@@ -71,7 +71,7 @@ export const AdminPatrons: React.FC = () => {
 
                 <button
                     onClick={() => ExportService.exportToCSV(patrons.map(p => ({ Name: p.name, Email: p.email, 'Total Spent': p.totalSpent, 'Nights': p.totalNights, 'Last Stay': p.lastStay })), 'c1002-patrons')}
-                    className="bg-gold text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#C5A059] transition-all shadow-xl shadow-gold/20 flex items-center gap-2 whitespace-nowrap"
+                    className="bg-gold text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#C5A059] transition-all shadow-xl shadow-gold/20 flex items-center gap-2 whitespace-nowrap cursor-pointer"
                 >
                     <span className="text-lg">📥</span> Export List
                 </button>
@@ -121,10 +121,10 @@ export const AdminPatrons: React.FC = () => {
                         </div>
 
                         <div className="mt-8 pt-6 border-t border-gray-50 flex gap-2">
-                            <button className="flex-1 bg-charcoal text-white font-black py-4 rounded-xl hover:bg-gold transition-all uppercase tracking-widest text-[9px] shadow-lg shadow-charcoal/10">
+                            <button className="flex-1 bg-charcoal text-white font-black py-4 rounded-xl hover:bg-gold transition-all uppercase tracking-widest text-[9px] shadow-lg shadow-charcoal/10 cursor-pointer">
                                 View History
                             </button>
-                            <button className="px-5 bg-gray-50 text-charcoal rounded-xl hover:bg-gray-100 transition-all border border-gray-100" title="Add Private Note">
+                            <button className="px-5 bg-gray-50 text-charcoal rounded-xl hover:bg-gray-100 transition-all border border-gray-100 cursor-pointer" title="Add Private Note">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                             </button>
                         </div>

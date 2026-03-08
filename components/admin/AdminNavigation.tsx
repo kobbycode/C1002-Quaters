@@ -62,7 +62,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
                 </div>
                 <button
                     onClick={() => setEditingNav({ id: Date.now().toString(), label: '', path: '/' })}
-                    className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#6B006B] transition-all"
+                    className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#6B006B] transition-all cursor-pointer"
                 >
                     + Add Link
                 </button>
@@ -80,7 +80,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
                         className={`flex items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-100 group transition-all ${dragOverIndex === index ? 'border-gold border-2 -translate-y-1' : ''}`}
                     >
                         <div className="flex items-center gap-8">
-                            <div className="cursor-move opacity-30 group-hover:opacity-100 transition-opacity">
+                            <div className="cursor-move cursor-pointer opacity-30 group-hover:opacity-100 transition-opacity">
                                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
                                 </svg>
@@ -94,7 +94,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => setEditingNav(link)}
-                                className="text-[10px] font-black uppercase text-primary hover:underline"
+                                className="text-[10px] font-black uppercase text-primary hover:underline cursor-pointer"
                             >
                                 Modify
                             </button>
@@ -113,7 +113,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
                                         showToast('Navigation link removed');
                                     }
                                 }}
-                                className="text-[10px] font-black uppercase text-red-400 hover:text-red-600"
+                                className="text-[10px] font-black uppercase text-red-400 hover:text-red-600 cursor-pointer"
                             >
                                 Delete
                             </button>

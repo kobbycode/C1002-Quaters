@@ -149,7 +149,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                         {/* Database Seeding Button */}
                         <button
                             onClick={handleSeedDatabase}
-                            className="mb-6 w-full bg-gold/10 text-gold border border-gold/20 font-black py-4 rounded-xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold hover:text-white transition-all flex items-center justify-center gap-2"
+                            className="mb-6 w-full bg-gold/10 text-gold border border-gold/20 font-black py-4 rounded-xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
@@ -162,7 +162,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                         <div className="flex flex-col gap-4">
                             <button
                                 onClick={handleExportConfig}
-                                className="w-full bg-charcoal text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:bg-gold transition-all flex items-center justify-center gap-3"
+                                className="w-full bg-charcoal text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:bg-gold transition-all flex items-center justify-center gap-3 cursor-pointer"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -178,7 +178,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                     className="absolute inset-0 opacity-0 cursor-pointer pointer-events-auto"
                                 />
                                 <button
-                                    className="w-full bg-gray-50 text-charcoal font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-[10px] border border-gray-100 flex items-center justify-center gap-3"
+                                    className="w-full bg-gray-50 text-charcoal font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-[10px] border border-gray-100 flex items-center justify-center gap-3 cursor-pointer"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
@@ -217,8 +217,8 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                                 if (e.key === 'Escape') setEditingIndex(null);
                                             }}
                                         />
-                                        <button onClick={() => handleSaveEdit(idx)} className="text-green-500 hover:text-green-600 font-bold text-[10px] uppercase">Save</button>
-                                        <button onClick={() => setEditingIndex(null)} className="text-gray-400 hover:text-gray-600 font-bold text-[10px] uppercase">Cancel</button>
+                                        <button onClick={() => handleSaveEdit(idx)} className="text-green-500 hover:text-green-600 font-bold text-[10px] uppercase cursor-pointer">Save</button>
+                                        <button onClick={() => setEditingIndex(null)} className="text-gray-400 hover:text-gray-600 font-bold text-[10px] uppercase cursor-pointer">Cancel</button>
                                     </div>
                                 ) : (
                                     <>
@@ -229,7 +229,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                                     setEditingIndex(idx);
                                                     setEditValue(cat);
                                                 }}
-                                                className="text-gray-400 hover:text-primary p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="text-gray-400 hover:text-primary p-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                                                 title="Edit Category"
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,7 +251,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                                         showToast(`Category "${cat}" removed`);
                                                     }
                                                 }}
-                                                className="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                                                 title="Delete Category"
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -288,7 +288,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                             />
                             <button
                                 type="submit"
-                                className="bg-charcoal text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg"
+                                className="bg-charcoal text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg cursor-pointer"
                             >
                                 Add
                             </button>
@@ -322,8 +322,8 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                                 if (e.key === 'Escape') setEditingTagIndex(null);
                                             }}
                                         />
-                                        <button onClick={() => handleSaveTagEdit(idx)} className="text-green-500 hover:text-green-600 font-bold text-[10px] uppercase">Save</button>
-                                        <button onClick={() => setEditingTagIndex(null)} className="text-gray-400 hover:text-gray-600 font-bold text-[10px] uppercase">Cancel</button>
+                                        <button onClick={() => handleSaveTagEdit(idx)} className="text-green-500 hover:text-green-600 font-bold text-[10px] uppercase cursor-pointer">Save</button>
+                                        <button onClick={() => setEditingTagIndex(null)} className="text-gray-400 hover:text-gray-600 font-bold text-[10px] uppercase cursor-pointer">Cancel</button>
                                     </div>
                                 ) : (
                                     <>
@@ -334,7 +334,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                                     setEditingTagIndex(idx);
                                                     setEditTagValue(tag);
                                                 }}
-                                                className="text-gray-400 hover:text-gold p-2 transition-opacity"
+                                                className="text-gray-400 hover:text-gold p-2 transition-opacity cursor-pointer"
                                                 title="Edit Tag"
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -361,7 +361,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                                                         showToast(`Tag "${tag}" removed from registry and rooms`);
                                                     }
                                                 }}
-                                                className="text-red-400 hover:text-red-600 p-2 transition-opacity"
+                                                className="text-red-400 hover:text-red-600 p-2 transition-opacity cursor-pointer"
                                                 title="Delete Tag"
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -401,7 +401,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                             />
                             <button
                                 type="submit"
-                                className="bg-charcoal text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold transition-all shadow-lg"
+                                className="bg-charcoal text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold transition-all shadow-lg cursor-pointer"
                             >
                                 Add
                             </button>
@@ -462,7 +462,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ config, updateConf
                             window.location.reload();
                             showToast('System cache cleared', 'info');
                         }}
-                        className="bg-white text-red-600 border border-red-200 px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                        className="bg-white text-red-600 border border-red-200 px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-sm cursor-pointer"
                     >
                         Force Re-sync
                     </button>

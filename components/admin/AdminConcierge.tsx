@@ -39,7 +39,7 @@ export const AdminConcierge: React.FC<AdminConciergeProps> = ({ config, updateCo
                         <div className="flex justify-end">
                             <button
                                 onClick={() => showToast('Concierge directive updated successfully', 'success')}
-                                className="bg-charcoal text-white font-black px-10 py-5 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20"
+                                className="bg-charcoal text-white font-black px-10 py-5 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20 cursor-pointer"
                             >
                                 Synchronize AI Persona
                             </button>

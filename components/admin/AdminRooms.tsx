@@ -122,7 +122,7 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                 </div>
                 <button
                     onClick={onOpenAddRoom}
-                    className="bg-charcoal text-white font-black px-8 py-4 rounded-xl hover:bg-gold transition-all shadow-xl shadow-charcoal/10 uppercase tracking-widest text-xs flex items-center gap-3"
+                    className="bg-charcoal text-white font-black px-8 py-4 rounded-xl hover:bg-gold transition-all shadow-xl shadow-charcoal/10 uppercase tracking-widest text-xs flex items-center gap-3 cursor-pointer"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
                     Add New Room
@@ -302,13 +302,13 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                             <div className="grid grid-cols-2 gap-3 mb-8">
                                 <button
                                     onClick={() => handleToggleBestSeller(room.id, room.isBestSeller || false)}
-                                    className={`px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${room.isBestSeller ? 'bg-primary/5 border-primary/20 text-primary' : 'bg-gray-50 border-transparent text-gray-400 hover:text-charcoal hover:bg-gray-100'}`}
+                                    className={`px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all cursor-pointer ${room.isBestSeller ? 'bg-primary/5 border-primary/20 text-primary' : 'bg-gray-50 border-transparent text-gray-400 hover:text-charcoal hover:bg-gray-100'}`}
                                 >
                                     {room.isBestSeller ? 'Remove Popular' : 'Set Popular'}
                                 </button>
                                 <button
                                     onClick={() => handleToggleElite(room.id, room.isElite || false)}
-                                    className={`px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${room.isElite ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-gray-50 border-transparent text-gray-400 hover:text-charcoal hover:bg-gray-100'}`}
+                                    className={`px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all cursor-pointer ${room.isElite ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-gray-50 border-transparent text-gray-400 hover:text-charcoal hover:bg-gray-100'}`}
                                 >
                                     {room.isElite ? 'Remove Pick' : 'Set Pick'}
                                 </button>
@@ -317,20 +317,20 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                             <div className="mt-auto flex gap-3 pt-6 border-t border-gray-50">
                                 <button
                                     onClick={() => onEditRoom(room)}
-                                    className="flex-1 bg-gray-50 text-charcoal font-black py-4 rounded-xl hover:bg-gray-100 transition-all uppercase tracking-widest text-[10px] border border-transparent hover:border-gray-200"
+                                    className="flex-1 bg-gray-50 text-charcoal font-black py-4 rounded-xl hover:bg-gray-100 transition-all uppercase tracking-widest text-[10px] border border-transparent hover:border-gray-200 cursor-pointer"
                                 >
                                     Edit Unit
                                 </button>
                                 <button
                                     onClick={() => handleDelete(room.id)}
-                                    className="px-5 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all border border-red-100/50"
+                                    className="px-5 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all border border-red-100/50 cursor-pointer"
                                     title="Delete Room"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
                                 <button
                                     onClick={() => setSelectedRoomDetail(room)}
-                                    className="px-5 bg-gold/10 text-gold rounded-xl hover:bg-gold hover:text-white transition-all border border-gold/20"
+                                    className="px-5 bg-gold/10 text-gold rounded-xl hover:bg-gold hover:text-white transition-all border border-gold/20 cursor-pointer"
                                     title="View Detailed Analysis"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
@@ -355,7 +355,7 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                                 setSelectedStatus('all');
                                 setSelectedTags([]);
                             }}
-                            className="mt-8 text-gold font-black uppercase tracking-widest text-[10px] hover:text-charcoal transition-colors border-b border-gold/30"
+                            className="mt-8 text-gold font-black uppercase tracking-widest text-[10px] hover:text-charcoal transition-colors border-b border-gold/30 cursor-pointer"
                         >
                             Reset all filters
                         </button>

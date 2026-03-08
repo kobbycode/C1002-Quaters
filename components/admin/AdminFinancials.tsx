@@ -60,7 +60,7 @@ export const AdminFinancials: React.FC = () => {
                 <button
                     onClick={() => ExportService.exportFinancialsToPDF(financialData, bookings, config)}
                     // Passing real financialData now!
-                    className="bg-charcoal text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-charcoal/20 flex items-center gap-2"
+                    className="bg-charcoal text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-charcoal/20 flex items-center gap-2 cursor-pointer"
                 >
                     <span className="text-lg">📄</span> Download Report
                 </button>

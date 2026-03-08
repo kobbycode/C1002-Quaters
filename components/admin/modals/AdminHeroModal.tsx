@@ -67,8 +67,8 @@ export const AdminHeroModal: React.FC<AdminHeroModalProps> = ({
                     </div>
                 </div>
                 <div className="mt-12 flex gap-4">
-                    <button onClick={onSave} className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20">Commit Chapter</button>
-                    <button onClick={() => setEditingHero(null)} className="flex-1 bg-gray-100 text-charcoal font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px]">Discard</button>
+                    <button onClick={onSave} className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20 cursor-pointer">Commit Chapter</button>
+                    <button onClick={() => setEditingHero(null)} className="flex-1 bg-gray-100 text-charcoal font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] cursor-pointer">Discard</button>
                 </div>
             </div>
         </div>

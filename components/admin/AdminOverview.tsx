@@ -247,7 +247,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                                     <button
                                         key={f}
                                         onClick={() => setRevenueDateFilter(f)}
-                                        className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${revenueDateFilter === f ? 'bg-white text-gold shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
+                                        className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${revenueDateFilter === f ? 'bg-white text-gold shadow-sm' : 'text-gray-400 hover:text-charcoal'}`}
                                     >
                                         {f === '7d' ? 'Week' : f === '30d' ? 'Month' : 'Quarter'}
                                     </button>
@@ -456,7 +456,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                             <div className="w-1.5 h-6 bg-charcoal rounded-full" />
                             <h3 className="text-2xl font-black font-serif text-charcoal">Pulse Activity Feed</h3>
                         </div>
-                        <button onClick={() => setActiveTab('activity')} className="text-[10px] font-black uppercase text-gold hover:underline tracking-widest">
+                        <button onClick={() => setActiveTab('activity')} className="text-[10px] font-black uppercase text-gold hover:underline tracking-widest cursor-pointer">
                             Command Center
                         </button>
                     </div>

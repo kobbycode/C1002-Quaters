@@ -41,8 +41,8 @@ export const AdminNavModal: React.FC<AdminNavModalProps> = ({
                     </div>
                 </div>
                 <div className="mt-12 flex gap-4">
-                    <button onClick={onSave} className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all">Update Array</button>
-                    <button onClick={() => setEditingNav(null)} className="flex-1 bg-gray-100 text-charcoal font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px]">Close</button>
+                    <button onClick={onSave} className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all cursor-pointer">Update Array</button>
+                    <button onClick={() => setEditingNav(null)} className="flex-1 bg-gray-100 text-charcoal font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] cursor-pointer">Close</button>
                 </div>
             </div>
         </div>

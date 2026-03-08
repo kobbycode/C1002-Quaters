@@ -84,7 +84,7 @@ export const AdminNewsletter: React.FC<AdminNewsletterProps> = ({ config, update
                         {subscribers.length > 0 && (
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="bg-primary text-white font-black px-6 py-3 rounded-xl hover:bg-[#6B006B] transition-all shadow-lg shadow-primary/10 uppercase tracking-widest text-[10px] flex items-center justify-center gap-3"
+                                className="bg-primary text-white font-black px-6 py-3 rounded-xl hover:bg-[#6B006B] transition-all shadow-lg shadow-primary/10 uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 cursor-pointer"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                                 Broadcast
@@ -94,7 +94,7 @@ export const AdminNewsletter: React.FC<AdminNewsletterProps> = ({ config, update
                         {subscribers.length > 0 && (
                             <button
                                 onClick={handleExportCsv}
-                                className="bg-charcoal text-white font-black px-6 py-3 rounded-xl hover:bg-gold transition-all shadow-lg shadow-charcoal/10 uppercase tracking-widest text-[10px] flex items-center justify-center gap-3"
+                                className="bg-charcoal text-white font-black px-6 py-3 rounded-xl hover:bg-gold transition-all shadow-lg shadow-charcoal/10 uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 cursor-pointer"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -130,7 +130,7 @@ export const AdminNewsletter: React.FC<AdminNewsletterProps> = ({ config, update
                             </div>
                             <button
                                 onClick={() => handleRemoveSubscriber(email)}
-                                className="opacity-0 group-hover:opacity-100 absolute -top-2 -right-2 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-lg border border-red-100"
+                                className="opacity-0 group-hover:opacity-100 absolute -top-2 -right-2 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-lg border border-red-100 cursor-pointer"
                                 title="Remove Patron"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

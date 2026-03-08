@@ -118,7 +118,7 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                                             : [...currentTags, tag];
                                         setEditingRoom({ ...editingRoom, tags: newTags });
                                     }}
-                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${(editingRoom.tags || []).includes(tag)
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${(editingRoom.tags || []).includes(tag)
                                         ? 'bg-gold text-white shadow-lg shadow-gold/20'
                                         : 'bg-gray-50 text-gray-400 border border-gray-100 hover:border-gold/30'
                                         }`}
@@ -213,7 +213,7 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                             <button
                                 type="button"
                                 onClick={() => setEditingRoom({ ...editingRoom, size: (editingRoom.size || '') + '²' })}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-100 w-8 h-8 rounded-lg text-xs font-bold text-gold hover:border-gold transition-all"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-100 w-8 h-8 rounded-lg text-xs font-bold text-gold hover:border-gold transition-all cursor-pointer"
                                 title="Insert squared symbol"
                             >
                                 ²
@@ -279,7 +279,7 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                                             </span>
                                         )}
                                         {amenity}
-                                        <button onClick={() => removeAmenity(amenity)} className="hover:scale-125 transition-transform">
+                                        <button onClick={() => removeAmenity(amenity)} className="hover:scale-125 transition-transform cursor-pointer">
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
                                         </button>
                                     </span>
@@ -297,7 +297,7 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                                         <button
                                             key={a}
                                             onClick={() => setEditingRoom({ ...editingRoom, amenities: [...(editingRoom.amenities || []), a] })}
-                                            className="px-3 py-1.5 rounded-lg bg-white border border-gray-100 text-[10px] font-bold text-charcoal hover:border-gold hover:text-gold transition-all"
+                                            className="px-3 py-1.5 rounded-lg bg-white border border-gray-100 text-[10px] font-bold text-charcoal hover:border-gold hover:text-gold transition-all cursor-pointer"
                                         >
                                             + {a}
                                         </button>
@@ -316,7 +316,7 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                                 />
                                 <button
                                     onClick={addAmenity}
-                                    className="bg-charcoal text-white px-8 rounded-xl text-[10px] font-black uppercase hover:bg-gold transition-all"
+                                    className="bg-charcoal text-white px-8 rounded-xl text-[10px] font-black uppercase hover:bg-gold transition-all cursor-pointer"
                                 >
                                     Add Custom
                                 </button>
@@ -344,7 +344,7 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                                     <img src={url} className="w-full h-full object-cover" alt={`Gallery ${idx}`} />
                                     <button
                                         onClick={() => removeGalleryImage(idx)}
-                                        className="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                                     >
                                         ×
                                     </button>
@@ -365,8 +365,8 @@ export const AdminRoomModal: React.FC<AdminRoomModalProps> = ({
                 </div>
 
                 <div className="mt-12 flex gap-6">
-                    <button onClick={onSave} className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:bg-gold transition-all">Synchronize Unit Info</button>
-                    <button onClick={() => setEditingRoom(null)} className="flex-1 bg-gray-100 text-charcoal font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px]">Discard</button>
+                    <button onClick={onSave} className="flex-1 bg-charcoal text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:bg-gold transition-all cursor-pointer">Synchronize Unit Info</button>
+                    <button onClick={() => setEditingRoom(null)} className="flex-1 bg-gray-100 text-charcoal font-black py-6 rounded-2xl uppercase tracking-[0.2em] text-[10px] cursor-pointer">Discard</button>
                 </div>
             </div>
         </div>

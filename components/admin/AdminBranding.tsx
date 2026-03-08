@@ -67,7 +67,7 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                 </div>
                                 <button
                                     onClick={() => updateConfig({ ...config, brand: { ...(config.brand || {}), darkMode: !config.brand?.darkMode } })}
-                                    className={`w-14 h-8 rounded-full transition-all relative ${config.brand?.darkMode ? 'bg-gold' : 'bg-gray-200'}`}
+                                    className={`w-14 h-8 rounded-full transition-all relative cursor-pointer ${config.brand?.darkMode ? 'bg-gold' : 'bg-gray-200'}`}
                                 >
                                     <div className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all shadow-sm ${config.brand?.darkMode ? 'left-7' : 'left-1'}`} />
                                 </button>
@@ -115,7 +115,7 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                             <button
                                                 key={color}
                                                 onClick={() => updateConfig({ ...config, brand: { ...(config.brand || {}), primaryColor: color } })}
-                                                className={`w-8 h-8 rounded-lg color-swatch ${config.brand?.primaryColor === color ? 'selected ring-2 ring-offset-2 ring-gray-300' : ''}`}
+                                                className={`w-8 h-8 rounded-lg color-swatch cursor-pointer ${config.brand?.primaryColor === color ? 'selected ring-2 ring-offset-2 ring-gray-300' : ''}`}
                                                 style={{ backgroundColor: color }}
                                             />
                                         ))}
@@ -155,7 +155,7 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                                             <button
                                                 key={color}
                                                 onClick={() => updateConfig({ ...config, brand: { ...(config.brand || {}), accentColor: color } })}
-                                                className={`w-8 h-8 rounded-lg color-swatch ${config.brand?.accentColor === color ? 'selected ring-2 ring-offset-2 ring-gray-300' : ''}`}
+                                                className={`w-8 h-8 rounded-lg color-swatch cursor-pointer ${config.brand?.accentColor === color ? 'selected ring-2 ring-offset-2 ring-gray-300' : ''}`}
                                                 style={{ backgroundColor: color }}
                                             />
                                         ))}
@@ -282,7 +282,7 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({
                         </div>
 
                         {/* CTA Preview */}
-                        <button className="w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] text-white shadow-2xl transition-all" style={{ backgroundColor: config.brand.primaryColor }}>
+                        <button className="w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] text-white shadow-2xl transition-all cursor-pointer" style={{ backgroundColor: config.brand.primaryColor }}>
                             Sample Call to Action
                         </button>
                     </div>

@@ -184,7 +184,7 @@ export const AdminBookingModal: React.FC<AdminBookingModalProps> = ({
                                 <button
                                     onClick={() => handleUpdate({ adminNotes: localNotes })}
                                     disabled={isSaving}
-                                    className="text-[9px] font-black uppercase text-primary hover:underline"
+                                    className="text-[9px] font-black uppercase text-primary hover:underline cursor-pointer"
                                 >
                                     Save Notes
                                 </button>
@@ -201,7 +201,7 @@ export const AdminBookingModal: React.FC<AdminBookingModalProps> = ({
                     {/* Action Button */}
                     <button
                         onClick={() => setViewingBooking(null)}
-                        className="w-full bg-charcoal text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20"
+                        className="w-full bg-charcoal text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-[10px] hover:bg-gold transition-all shadow-xl shadow-charcoal/20 cursor-pointer"
                     >
                         Close Details
                     </button>
