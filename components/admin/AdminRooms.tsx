@@ -179,7 +179,7 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                             onClick={handleToggleSelectAll}
                             className="bg-gray-50 text-charcoal font-black px-6 py-4 rounded-xl hover:bg-gray-100 transition-all uppercase tracking-widest text-[10px] flex items-center gap-3 cursor-pointer"
                         >
-                            <div className={`w - 5 h - 5 rounded border - 2 flex items - center justify - center transition - all ${selectedIds.length === filteredRooms.length ? 'bg-gold border-gold' : 'border-gray-200 bg-white'} `}>
+                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedIds.length === filteredRooms.length ? 'bg-gold border-gold' : 'border-gray-200 bg-white'}`}>
                                 {selectedIds.length === filteredRooms.length && (
                                     <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                                 )}
@@ -312,14 +312,14 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
             {/* Room Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredRooms.map((room) => (
-                    <div key={room.id} className={`group bg - white rounded - [2.5rem] overflow - hidden border transition - all duration - 500 flex flex - col hover: -translate - y - 2 relative ${selectedIds.includes(room.id) ? 'border-gold ring-4 ring-gold/10' : 'border-gray-100 shadow-sm hover:shadow-2xl'} `}>
+                    <div key={room.id} className={`group bg-white rounded-[2.5rem] overflow-hidden border transition-all duration-500 flex flex-col hover:-translate-y-2 relative ${selectedIds.includes(room.id) ? 'border-gold ring-4 ring-gold/10' : 'border-gray-100 shadow-sm hover:shadow-2xl'}`}>
                         {/* Checkbox Overlay */}
                         <div
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleToggleSelect(room.id);
                             }}
-                            className={`absolute top - 6 left - 6 z - 20 w - 8 h - 8 rounded - xl border - 2 flex items - center justify - center transition - all cursor - pointer backdrop - blur - md ${selectedIds.includes(room.id) ? 'bg-gold border-gold scale-110' : 'bg-black/20 border-white/40 hover:border-white'} `}
+                            className={`absolute top-6 left-6 z-20 w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all cursor-pointer backdrop-blur-md ${selectedIds.includes(room.id) ? 'bg-gold border-gold scale-110' : 'bg-black/20 border-white/40 hover:border-white'}`}
                         >
                             {selectedIds.includes(room.id) && (
                                 <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
@@ -420,13 +420,13 @@ export const AdminRooms: React.FC<AdminRoomsProps> = ({ onEditRoom, onOpenAddRoo
                             <div className="grid grid-cols-2 gap-3 mb-8">
                                 <button
                                     onClick={() => handleToggleBestSeller(room.id, room.isBestSeller || false)}
-                                    className={`px - 4 py - 3 rounded - xl text - [9px] font - black uppercase tracking - widest border transition - all cursor - pointer ${room.isBestSeller ? 'bg-primary/5 border-primary/20 text-primary' : 'bg-gray-50 border-transparent text-gray-400 hover:text-charcoal hover:bg-gray-100'} `}
+                                    className={`px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all cursor-pointer ${room.isBestSeller ? 'bg-primary/5 border-primary/20 text-primary' : 'bg-gray-50 border-transparent text-gray-400 hover:text-charcoal hover:bg-gray-100'}`}
                                 >
                                     {room.isBestSeller ? 'Remove Popular' : 'Set Popular'}
                                 </button>
                                 <button
                                     onClick={() => handleToggleElite(room.id, room.isElite || false)}
-                                    className={`px - 4 py - 3 rounded - xl text - [9px] font - black uppercase tracking - widest border transition - all cursor - pointer ${room.isElite ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-gray-50 border-transparent text-gray-400 hover:text-charcoal hover:bg-gray-100'} `}
+                                    className={`px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all cursor-pointer ${room.isElite ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-gray-50 border-transparent text-gray-400 hover:text-charcoal hover:bg-gray-100'}`}
                                 >
                                     {room.isElite ? 'Remove Pick' : 'Set Pick'}
                                 </button>
